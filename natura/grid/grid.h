@@ -2,6 +2,7 @@
 
 #include "icg_helper.h"
 #include <glm/gtc/type_ptr.hpp>
+#include <cstdint>
 
 class Grid {
 
@@ -13,16 +14,34 @@ private:
     GLuint texture_id_;                     // texture ID
     GLuint num_indices_;                    // number of vertices to render
     GLuint MVP_id_;                         // model, view, proj matrix ID
-    int mSideNbPoints;                     // grids side X nb of vertices;
+    uint32_t mSideNbPoints;                      // grids side X nb of vertices;
+    bool mCleanedUp;                        // check if the grid is cleaned before its destruction.
 
 public:
 
-    Grid(int sideSize){
+    Grid(uint32_t sideSize){
         mSideNbPoints = sideSize;
-        Init();
+        mCleanedUp = true;
+    }
+
+    ~Grid(){
+        if (!mCleanedUp)
+            Cleanup();
+    }
+
+    void Cleanup() {
+        mCleanedUp = true;
+        glBindVertexArray(0);
+        glUseProgram(0);
+        glDeleteBuffers(1, &vertex_buffer_object_position_);
+        glDeleteBuffers(1, &vertex_buffer_object_index_);
+        glDeleteVertexArrays(1, &vertex_array_id_);
+        glDeleteProgram(program_id_);
+        glDeleteTextures(1, &texture_id_);
     }
 
     void Init() {
+        mCleanedUp = false; // Until the next Cleanup() call ...
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
                                               "grid_fshader.glsl");
@@ -113,15 +132,6 @@ public:
         glUseProgram(0);
     }
 
-    void Cleanup() {
-        glBindVertexArray(0);
-        glUseProgram(0);
-        glDeleteBuffers(1, &vertex_buffer_object_position_);
-        glDeleteBuffers(1, &vertex_buffer_object_index_);
-        glDeleteVertexArrays(1, &vertex_array_id_);
-        glDeleteProgram(program_id_);
-        glDeleteTextures(1, &texture_id_);
-    }
 
     void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
