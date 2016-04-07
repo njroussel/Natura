@@ -40,7 +40,8 @@ public:
         glDeleteTextures(1, &texture_id_);
     }
 
-    void Init() {
+    void Init(int texture_) {
+        texture_id_ = texture_;
         mCleanedUp = false; // Until the next Cleanup() call ...
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
@@ -61,8 +62,8 @@ public:
             std::vector<GLuint> indices;
             // always two subsequent entries in 'vertices' form a 2D vertex position.
 
-            // the given code below are the vertices for a simple quad.
-            // your grid should have the same dimension as that quad, i.e.,
+            // the given code below are the vertices for a simple perlin_quad.
+            // your grid should have the same dimension as that perlin_quad, i.e.,
             // reach from [-1, -1] to [1, 1].
 
             float sideX = 1 / float(mSideNbPoints);
@@ -109,19 +110,20 @@ public:
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
 
-        // create 1D texture (colormap)
+
+
+        // load texture
         {
-            const int ColormapSize = 2;
-            GLfloat tex[3 * ColormapSize] = {0.0, 0.2, 0.45, 158.0f / 255.0f, 181.0f / 255.0f, 210.0f / 255.0f};
-            glGenTextures(1, &texture_id_);
-            glBindTexture(GL_TEXTURE_1D, texture_id_);
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, ColormapSize, 0, GL_RGB, GL_FLOAT, tex);
-            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            GLuint tex_id = glGetUniformLocation(program_id_, "colormap");
-            glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
-            // check_error_gl();
+            //glGenTextures(1, &texture_id_);
+            glBindTexture(GL_TEXTURE_2D, texture_id_);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+            GLuint tex_id_2 = glGetUniformLocation(program_id_, "tex");
+            glUniform1i(tex_id_2, 0 /*GL_TEXTURE0*/);
+
+            // cleanup
+            glBindTexture(GL_TEXTURE_2D, 0);
         }
 
         // other uniforms
@@ -145,6 +147,9 @@ public:
 
         // pass the current time stamp to the shader.
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture_id_);
 
         // draw
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

@@ -2,7 +2,7 @@
 #include "icg_helper.h"
 #include "glm/gtc/type_ptr.hpp"
 
-class Quad {
+class PerlinQuad {
 
     private:
         GLuint vertex_array_id_;        // vertex array object
@@ -14,8 +14,8 @@ class Quad {
     public:
         void Init() {
             // compile the shaders
-            program_id_ = icg_helper::LoadShaders("quad_vshader.glsl",
-                                                  "quad_fshader.glsl");
+            program_id_ = icg_helper::LoadShaders("perlin_quad_vshader.glsl",
+                                                  "perlin_quad_fshader.glsl");
             if(!program_id_) {
                 exit(EXIT_FAILURE);
             }

@@ -39,7 +39,7 @@ float wave_h(float x, float y) {
 }
 void main() {
     fill_params();
-    uv = (position + vec2(1.0, 1.0)) * 0.5;
+    uv = position;
 
     float height = wave_h(uv[0], uv[1]);
     height_ = height;

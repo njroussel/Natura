@@ -9,14 +9,14 @@
 #include "terrain/terrain.h"
 #include "trackball.h"
 #include "framebuffer.h"
-#include "quad/quad.h"
+#include "perlin_quad/perlin_quad.h"
+#include "perlin_noise/perlinnoise.h"
 
-Quad quad;
-FrameBuffer perlinNoise;
 Terrain terrain(512);
 
 int window_width = 800;
 int window_height = 600;
+PerlinNoise perlinNoise(window_width, window_height);
 
 using namespace glm;
 
@@ -65,8 +65,6 @@ void Init() {
     // sets background color
     glClearColor(0.937, 0.937, 0.937 /*gray*/, 1.0 /*solid*/);
 
-    GLuint perlin_tex = perlinNoise.Init(window_width, window_height);
-    //quad.Init(perlin_tex);
 
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
@@ -80,9 +78,8 @@ void Init() {
 
     grid_model_matrix = translate(mat4(1.0f), vec3(-0.5f, -0.75f, 0.0f));
 
-    quad.Draw(projection_matrix * view_matrix);
-    terrain.Init();
-
+    int perlinNoiseTex = perlinNoise.generateNoise();
+    terrain.Init(perlinNoiseTex);
 }
 
 // gets called for every frame.
@@ -92,7 +89,7 @@ void Display() {
 
     const float time = glfwGetTime();
 
-    // draw a quad on the ground.
+    // draw a perlin_quad on the ground.
     terrain.Draw(time, trackball_matrix * grid_model_matrix, view_matrix, projection_matrix);
 }
 
@@ -231,7 +228,7 @@ int main(int argc, char *argv[]) {
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-    quad.Cleanup();
+    perlinNoise.Cleanup();
     terrain.Cleanup();
 
     // close OpenGL window and terminate GLFW

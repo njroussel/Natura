@@ -11,8 +11,8 @@ public:
         this->mSideSize = sideSize;
     }
 
-    void Init(){
-        mGrid.Init();
+    void Init(int tex){
+        mGrid.Init(tex);
     }
 
     void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
