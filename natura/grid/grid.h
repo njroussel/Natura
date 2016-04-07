@@ -3,7 +3,7 @@
 #include "icg_helper.h"
 #include <glm/gtc/type_ptr.hpp>
 
-class WaterGrid {
+class Grid {
 
 private:
     GLuint vertex_array_id_;                // vertex array object
@@ -17,8 +17,8 @@ private:
 public:
     void Init() {
         // compile the shaders.
-        program_id_ = icg_helper::LoadShaders("water_grid_vshader.glsl",
-                                              "water_grid_fshader.glsl");
+        program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
+                                              "grid_fshader.glsl");
         if (!program_id_) {
             exit(EXIT_FAILURE);
         }
@@ -33,26 +33,12 @@ public:
         {
             std::vector<GLfloat> vertices;
             std::vector<GLuint> indices;
-            // TODO 5: make a triangle grid with dimension 100x100.
             // always two subsequent entries in 'vertices' form a 2D vertex position.
-            int grid_dim = 100;
+            int grid_dim = 512;
 
             // the given code below are the vertices for a simple quad.
             // your grid should have the same dimension as that quad, i.e.,
             // reach from [-1, -1] to [1, 1].
-
-            /*
-            // vertex position of the triangles.
-            vertices.push_back(-1.0f); vertices.push_back( 1.0f);
-            vertices.push_back( 1.0f); vertices.push_back( 1.0f);
-            vertices.push_back( 1.0f); vertices.push_back(-1.0f);
-            vertices.push_back(-1.0f); vertices.push_back(-1.0f);
-
-            // and indices.
-            indices.push_back(0);
-            indices.push_back(1);
-            indices.push_back(3);
-            indices.push_back(2);*/
 
             float side = 2.0f / grid_dim;
             float offset = -1.0f;
@@ -146,11 +132,6 @@ public:
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
 
         // draw
-        // TODO 5: for debugging it can be helpful to draw only the wireframe.
-        // You can do that by uncommenting the next line.
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        // TODO 5: depending on how you set up your vertex index buffer, you
-        // might have to change GL_TRIANGLE_STRIP to GL_TRIANGLES.
         glDrawElements(GL_TRIANGLE_STRIP, num_indices_, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);

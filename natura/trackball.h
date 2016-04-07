@@ -28,14 +28,6 @@ public:
         ProjectOntoSurface(current_pos);
 
         mat4 rotation = IDENTITY_MATRIX;
-        // TODO 3: Calculate the rotation given the projections of the anocher
-        // point and the current position. The rotation axis is given by the cross
-        // product of the two projected points, and the angle between them can be
-        // used as the magnitude of the rotation.
-        // you might want to scale the rotation magnitude by a scalar factor.
-        // p.s. No need for using complicated quaternions as suggested inthe wiki
-        // article.
-       // ProjectOntoSurface(anchor_pos_);
         vec3 v1 = normalize(anchor_pos_);
         vec3 v2 = normalize(current_pos);
         vec3 axis = cross(v1, v2);
@@ -52,7 +44,6 @@ private:
     // https://www.opengl.org/wiki/Object_Mouse_Trackball.
     // The trackball radius is given by 'radius_'.
     void ProjectOntoSurface(vec3 &p) const {
-        // TODO 2: Implement this function. Read above link for details.
         float norm = sqrt(p[0] * p[0] + p[1] * p[1]);
         if (norm <= radius_ * radius_ / 2.0f) {
             p[2] = sqrt(radius_ * radius_ - (p[0] * p[0] + p[1] * p[1]));

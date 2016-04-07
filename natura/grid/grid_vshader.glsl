@@ -1,5 +1,5 @@
 #version 330
-#define PI radians(180)
+#define PI radians(180.0f)
 
 in vec2 position;
 
@@ -41,11 +41,6 @@ void main() {
     fill_params();
     uv = (position + vec2(1.0, 1.0)) * 0.5;
 
-    // convert the 2D position into 3D positions that all lay in a horizontal
-    // plane.
-    // TODO 6: animate the height of the grid points as a sine function of the
-    // 'time' and the position ('uv') within the grid.
-    // Water
     float height = wave_h(uv[0], uv[1]);
     height_ = height;
     vec3 pos_3d = vec3(position.x, height, -position.y);
