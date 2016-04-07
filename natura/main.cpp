@@ -3,12 +3,10 @@
 #include <GLFW/glfw3.h>
 
 // contains helper functions such as shader compiler
-#include "icg_helper.h"
+//#include "icg_helper.h"
 
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "grid/grid.h"
-
+#include "terrain/terrain.h"
 #include "trackball.h"
 #include "framebuffer.h"
 

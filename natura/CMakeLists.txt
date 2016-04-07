@@ -11,5 +11,5 @@ file(GLOB SHADERS
 
 deploy_shaders_to_build_dir(${SHADERS})
 
-add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS})
+add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS} terrain/terrain.h)
 target_link_libraries(${EXERCISENAME} ${COMMON_LIBS})
