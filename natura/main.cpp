@@ -68,7 +68,7 @@ void Init() {
     terrain.Init(512);
 
     GLuint perlin_tex = perlinNoise.Init(window_width, window_height);
-    quad.Init(perlin_tex);
+    //quad.Init(perlin_tex);
 
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
