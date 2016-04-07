@@ -17,10 +17,12 @@ private:
 
 public:
 
-    void Init(int sideNbPoints) {
+    Grid(int sideSize){
+        mSideNbPoints = sideSize;
+        Init();
+    }
 
-        mSideNbPoints = sideNbPoints;
-
+    void Init() {
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
                                               "grid_fshader.glsl");

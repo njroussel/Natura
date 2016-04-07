@@ -7,14 +7,12 @@
 
 class Terrain {
 public:
-    Terrain(uint32_t size_x, uint32_t size_y) : mGrid() {
-        this->size_x_ = size_x;
-        this->size_y_ = size_y;
+    Terrain(uint32_t sideSize) : mGrid(sideSize) {
+        this->mSideSize = sideSize;
     }
 
-    void Init(int gridSideSize){
-        // TODO : Init gid
-        mGrid.Init(gridSideSize);
+    void Init(){
+        mGrid.Init();
     }
 
     void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
@@ -28,8 +26,7 @@ public:
     }
 
 private:
-    uint32_t size_x_;
-    uint32_t size_y_;
+    uint32_t mSideSize;
     Grid mGrid;
 };
 
