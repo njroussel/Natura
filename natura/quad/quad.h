@@ -10,6 +10,7 @@ class Quad {
         GLuint vertex_buffer_object_;   // memory buffer
         GLuint texture_id_;             // texture ID
 
+
     public:
         void Init() {
             // compile the shaders
