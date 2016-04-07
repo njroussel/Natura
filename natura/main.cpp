@@ -10,7 +10,7 @@
 #include "trackball.h"
 #include "framebuffer.h"
 
-Grid grid;
+Terrain terrain(521, 512);
 
 int window_width = 800;
 int window_height = 600;
@@ -63,7 +63,7 @@ void Init() {
     // sets background color
     glClearColor(0.937, 0.937, 0.937 /*gray*/, 1.0 /*solid*/);
 
-    grid.Init(512);
+    terrain.Init(512);
 
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
@@ -85,7 +85,7 @@ void Display() {
     const float time = glfwGetTime();
 
     // draw a quad on the ground.
-    grid.Draw(time, trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
+    terrain.Draw(time, trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -224,7 +224,7 @@ int main(int argc, char *argv[]) {
         glfwPollEvents();
     }
 
-    grid.Cleanup();
+    terrain.Cleanup();
 
     // close OpenGL window and terminate GLFW
     glfwDestroyWindow(window);

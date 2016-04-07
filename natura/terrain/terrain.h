@@ -12,15 +12,19 @@ public:
         this->size_y_ = size_y;
     }
 
-    void Init(){
+    void Init(int gridSideSize){
         // TODO : Init gid
-        mGrid.Init();
+        mGrid.Init(gridSideSize);
     }
 
     void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         mGrid.Draw(time, model, view, projection);
+    }
+
+    void Cleanup(){
+        mGrid.Cleanup();
     }
 
 private:
