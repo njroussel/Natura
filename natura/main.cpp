@@ -69,27 +69,26 @@ void Init() {
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
 
-    view_matrix = LookAt(vec3(2.0f, 2.0f, 4.0f),
-                         vec3(0.0f, 0.0f, 0.0f),
-                         vec3(0.0f, 1.0f, 0.0f));
     view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
 
+    old_trackball_matrix = IDENTITY_MATRIX;
     trackball_matrix = IDENTITY_MATRIX;
 
-    grid_model_matrix = translate(mat4(1.0f), vec3(-0.5f, -0.75f, 0.0f));
+    grid_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
+    grid_model_matrix = translate(grid_model_matrix, vec3(-1.0f, 0.0f, +1.0f));
+    grid_model_matrix = scale(grid_model_matrix, vec3(2.0, 1.0, 2.0f));
 
     int perlinNoiseTex = perlinNoise.generateNoise();
     terrain.Init(perlinNoiseTex);
 }
 
-// gets called for every frame.
+// gets called for every frame.grid_model_matrix
 void Display() {
    // glViewport(0,0,window_width,window_height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const float time = glfwGetTime();
 
-    // draw a perlin_quad on the ground.
     terrain.Draw(time, trackball_matrix * grid_model_matrix, view_matrix, projection_matrix);
 }
 

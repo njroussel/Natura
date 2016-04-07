@@ -40,7 +40,7 @@ public:
         glDeleteTextures(1, &texture_id_);
     }
 
-    void Init(int texture_) {
+    void Init(GLuint texture_) {
         texture_id_ = texture_;
         mCleanedUp = false; // Until the next Cleanup() call ...
         // compile the shaders.
@@ -60,11 +60,6 @@ public:
         {
             std::vector<GLfloat> vertices;
             std::vector<GLuint> indices;
-            // always two subsequent entries in 'vertices' form a 2D vertex position.
-
-            // the given code below are the vertices for a simple perlin_quad.
-            // your grid should have the same dimension as that perlin_quad, i.e.,
-            // reach from [-1, -1] to [1, 1].
 
             float sideX = 1 / float(mSideNbPoints);
 
@@ -111,10 +106,8 @@ public:
         }
 
 
-
         // load texture
         {
-            //glGenTextures(1, &texture_id_);
             glBindTexture(GL_TEXTURE_2D, texture_id_);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -144,9 +137,6 @@ public:
         // setup MVP
         glm::mat4 MVP = projection * view * model;
         glUniformMatrix4fv(MVP_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(MVP));
-
-        // pass the current time stamp to the shader.
-        glUniform1f(glGetUniformLocation(program_id_, "time"), time);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_id_);

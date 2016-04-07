@@ -1,5 +1,4 @@
-#ifndef NATURA_TERRAIN_H
-#define NATURA_TERRAIN_H
+#pragma once
 
 #include <cstdint>
 #include "../grid/grid.h"
@@ -8,7 +7,6 @@
 class Terrain {
 public:
     Terrain(uint32_t sideSize) : mGrid(sideSize) {
-        this->mSideSize = sideSize;
     }
 
     void Init(int tex){
@@ -26,9 +24,5 @@ public:
     }
 
 private:
-    uint32_t mSideSize;
     Grid mGrid;
 };
-
-
-#endif //NATURA_TERRAIN_H
