@@ -62,7 +62,7 @@ mat4 LookAt(vec3 eye, vec3 center, vec3 up) {
 }
 
 void Init() {
-    // sets background color
+    // sets background color b
     glClearColor(0.937, 0.937, 0.937 /*gray*/, 1.0 /*solid*/);
 
 
@@ -84,7 +84,7 @@ void Init() {
 
 // gets called for every frame.grid_model_matrix
 void Display() {
-   // glViewport(0,0,window_width,window_height);
+    glViewport(0,0,window_width,window_height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const float time = glfwGetTime();
@@ -146,11 +146,10 @@ void SetupProjection(GLFWwindow *window, int width, int height) {
     cout << "Window has been resized to "
     << window_width << "x" << window_height << "." << endl;
 
-    glViewport(0, 0, window_width, window_height);
-
-    projection_matrix = PerspectiveProjection(45.0f,
-                                              (GLfloat) window_width / window_height,
+    projection_matrix = PerspectiveProjection(45.0f, (GLfloat) window_width / window_height,
                                               0.1f, 100.0f);
+    glViewport(0, 0, window_width, window_height);
+    perlinNoise.refreshNoise(window_width, window_height);
 }
 
 void ErrorCallback(int error, const char *description) {

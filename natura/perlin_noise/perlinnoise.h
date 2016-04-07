@@ -5,12 +5,12 @@
 class PerlinNoise {
 
 public:
-    PerlinNoise(uint32_t width, uint32_t height){
+    PerlinNoise(uint32_t width, uint32_t height) {
         mWidth = width;
         mHeight = height;
     }
 
-    int generateNoise(){
+    int generateNoise() {
         quad.Init();
         int tex = frameBuffer.Init(mWidth, mHeight);
         frameBuffer.Bind();
@@ -20,13 +20,21 @@ public:
         return tex;
     }
 
-    void Cleanup(){
+    void refreshNoise(uint32_t width, uint32_t height) {
+        mWidth = width;
+        mHeight = height;
         frameBuffer.Cleanup();
-        quad.Cleanup();
+        frameBuffer.Init(width, height);
+
+        frameBuffer.Bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        quad.Draw(IDENTITY_MATRIX);
+        frameBuffer.Unbind();
     }
 
-    void Draw(mat4 MVP){
-        quad.Draw(MVP);
+    void Cleanup() {
+        frameBuffer.Cleanup();
+        quad.Cleanup();
     }
 
 private:
