@@ -6,8 +6,8 @@ file(GLOB_RECURSE HEADERS "*.h")
 # list all the files you want to copy everytime
 # you build (ie, you want the shaders there)
 file(GLOB SHADERS
-        grid/grid_fshader.glsl
-        grid/grid_vshader.glsl)
+        grid/*.glsl
+        quad/*.glsl)
 
 deploy_shaders_to_build_dir(${SHADERS})
 

@@ -9,6 +9,7 @@
 #include "terrain/terrain.h"
 #include "trackball.h"
 #include "framebuffer.h"
+#include "quad/quad.h"
 
 Terrain terrain(521, 512);
 

@@ -135,7 +135,7 @@ public:
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
 
         // draw
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawElements(GL_TRIANGLE_STRIP, num_indices_, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
