@@ -11,9 +11,9 @@
 #include "framebuffer.h"
 #include "quad/quad.h"
 
-Terrain terrain(521, 512);
 Quad quad;
 FrameBuffer perlinNoise;
+Terrain terrain(512);
 
 int window_width = 800;
 int window_height = 600;
@@ -65,8 +65,6 @@ void Init() {
     // sets background color
     glClearColor(0.937, 0.937, 0.937 /*gray*/, 1.0 /*solid*/);
 
-    terrain.Init(512);
-
     GLuint perlin_tex = perlinNoise.Init(window_width, window_height);
     //quad.Init(perlin_tex);
 
@@ -83,6 +81,8 @@ void Init() {
     grid_model_matrix = translate(mat4(1.0f), vec3(-0.5f, -0.75f, 0.0f));
 
     quad.Draw(projection_matrix * view_matrix);
+    terrain.Init();
+
 }
 
 // gets called for every frame.
