@@ -12,6 +12,7 @@
 #include "quad/quad.h"
 
 Terrain terrain(521, 512);
+Quad quad;
 
 int window_width = 800;
 int window_height = 600;
@@ -22,8 +23,7 @@ mat4 projection_matrix;
 mat4 view_matrix;
 mat4 trackball_matrix;
 mat4 old_trackball_matrix;
-mat4 cube_scale;
-mat4 quad_model_matrix;
+mat4 grid_model_matrix;
 
 Trackball trackball;
 
@@ -65,6 +65,7 @@ void Init() {
     glClearColor(0.937, 0.937, 0.937 /*gray*/, 1.0 /*solid*/);
 
     terrain.Init(512);
+    quad.Init();
 
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
@@ -76,17 +77,19 @@ void Init() {
 
     trackball_matrix = IDENTITY_MATRIX;
 
-    quad_model_matrix = translate(mat4(1.0f), vec3(-0.5f, -0.5f, 0.0f));
+    grid_model_matrix = translate(mat4(1.0f), vec3(-0.5f, -0.75f, 0.0f));
+    quad.Draw(projection_matrix * view_matrix);
 }
 
 // gets called for every frame.
 void Display() {
+   // glViewport(0,0,window_width,window_height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     const float time = glfwGetTime();
 
     // draw a quad on the ground.
-    terrain.Draw(time, trackball_matrix * quad_model_matrix, view_matrix, projection_matrix);
+    terrain.Draw(time, trackball_matrix * grid_model_matrix, view_matrix, projection_matrix);
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -224,7 +227,7 @@ int main(int argc, char *argv[]) {
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
+    quad.Cleanup();
     terrain.Cleanup();
 
     // close OpenGL window and terminate GLFW
