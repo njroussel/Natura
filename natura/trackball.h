@@ -54,5 +54,4 @@ private:
 
     float radius_;
     vec3 anchor_pos_;
-    mat4 rotation_;
 };
