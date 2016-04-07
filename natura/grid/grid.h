@@ -13,9 +13,13 @@ private:
     GLuint texture_id_;                     // texture ID
     GLuint num_indices_;                    // number of vertices to render
     GLuint MVP_id_;                         // model, view, proj matrix ID
+    int mGridSideSize;                      // grids side size
 
 public:
-    void Init() {
+    void Init(int gridSideSize) {
+
+        mGridSideSize = gridSideSize;
+
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
                                               "grid_fshader.glsl");
@@ -34,7 +38,7 @@ public:
             std::vector<GLfloat> vertices;
             std::vector<GLuint> indices;
             // always two subsequent entries in 'vertices' form a 2D vertex position.
-            int grid_dim = 512;
+            int grid_dim = mGridSideSize;
 
             // the given code below are the vertices for a simple quad.
             // your grid should have the same dimension as that quad, i.e.,
@@ -50,16 +54,16 @@ public:
                 }
             }
 
-            for (unsigned int j = 0; j < grid_dim -1; j++) {
-                if(j %2 == 0) {
+            for (unsigned int j = 0; j < grid_dim - 1; j++) {
+                if (j % 2 == 0) {
                     for (int i = 0; i < grid_dim; i++) {
-                        indices.push_back(grid_dim*j + i);
-                        indices.push_back(grid_dim*j + i + grid_dim);
+                        indices.push_back(grid_dim * j + i);
+                        indices.push_back(grid_dim * j + i + grid_dim);
                     }
-                } else{
-                    for (int i = grid_dim -1; i >= 0; i--) {
-                        indices.push_back(grid_dim*j + i);
-                        indices.push_back(grid_dim*j + i + grid_dim);
+                } else {
+                    for (int i = grid_dim - 1; i >= 0; i--) {
+                        indices.push_back(grid_dim * j + i);
+                        indices.push_back(grid_dim * j + i + grid_dim);
                     }
                 }
             }
@@ -88,7 +92,7 @@ public:
         // create 1D texture (colormap)
         {
             const int ColormapSize = 2;
-            GLfloat tex[3 * ColormapSize] = {0.0, 0.2, 0.45, 158.0f/255.0f, 181.0f/255.0f, 210.0f/255.0f};
+            GLfloat tex[3 * ColormapSize] = {0.0, 0.2, 0.45, 158.0f / 255.0f, 181.0f / 255.0f, 210.0f / 255.0f};
             glGenTextures(1, &texture_id_);
             glBindTexture(GL_TEXTURE_1D, texture_id_);
             glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, ColormapSize, 0, GL_RGB, GL_FLOAT, tex);
