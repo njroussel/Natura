@@ -3,7 +3,7 @@
 #include "icg_helper.h"
 #include <glm/gtc/type_ptr.hpp>
 
-class Grid {
+class WaterGrid {
 
 private:
     GLuint vertex_array_id_;                // vertex array object
@@ -17,8 +17,8 @@ private:
 public:
     void Init() {
         // compile the shaders.
-        program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
-                                              "grid_fshader.glsl");
+        program_id_ = icg_helper::LoadShaders("water_grid_vshader.glsl",
+                                              "water_grid_fshader.glsl");
         if (!program_id_) {
             exit(EXIT_FAILURE);
         }
@@ -41,6 +41,18 @@ public:
             // your grid should have the same dimension as that quad, i.e.,
             // reach from [-1, -1] to [1, 1].
 
+            /*
+            // vertex position of the triangles.
+            vertices.push_back(-1.0f); vertices.push_back( 1.0f);
+            vertices.push_back( 1.0f); vertices.push_back( 1.0f);
+            vertices.push_back( 1.0f); vertices.push_back(-1.0f);
+            vertices.push_back(-1.0f); vertices.push_back(-1.0f);
+
+            // and indices.
+            indices.push_back(0);
+            indices.push_back(1);
+            indices.push_back(3);
+            indices.push_back(2);*/
 
             float side = 2.0f / grid_dim;
             float offset = -1.0f;
@@ -87,40 +99,19 @@ public:
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
 
-        // load texture
+        // create 1D texture (colormap)
         {
-            int width;
-            int height;
-            int nb_component;
-            string filename = "grid_texture.tga";
-            // set stb_image to have the same coordinates as OpenGL
-            stbi_set_flip_vertically_on_load(1);
-            unsigned char *image = stbi_load(filename.c_str(), &width,
-                                             &height, &nb_component, 0);
-
-            if (image == nullptr) {
-                throw (string("Failed to load texture"));
-            }
-
+            const int ColormapSize = 2;
+            GLfloat tex[3 * ColormapSize] = {0.0, 0.2, 0.45, 158.0f/255.0f, 181.0f/255.0f, 210.0f/255.0f};
             glGenTextures(1, &texture_id_);
-            glBindTexture(GL_TEXTURE_2D, texture_id_);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-            if (nb_component == 3) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-                             GL_RGB, GL_UNSIGNED_BYTE, image);
-            } else if (nb_component == 4) {
-                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                             GL_RGBA, GL_UNSIGNED_BYTE, image);
-            }
-
-            GLuint tex_id = glGetUniformLocation(program_id_, "tex");
+            glBindTexture(GL_TEXTURE_1D, texture_id_);
+            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, ColormapSize, 0, GL_RGB, GL_FLOAT, tex);
+            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            GLuint tex_id = glGetUniformLocation(program_id_, "colormap");
             glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
-
-            // cleanup
-            glBindTexture(GL_TEXTURE_2D, 0);
-            stbi_image_free(image);
+            // check_error_gl();
         }
 
         // other uniforms
@@ -146,10 +137,6 @@ public:
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
-
-        // bind textures
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture_id_);
 
         // setup MVP
         glm::mat4 MVP = projection * view * model;

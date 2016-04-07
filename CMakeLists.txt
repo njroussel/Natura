@@ -5,5 +5,4 @@ project(Natura)
 include(common/icg_settings.cmake)
 
 
-# week 1
 add_subdirectory(natura)
