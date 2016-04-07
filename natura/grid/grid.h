@@ -14,7 +14,7 @@ private:
     GLuint texture_id_;                     // texture ID
     GLuint num_indices_;                    // number of vertices to render
     GLuint MVP_id_;                         // model, view, proj matrix ID
-    uint32_t mSideNbPoints;                      // grids side X nb of vertices;
+    uint32_t mSideNbPoints;                 // grids side X nb of vertices;
     bool mCleanedUp;                        // check if the grid is cleaned before its destruction.
 
 public:
