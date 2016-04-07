@@ -4,5 +4,4 @@ project(Natura)
 # load the common ICG configuration
 include(common/icg_settings.cmake)
 
-
 add_subdirectory(natura)

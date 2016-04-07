@@ -10,6 +10,7 @@
 #include "grid/grid.h"
 
 #include "trackball.h"
+#include "framebuffer.h"
 
 Grid water;
 
