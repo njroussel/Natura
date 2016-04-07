@@ -77,7 +77,7 @@ void Init() {
 
     trackball_matrix = IDENTITY_MATRIX;
 
-    quad_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
+    quad_model_matrix = translate(mat4(1.0f), vec3(-0.5f, -0.5f, 0.0f));
 }
 
 // gets called for every frame.

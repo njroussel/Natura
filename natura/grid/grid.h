@@ -13,12 +13,13 @@ private:
     GLuint texture_id_;                     // texture ID
     GLuint num_indices_;                    // number of vertices to render
     GLuint MVP_id_;                         // model, view, proj matrix ID
-    int mGridSideSize;                      // grids side size
+    int mSideNbPoints;                     // grids side X nb of vertices;
 
 public:
-    void Init(int gridSideSize) {
 
-        mGridSideSize = gridSideSize;
+    void Init(int sideNbPoints) {
+
+        mSideNbPoints = sideNbPoints;
 
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
@@ -38,32 +39,30 @@ public:
             std::vector<GLfloat> vertices;
             std::vector<GLuint> indices;
             // always two subsequent entries in 'vertices' form a 2D vertex position.
-            int grid_dim = mGridSideSize;
 
             // the given code below are the vertices for a simple quad.
             // your grid should have the same dimension as that quad, i.e.,
             // reach from [-1, -1] to [1, 1].
 
-            float side = 2.0f / grid_dim;
-            float offset = -1.0f;
+            float sideX = 1 / float(mSideNbPoints);
 
-            for (int i = 0; i < grid_dim; i++) {
-                for (int j = 0; j < grid_dim; j++) {
-                    vertices.push_back(offset + i * side);
-                    vertices.push_back(offset + j * side);
+            for (int i = 0; i < mSideNbPoints; i++) {
+                for (int j = 0; j < mSideNbPoints; j++) {
+                    vertices.push_back(i * sideX);
+                    vertices.push_back(j * sideX);
                 }
             }
 
-            for (unsigned int j = 0; j < grid_dim - 1; j++) {
+            for (unsigned int j = 0; j < mSideNbPoints - 1; j++) {
                 if (j % 2 == 0) {
-                    for (int i = 0; i < grid_dim; i++) {
-                        indices.push_back(grid_dim * j + i);
-                        indices.push_back(grid_dim * j + i + grid_dim);
+                    for (int i = 0; i < mSideNbPoints; i++) {
+                        indices.push_back(mSideNbPoints * j + i);
+                        indices.push_back(mSideNbPoints * j + i + mSideNbPoints);
                     }
                 } else {
-                    for (int i = grid_dim - 1; i >= 0; i--) {
-                        indices.push_back(grid_dim * j + i);
-                        indices.push_back(grid_dim * j + i + grid_dim);
+                    for (int i = mSideNbPoints - 1; i >= 0; i--) {
+                        indices.push_back(mSideNbPoints * j + i);
+                        indices.push_back(mSideNbPoints * j + i + mSideNbPoints);
                     }
                 }
             }
@@ -136,6 +135,7 @@ public:
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
 
         // draw
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawElements(GL_TRIANGLE_STRIP, num_indices_, GL_UNSIGNED_INT, 0);
 
         glBindVertexArray(0);
