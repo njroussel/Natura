@@ -7,5 +7,6 @@ out vec3 color;
 uniform sampler2D tex;
 
 void main() {
-    color = texture(tex, uv).bgr;
+    float componentColor = (1 + texture(tex, uv).r)/ 2.0f;
+    color = vec3(componentColor);
 }
