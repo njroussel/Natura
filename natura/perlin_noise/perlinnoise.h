@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cstdint>
+#include "../perlin_quad/perlin_quad.h"
+#include "../framebuffer.h"
 
 class PerlinNoise {
 

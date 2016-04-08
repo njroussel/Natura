@@ -13,9 +13,10 @@ public:
     // this function is called when the user presses the left mouse button down.
     // x, and y are in [-1, 1]. (-1, -1) is the bottom left corner while (1, 1)
     // is the top right corner.
-    void BeingDrag(float x, float y) {
+    void BeginDrag(float x, float y) {
         anchor_pos_ = vec3(x, y, 0.0f);
         ProjectOntoSurface(anchor_pos_);
+        old_matrix_ = matrix_;
     }
 
     // this function is called while the user moves the curser around while the
@@ -37,6 +38,14 @@ public:
         return rotation;
     }
 
+    mat4 recomputeMatrixAfterDrag(float x, float y) {
+        matrix_ = Drag(x, y) * old_matrix_;
+    }
+
+    mat4 matrix() {
+        return matrix_;
+    }
+
 private:
     // projects the point p (whose z coordiante is still empty/zero) onto the
     // trackball surface. If the position at the mouse cursor is outside the
@@ -54,4 +63,6 @@ private:
 
     float radius_;
     vec3 anchor_pos_;
+    mat4 matrix_ = IDENTITY_MATRIX;
+    mat4 old_matrix_ = IDENTITY_MATRIX;
 };
