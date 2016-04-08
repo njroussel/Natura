@@ -35,7 +35,7 @@ void Init() {
     projection = new Projection(45.0f, (GLfloat) window_width / window_height, 0.1f, 100.0f);
 
     // sets background color b
-    glClearColor(0.937, 0.937, 0.937 /*gray*/, 1.0 /*solid*/);
+    glClearColor(0.0, 0.0, 0.0 /*gray*/, 1.0 /*solid*/);
 
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
@@ -57,6 +57,7 @@ void Display() {
     const float time = glfwGetTime();
 
     terrain.Draw(time, trackball->matrix() * grid_model_matrix, view_matrix, projection->perspective());
+    //perlinNoise.Draw();
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.

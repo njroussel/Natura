@@ -50,16 +50,17 @@ const int  p[512] = int[](151,160,137,91,90,15,
 
 
 void main() {
-
-      int X =  int(floor(uv[0])) & 255;                  // FIND UNIT CUBE THAT
-      int Y =  int(floor(uv[1])) & 255;                  // CONTAINS POINT.
-      int Z =  0 & 255;                                       // CONTAINS POINT.
-      float x = uv[0] - floor(uv[0]);                                // FIND RELATIVE X,Y,Z
-      float y = uv [1] - floor(uv[1]);                                // OF POINT IN CUBE.
+      float x = (uv[0] + 0.5) * 5;
+      float y = (uv[1] + 0.5) * 5;
+      int X =  int(floor(x)) & 255;                  // FIND UNIT CUBE THAT
+      int Y =  int(floor(y)) & 255;                  // CONTAINS POINT.
+      int Z =  0 & 255;
+      x -=  floor(x);                    // FIND RELATIVE X,Y,Z
+      y -=  floor(y);                   // OF POINT IN CUBE.
       float z = 0;                                // OF POINT IN CUBE.
       float u = fade(x),                               // COMPUTE FADE CURVES
              v = fade(y),
-             w = fade(z);                           // FOR EACH OF X,Y,Z.
+             w = fade(z);                               // FOR EACH OF X,Y,Z.
       int A = p[X  ]+Y, AA = p[A]+Z, AB = p[A+1]+Z,      // HASH COORDINATES OF
           B = p[X+1]+Y, BA = p[B]+Z, BB = p[B+1]+Z;      // THE 8 CUBE CORNERS,
 

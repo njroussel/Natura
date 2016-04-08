@@ -39,6 +39,10 @@ public:
         quad.Cleanup();
     }
 
+    void Draw(){
+        quad.Draw(IDENTITY_MATRIX);
+    }
+
 private:
     uint32_t mWidth;
     uint32_t mHeight;
