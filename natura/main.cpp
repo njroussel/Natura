@@ -23,9 +23,9 @@ int window_height = 600;
 mat4 view_matrix;
 mat4 grid_model_matrix;
 
-Trackball* trackball;
+Trackball *trackball;
 PerlinNoise perlinNoise(window_width, window_height);
-Projection* projection;
+Projection *projection;
 
 //TODO : Used for zoom - cleanup
 float old_y;
