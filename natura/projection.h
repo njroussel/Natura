@@ -1,10 +1,10 @@
 #pragma once
 
-class Perspective {
+class Projection {
 
 public :
 
-    Perspective(float fovy, float aspect, float near, float far) {
+    Projection(float fovy, float aspect, float near, float far) {
         mFovy = fovy;
         mNear = near;
         mFar = far;

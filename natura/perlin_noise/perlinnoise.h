@@ -38,6 +38,7 @@ public:
         frameBuffer.Cleanup();
         quad.Cleanup();
     }
+    
 
 private:
     uint32_t mWidth;

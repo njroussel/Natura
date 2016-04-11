@@ -12,6 +12,7 @@ private:
     GLuint texture_id_;             // texture ID
 
 public:
+
     void Init() {
         // compile the shaders
         program_id_ = icg_helper::LoadShaders("perlin_quad_vshader.glsl",

@@ -9,7 +9,7 @@
 #include "terrain/terrain.h"
 #include "trackball.h"
 #include "perlin_noise/perlinnoise.h"
-#include "perspective.h"
+#include "projection.h"
 #include "keyboard.h"
 
 using namespace glm;
@@ -23,16 +23,19 @@ int window_height = 600;
 mat4 view_matrix;
 mat4 grid_model_matrix;
 
-Trackball trackball;
+Trackball *trackball;
 PerlinNoise perlinNoise(window_width, window_height);
-Perspective projection(45.0f, (GLfloat) window_width / window_height, 0.1f, 100.0f);
+Projection *projection;
 
 //TODO : Used for zoom - cleanup
 float old_y;
 
 void Init() {
+    trackball = new Trackball();
+    projection = new Projection(45.0f, (GLfloat) window_width / window_height, 0.1f, 100.0f);
+
     // sets background color b
-    glClearColor(0.937, 0.937, 0.937 /*gray*/, 1.0 /*solid*/);
+    glClearColor(0, 0, 0/*gray*/, 1.0 /*solid*/);
 
     // enable depth test.
     glEnable(GL_DEPTH_TEST);
@@ -53,7 +56,7 @@ void Display() {
 
     const float time = glfwGetTime();
 
-    terrain.Draw(time, trackball.matrix() * grid_model_matrix, view_matrix, projection.perspective());
+    terrain.Draw(time, trackball->matrix() * grid_model_matrix, view_matrix, projection->perspective());
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -72,7 +75,7 @@ void MouseButton(GLFWwindow *window, int button, int action, int mod) {
         double x_i, y_i;
         glfwGetCursorPos(window, &x_i, &y_i);
         vec2 p = TransformScreenCoords(window, x_i, y_i);
-        trackball.BeginDrag(p.x, p.y);
+        trackball->BeginDrag(p.x, p.y);
     }
 
     if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
@@ -87,7 +90,7 @@ void MouseButton(GLFWwindow *window, int button, int action, int mod) {
 void MousePos(GLFWwindow *window, double x, double y) {
     if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         vec2 p = TransformScreenCoords(window, x, y);
-        trackball.recomputeMatrixAfterDrag(p.x, p.y);
+        trackball->recomputeMatrixAfterDrag(p.x, p.y);
     }
 
     // zoom
@@ -103,7 +106,7 @@ void MousePos(GLFWwindow *window, double x, double y) {
 void resize_callback(GLFWwindow *window, int width, int height) {
     window_width = width;
     window_height = height;
-    projection.reGenerateMatrix((GLfloat) window_width / window_height);
+    projection->reGenerateMatrix((GLfloat) window_width / window_height);
     glViewport(0, 0, window_width, window_height);
     perlinNoise.refreshNoise(window_width, window_height);
 }
