@@ -6,12 +6,12 @@ class Keyboard {
 
 private :
 
-    std::map<tuple(GLFWwindow*, int, int, int, int), callback>* mKeyMap;
+    std::map<std::tuple(GLFWwindow*, int, int, int, int), callback>* mKeyMap;
 
 public:
 
     Keyboard(){
-        mKeyMap = new map<tuple(GLFWwindow*, int, int, int, int), callback>();
+        mKeyMap = new map<std::tuple(GLFWwindow*, int, int, int, int), callback>();
     }
 
     ~Keyboard(){
@@ -19,7 +19,7 @@ public:
     }
 
     void addKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods, callback function){
-        mKeyMap->insert(std::map<tuple(GLFWwindow*, int, int, int, int), callback>::value_type(tuple(window, key, scancode, action, mods), function));
+        mKeyMap->insert(std::pair<std::tuple(GLFWwindow*, int, int, int, int), callback> ((const std::tuple) std::tuple(window, key, scancode, action, mods), function));
     }
 
     void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
