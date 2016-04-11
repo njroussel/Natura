@@ -4,15 +4,6 @@
 
 class FrameBuffer {
 
-private:
-
-    int width_;
-    int height_;
-    GLuint framebuffer_object_id_;
-    GLuint depth_render_buffer_id_;
-    GLuint color_texture_id_;
-
-
 public:
     
     // warning: overrides viewport!!
@@ -89,4 +80,13 @@ public:
         glBindFramebuffer(GL_FRAMEBUFFER, 0 /*UNBIND*/);
         glDeleteFramebuffers(1, &framebuffer_object_id_);
     }
+
+private:
+
+    int width_;
+    int height_;
+    GLuint framebuffer_object_id_;
+    GLuint depth_render_buffer_id_;
+    GLuint color_texture_id_;
+
 };
