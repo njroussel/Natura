@@ -150,9 +150,13 @@ public:
                         0 /*GL_TEXTURE0*/);
 
             //temporary color texture
-            const int ColormapSize = 2;
+            const int ColormapSize = 4;
             //GLfloat tex[3 * ColormapSize] = {0.0, 0.2, 0.45, 158.0f / 255.0f, 181.0f / 255.0f, 210.0f / 255.0f};
-            GLfloat tex[3 * ColormapSize] = {0.0, 0.2, 0.45, 158.0f / 255.0f, 181.0f / 255.0f, 210.0f / 255.0f};
+            GLfloat tex[3 * ColormapSize] = {225.0f / 255.0f, 197.0f / 255.0f, 64.0f / 255.0f,
+                                             20.0f / 255.0f, 152.0f / 255.0f, 29.0f / 255.0f,
+                                             181.0f / 255.0f, 181.0f / 255.0f, 177.0f / 255.0f,
+                                             232.0f / 255.0f, 239.0f / 255.0f, 233.0f / 255.0f};
+
             glGenTextures(1, &texture_id_2_);
             glBindTexture(GL_TEXTURE_1D, texture_id_2_);
             glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, ColormapSize, 0, GL_RGB, GL_FLOAT, tex);
