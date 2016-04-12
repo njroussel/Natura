@@ -41,8 +41,9 @@ public:
     }
 
     void Init(GLuint texture_) {
-        texture_id_ = texture_;
+
         mCleanedUp = false; // Until the next Cleanup() call ...
+
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("grid_vshader.glsl",
                                               "grid_fshader.glsl");
@@ -105,19 +106,11 @@ public:
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
 
+        this->texture_id_ = texture_;
+        glBindTexture(GL_TEXTURE_2D, texture_id_);
+        glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"),
+                    0 /*GL_TEXTURE0*/);
 
-        // load texture
-        {
-            glBindTexture(GL_TEXTURE_2D, texture_id_);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-            GLuint tex_id_2 = glGetUniformLocation(program_id_, "tex");
-            glUniform1i(tex_id_2, 0 /*GL_TEXTURE0*/);
-
-            // cleanup
-            glBindTexture(GL_TEXTURE_2D, 0);
-        }
 
         // other uniforms
         MVP_id_ = glGetUniformLocation(program_id_, "MVP");
