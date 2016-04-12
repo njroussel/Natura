@@ -30,6 +30,15 @@ Projection *projection;
 //TODO : Used for zoom - cleanup
 float old_y;
 
+
+//calibration values
+float H = 0.55f;
+float lacunarity = 2.0f;
+float offset = 1.0f;
+float frequency = 0.64f;
+int octaves = 4;
+float amplitude = 0.95f;
+
 void Init() {
     trackball = new Trackball();
     projection = new Projection(45.0f, (GLfloat) window_width / window_height, 0.1f, 100.0f);
@@ -46,7 +55,7 @@ void Init() {
     grid_model_matrix = translate(grid_model_matrix, vec3(-1.0f, 0.0f, +1.0f));
     grid_model_matrix = scale(grid_model_matrix, vec3(2.0, 1.0, 2.0f));
 
-    int perlinNoiseTex = perlinNoise.generateNoise();
+    int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
     terrain.Init(perlinNoiseTex);
 }
 
@@ -56,7 +65,8 @@ void Display() {
 
     const float time = glfwGetTime();
 
-    terrain.Draw(time, trackball->matrix() * grid_model_matrix, view_matrix, projection->perspective());
+    terrain.Draw(amplitude, time, trackball->matrix() * grid_model_matrix, view_matrix, projection->perspective());
+    //perlinNoise.Draw(H);
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -108,11 +118,58 @@ void resize_callback(GLFWwindow *window, int width, int height) {
     window_height = height;
     projection->reGenerateMatrix((GLfloat) window_width / window_height);
     glViewport(0, 0, window_width, window_height);
-    perlinNoise.refreshNoise(window_width, window_height);
+    perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves);
 }
 
 void ErrorCallback(int error, const char *description) {
     fputs(description, stderr);
+}
+
+void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+    if (key == GLFW_KEY_H && action == GLFW_PRESS) {
+        H += 0.05f;
+    }
+    if (key == GLFW_KEY_N && action == GLFW_PRESS) {
+        H -= 0.05f;
+    }
+    if (key == GLFW_KEY_F && action == GLFW_PRESS) {
+        frequency += 0.1f;
+    }
+    if (key == GLFW_KEY_V && action == GLFW_PRESS) {
+        frequency -= 0.1f;
+    }
+    if (key == GLFW_KEY_O && action == GLFW_PRESS) {
+        offset += 0.05;
+    }
+    if (key == GLFW_KEY_L && action == GLFW_RELEASE) {
+        offset -= 0.05;
+    }
+    if (key == GLFW_KEY_I && action == GLFW_PRESS) {
+        lacunarity += 0.05f;
+    }
+    if (key == GLFW_KEY_K && action == GLFW_PRESS) {
+        lacunarity -= 0.05f;
+    }
+    if (key == GLFW_KEY_A && action == GLFW_PRESS) {
+        amplitude += 0.1f;
+    }
+    if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
+        amplitude -= 0.1f;
+    }
+    if ((key >= 49 && key <= 57) && action == GLFW_PRESS) {
+        octaves = key - 49;
+    }
+    cout << "H : " << H << endl;
+    cout << "Lacunarity : " << lacunarity << endl;
+    cout << "Offset : " << offset << endl;
+    cout << "Frequency : " << frequency << endl;
+    cout << "Octaves : " << octaves << endl;
+    cout << "Amplitude : " << amplitude << endl;
+    perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves);
+    //Just acces mKeyMap and call the callback function.
 }
 
 int main(int argc, char *argv[]) {
@@ -145,7 +202,7 @@ int main(int argc, char *argv[]) {
     glfwMakeContextCurrent(window);
 
     // set the callback for escape key
-    glfwSetKeyCallback(window, Keyboard::keyCallback);
+    glfwSetKeyCallback(window, keyCallback);
 
     // set the framebuffer resize callback
     glfwSetFramebufferSizeCallback(window, resize_callback);

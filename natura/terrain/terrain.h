@@ -13,10 +13,10 @@ public:
         mGrid.Init(tex);
     }
 
-    void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
+    void Draw(float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
-        mGrid.Draw(time, model, view, projection);
+        mGrid.Draw(amplitude, time, model, view, projection);
     }
 
     void Cleanup(){

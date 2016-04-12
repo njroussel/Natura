@@ -60,13 +60,20 @@ public:
         glDeleteTextures(1, &texture_id_);
     }
 
-    void Draw(const glm::mat4 &MVP) {
+    void Draw(const glm::mat4 &MVP, float H, float frequency, float lacunarity, float offset, int octaves) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
+
 
         // setup MVP
         GLuint MVP_id = glGetUniformLocation(program_id_, "MVP");
         glUniformMatrix4fv(MVP_id, 1, GL_FALSE, value_ptr(MVP));
+
+        glUniform1f(glGetUniformLocation(program_id_, "H"), H);
+        glUniform1f(glGetUniformLocation(program_id_, "lacunarity"), lacunarity);
+        glUniform1f(glGetUniformLocation(program_id_, "frequency"), frequency);
+        glUniform1f(glGetUniformLocation(program_id_, "offset"), offset);
+        glUniform1i(glGetUniformLocation(program_id_, "octaves"), octaves);
 
         // draw
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);

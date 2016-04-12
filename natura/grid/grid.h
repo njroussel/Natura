@@ -13,18 +13,20 @@ private:
     GLuint program_id_;                     // GLSL shader program ID
     GLuint texture_id_;                     // texture ID
     GLuint num_indices_;                    // number of vertices to render
-    GLuint MVP_id_;                         // model, view, proj matrix ID
+    GLuint M_id_;                           // model matrix ID
+    GLuint V_id_;                           // view matrix ID
+    GLuint P_id_;                           // proj matrix ID
     uint32_t mSideNbPoints;                 // grids side X nb of vertices;
     bool mCleanedUp;                        // check if the grid is cleaned before its destruction.
 
 public:
 
-    Grid(uint32_t sideSize){
+    Grid(uint32_t sideSize) {
         mSideNbPoints = sideSize;
         mCleanedUp = true;
     }
 
-    ~Grid(){
+    ~Grid() {
         if (!mCleanedUp)
             Cleanup();
     }
@@ -106,6 +108,29 @@ public:
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
 
+        glm::vec3 La = glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 Ld = glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 light_pos = glm::vec3(0.0f, 0.0f, 100.0f);
+
+        GLuint La_id = glGetUniformLocation(program_id_, "La");
+        GLuint Ld_id = glGetUniformLocation(program_id_, "Ld");
+        GLuint light_pos_id = glGetUniformLocation(program_id_, "light_pos");
+
+        glUniform3fv(La_id, ONE, glm::value_ptr(La));
+        glUniform3fv(Ld_id, ONE, glm::value_ptr(Ld));
+        glUniform3fv(light_pos_id, ONE, glm::value_ptr(light_pos));
+
+        glm::vec3 ka = glm::vec3(0.5f, 0.5f, 0.5f);
+        glm::vec3 kd = glm::vec3(0.5f, 0.5f, 0.5f);
+
+        GLuint ka_id = glGetUniformLocation(program_id_, "ka");
+        GLuint kd_id = glGetUniformLocation(program_id_, "kd");
+        GLuint alpha_id = glGetUniformLocation(program_id_, "alpha");
+
+        glUniform3fv(ka_id, ONE, glm::value_ptr(ka));
+        glUniform3fv(kd_id, ONE, glm::value_ptr(kd));
+
+
         this->texture_id_ = texture_;
         glBindTexture(GL_TEXTURE_2D, texture_id_);
         glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"),
@@ -113,7 +138,9 @@ public:
 
 
         // other uniforms
-        MVP_id_ = glGetUniformLocation(program_id_, "MVP");
+        M_id_ = glGetUniformLocation(program_id_, "model");
+        V_id_ = glGetUniformLocation(program_id_, "view");
+        P_id_ = glGetUniformLocation(program_id_, "projection");
 
         // to avoid the current object being polluted
         glBindVertexArray(0);
@@ -121,15 +148,17 @@ public:
     }
 
 
-    void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
+    void Draw(float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
 
-        // setup MVP
-        glm::mat4 MVP = projection * view * model;
-        glUniformMatrix4fv(MVP_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(MVP));
+        glUniform1f(glGetUniformLocation(program_id_, "amplitude"), amplitude);
+
+        glUniformMatrix4fv(M_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(model));
+        glUniformMatrix4fv(V_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(view));
+        glUniformMatrix4fv(P_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_id_);

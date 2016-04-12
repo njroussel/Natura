@@ -12,17 +12,17 @@ public:
         mHeight = height;
     }
 
-    int generateNoise() {
+    int generateNoise(float H, float frequency, float lacunarity, float offset, int octaves) {
         quad.Init();
         int tex = frameBuffer.Init(mWidth, mHeight);
         frameBuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        quad.Draw(IDENTITY_MATRIX);
+        quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves);
         frameBuffer.Unbind();
         return tex;
     }
 
-    void refreshNoise(uint32_t width, uint32_t height) {
+    void refreshNoise(uint32_t width, uint32_t height, float H, float frequency, float lacunarity, float offset, int octaves) {
         mWidth = width;
         mHeight = height;
         frameBuffer.Cleanup();
@@ -30,13 +30,17 @@ public:
 
         frameBuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        quad.Draw(IDENTITY_MATRIX);
+        quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves);
         frameBuffer.Unbind();
     }
 
     void Cleanup() {
         frameBuffer.Cleanup();
         quad.Cleanup();
+    }
+
+    void Draw(float H){
+       // quad.Draw(IDENTITY_MATRIX, H, );
     }
     
 
