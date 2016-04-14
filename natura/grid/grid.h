@@ -113,7 +113,7 @@ public:
         {
             glm::vec3 La = glm::vec3(1.0f, 1.0f, 1.0f);
             glm::vec3 Ld = glm::vec3(1.0f, 1.0f, 1.0f);
-            glm::vec3 light_pos = glm::vec3(100.0f, 100.0f, 100.0f);
+            glm::vec3 light_pos = glm::vec3(0.0f, 100.0f, 0.0f);
 
             GLuint La_id = glGetUniformLocation(program_id_, "La");
             GLuint Ld_id = glGetUniformLocation(program_id_, "Ld");
@@ -132,8 +132,6 @@ public:
 
             glUniform3fv(ka_id, ONE, glm::value_ptr(ka));
             glUniform3fv(kd_id, ONE, glm::value_ptr(kd));
-
-
 
             // other uniforms
             M_id_ = glGetUniformLocation(program_id_, "model");
@@ -168,6 +166,7 @@ public:
             // check_error_gl();
 
         }
+
         // to avoid the current object being polluted
         glBindVertexArray(0);
         glUseProgram(0);
