@@ -22,16 +22,17 @@ public:
         return tex;
     }
 
-    void refreshNoise(uint32_t width, uint32_t height, float H, float frequency, float lacunarity, float offset, int octaves) {
+    int refreshNoise(uint32_t width, uint32_t height, float H, float frequency, float lacunarity, float offset, int octaves) {
         mWidth = width;
         mHeight = height;
         frameBuffer.Cleanup();
-        frameBuffer.Init(width, height);
+        int tex = frameBuffer.Init(width, height);
 
         frameBuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves);
         frameBuffer.Unbind();
+        return tex;
     }
 
     void Cleanup() {

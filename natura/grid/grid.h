@@ -32,6 +32,10 @@ public:
             Cleanup();
     }
 
+    void setTextureId(int id){
+        this->texture_id_ = id;
+    }
+
     void Cleanup() {
         mCleanedUp = true;
         glBindVertexArray(0);
@@ -145,7 +149,7 @@ public:
         {
             //perlin texture
             this->texture_id_ = texture_;
-            glBindTexture(GL_TEXTURE_2D, texture_id_);
+            //glBindTexture(GL_TEXTURE_2D, texture_id_);
             glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"),
                         0 /*GL_TEXTURE0*/);
 

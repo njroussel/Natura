@@ -118,7 +118,7 @@ void resize_callback(GLFWwindow *window, int width, int height) {
     window_height = height;
     projection->reGenerateMatrix((GLfloat) window_width / window_height);
     glViewport(0, 0, window_width, window_height);
-    perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves);
+    terrain.Refresh(perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves));
 }
 
 void ErrorCallback(int error, const char *description) {
@@ -168,7 +168,7 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
     cout << "Frequency : " << frequency << endl;
     cout << "Octaves : " << octaves << endl;
     cout << "Amplitude : " << amplitude << endl;
-    perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves);
+    terrain.Refresh(perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves));
     //Just acces mKeyMap and call the callback function.
 }
 

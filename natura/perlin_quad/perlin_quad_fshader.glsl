@@ -69,8 +69,8 @@ float perlinNoise(vec2 point, float freq) {
 
 float multifractal(vec2 point) {
     float sum = perlinNoise(point, frequency)*2;
-    float amplitude = 1f;
-    float range = 2f;
+    float amplitude = 1.f;
+    float range = 2.f;
     float tmpFreq = frequency;
     for (int i = 1; i < octaves; i++) {
         tmpFreq *= lacunarity;
