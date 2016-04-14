@@ -32,11 +32,11 @@ float old_y;
 
 
 //calibration values
-float H = 0.55f;
+float H = 0.4f;
 float lacunarity = 2.0f;
 float offset = 1.0f;
 float frequency = 0.64f;
-int octaves = 4;
+int octaves = 6;
 float amplitude = 0.95f;
 
 void Init() {

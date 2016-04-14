@@ -19,7 +19,7 @@ void main() {
     vec3 normal = normalize(normal_mv);
     vec3 light = normalize(light_dir);
     float dotNl = dot(normal, light) < 0.0f ? 0.0f : dot(normal, light);
-    vec3 diffuse = kd * dotNl * Ld;
+    vec3 diffuse = colormapValue * 0.5f * dotNl * Ld;
 
     color = diffuse + ambient;
 }
