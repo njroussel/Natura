@@ -3,7 +3,8 @@
 in vec2 position;
 
 out vec2 uv;
-
+#define noise_size 16
+uniform vec2 quad_indices;
 uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
@@ -16,17 +17,21 @@ out vec3 normal_mv;
 
 void main() {
     uv = position;
-    float height = amplitude * (texture(perlin_tex, position).r - 0.5);
+    vec2 pos_2d = position;
+    pos_2d.x += quad_indices.x;
+    pos_2d.y += quad_indices.y;
+    pos_2d = pos_2d / noise_size;
+    float height = amplitude * (texture(perlin_tex, pos_2d).r - 0.5);
     vec3 pos_3d = vec3(position.x, height, position.y);
 
     mat4 MV = view * model;
     vec4 vpoint_mv = MV * vec4(pos_3d, 1.0);
 
     float epsilon = 0.005f;
-    float zDiffXaxis = texture(perlin_tex, vec2(position.x + epsilon, position.y)).r -
-                texture(perlin_tex, vec2(position.x - epsilon, position.y)).r;
-    float zDiffYaxis = texture(perlin_tex, vec2(position.x, position.y + epsilon)).r -
-                texture(perlin_tex, vec2(position.x, position.y - epsilon)).r;
+    float zDiffXaxis = texture(perlin_tex, vec2(pos_2d.x + epsilon, pos_2d.y)).r -
+                texture(perlin_tex, vec2(pos_2d.x - epsilon, pos_2d.y)).r;
+    float zDiffYaxis = texture(perlin_tex, vec2(pos_2d.x, pos_2d.y + epsilon)).r -
+                texture(perlin_tex, vec2(pos_2d.x, pos_2d.y - epsilon)).r;
 
     vec3 normal = normalize(cross(vec3(0.0f, 2 * epsilon, zDiffXaxis), vec3(2*epsilon, 0.0f, zDiffYaxis)));
 

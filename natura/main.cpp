@@ -14,7 +14,7 @@
 
 using namespace glm;
 
-Terrain terrain(512);
+Terrain terrain(16, 64);
 
 int window_width = 800;
 int window_height = 600;
