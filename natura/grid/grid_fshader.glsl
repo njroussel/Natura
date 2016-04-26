@@ -6,13 +6,18 @@ in vec3 light_dir;
 
 out vec3 color;
 
+uniform vec2 quad_indices;
 uniform sampler2D perlin_tex;
 uniform sampler1D colormap;
 uniform vec3 La, Ld;
 uniform vec3 ka, kd;
 
 void main() {
-    float componentColor = (texture(perlin_tex, uv/2).r + 0.5) / 2.0f;
+    vec2 pos_2d = uv;
+    pos_2d.x += quad_indices.x;
+    pos_2d.y += quad_indices.y;
+    pos_2d = pos_2d / 2;
+    float componentColor = (texture(perlin_tex, pos_2d).r + 0.5) / 2.0f;
     vec3 colormapValue = texture(colormap, componentColor).xyz;
 
     vec3 ambient = colormapValue * La;

@@ -11,7 +11,7 @@ public:
         for (size_t i = 0 ; i < side_quad_count ; i ++) {
             std::deque<Grid> row;
             for (size_t j = 0 ; j < side_quad_count ; j ++) {
-                Grid grid(quad_side_size);
+                Grid grid(quad_side_size, glm::vec2(i, j));
                 row.push_back(grid);
             }
             m_quads.push_back(row);
