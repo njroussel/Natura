@@ -19,12 +19,14 @@ private:
     GLuint P_id_;                           // proj matrix ID
     uint32_t mSideNbPoints;                 // grids side X nb of vertices;
     bool mCleanedUp;                        // check if the grid is cleaned before its destruction.
+    glm::vec2 m_indices;                    // Tile indices on the terrain.
 
 public:
 
-    Grid(uint32_t sideSize) {
+    Grid(uint32_t sideSize, glm::vec2 indices) {
         mSideNbPoints = sideSize;
         mCleanedUp = true;
+        m_indices = indices;
     }
 
     ~Grid() {
@@ -70,7 +72,7 @@ public:
             std::vector<GLuint> indices;
 
             float sideX = 1 / float(mSideNbPoints);
-
+            mSideNbPoints ++; // OFF BY ONE BY @Rimbaut
             for (int i = 0; i < mSideNbPoints; i++) {
                 for (int j = 0; j < mSideNbPoints; j++) {
                     vertices.push_back(i * sideX);
@@ -163,6 +165,7 @@ public:
             glBindTexture(GL_TEXTURE_1D, texture_id_2_);
             glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, ColormapSize, 0, GL_RGB, GL_FLOAT, tex);
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             GLuint tex_id = glGetUniformLocation(program_id_, "colormap");
@@ -188,6 +191,7 @@ public:
         glUniformMatrix4fv(M_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(model));
         glUniformMatrix4fv(V_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(view));
         glUniformMatrix4fv(P_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
+        glUniform2fv(glGetUniformLocation(program_id_, "quad_indices"), ONE, glm::value_ptr(m_indices));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_id_);
