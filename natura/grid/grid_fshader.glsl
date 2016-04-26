@@ -12,7 +12,7 @@ uniform vec3 La, Ld;
 uniform vec3 ka, kd;
 
 void main() {
-    float componentColor = (texture(perlin_tex, uv).r + 0.5) / 2.0f;
+    float componentColor = (texture(perlin_tex, uv/2).r + 0.5) / 2.0f;
     vec3 colormapValue = texture(colormap, componentColor).xyz;
 
     vec3 ambient = colormapValue * La;
