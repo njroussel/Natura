@@ -3,7 +3,7 @@
 in vec2 position;
 
 out vec2 uv;
-
+#define noise_size 16
 uniform vec2 quad_indices;
 uniform mat4 projection;
 uniform mat4 model;
@@ -20,7 +20,7 @@ void main() {
     vec2 pos_2d = position;
     pos_2d.x += quad_indices.x;
     pos_2d.y += quad_indices.y;
-    pos_2d = pos_2d / 2;
+    pos_2d = pos_2d / noise_size;
     float height = amplitude * (texture(perlin_tex, pos_2d).r - 0.5);
     vec3 pos_3d = vec3(position.x, height, position.y);
 
