@@ -14,6 +14,8 @@ private:
     GLuint texture_perlin_id_;              // texture ID
     GLuint texture_grass_id_;               // texture ID
     GLuint texture_rock_id_;                // texture ID
+    GLuint texture_snow_id_;                // texture ID
+    GLuint texture_sand_id_;                // texture ID
     GLuint num_indices_;                    // number of vertices to render
     GLuint M_id_;                           // model matrix ID
     GLuint V_id_;                           // view matrix ID
@@ -155,7 +157,7 @@ public:
         }
 
         {
-            // load rock texture
+            // load grass texture
             int width;
             int height;
             int nb_component;
@@ -223,6 +225,74 @@ public:
             // cleanup
             stbi_image_free(image);
         }
+        {
+            // load snow texture
+            int width;
+            int height;
+            int nb_component;
+            string filename = "snow.tga";
+            // set stb_image to have the same coordinates as OpenGL
+            stbi_set_flip_vertically_on_load(1);
+            unsigned char *image = stbi_load(filename.c_str(), &width,
+                                             &height, &nb_component, 0);
+
+            if (image == nullptr) {
+                throw (string("Failed to load texture"));
+            }
+
+            glGenTextures(1, &texture_snow_id_);
+            glBindTexture(GL_TEXTURE_2D, texture_snow_id_);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+            if (nb_component == 3) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
+                             GL_RGB, GL_UNSIGNED_BYTE, image);
+            } else if (nb_component == 4) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                             GL_RGBA, GL_UNSIGNED_BYTE, image);
+            }
+
+            GLuint tex_id = glGetUniformLocation(program_id_, "snow_tex");
+            glUniform1i(tex_id, 3 /*GL_TEXTURE3*/);
+
+            // cleanup
+            stbi_image_free(image);
+        }
+        {
+            // load sand texture
+            int width;
+            int height;
+            int nb_component;
+            string filename = "sand.tga";
+            // set stb_image to have the same coordinates as OpenGL
+            stbi_set_flip_vertically_on_load(1);
+            unsigned char *image = stbi_load(filename.c_str(), &width,
+                                             &height, &nb_component, 0);
+
+            if (image == nullptr) {
+                throw (string("Failed to load texture"));
+            }
+
+            glGenTextures(1, &texture_sand_id_);
+            glBindTexture(GL_TEXTURE_2D, texture_sand_id_);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+            if (nb_component == 3) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
+                             GL_RGB, GL_UNSIGNED_BYTE, image);
+            } else if (nb_component == 4) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                             GL_RGBA, GL_UNSIGNED_BYTE, image);
+            }
+
+            GLuint tex_id = glGetUniformLocation(program_id_, "sand_tex");
+            glUniform1i(tex_id, 4 /*GL_TEXTURE4*/);
+
+            // cleanup
+            stbi_image_free(image);
+        }
 
         // to avoid the current object being polluted
         glBindVertexArray(0);
@@ -250,6 +320,12 @@ public:
 
         glActiveTexture(GL_TEXTURE2);
         glBindTexture(GL_TEXTURE_2D, texture_rock_id_);
+
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, texture_snow_id_);
+
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, texture_sand_id_);
 
         // draw
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
