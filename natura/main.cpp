@@ -163,24 +163,30 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
     if ((key >= 49 && key <= 57) && action == GLFW_PRESS) {
         octaves = key - 49;
     }
-    if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
-        displ.x -= 128;
+    if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        displ.x -= 0.2;
     }
-    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
-        displ.x += 128;
+    if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        displ.x += 0.2;
     }
-    if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
-        displ.y -= 128;
+    if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        displ.y -= 0.2;
     }
-    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
-        displ.y += 128;
+    if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        displ.y += 0.2;
     }
-    /*cout << "H : " << H << endl;
+    if (key == GLFW_KEY_J && action == GLFW_PRESS) {
+        octaves --;
+    }
+    if (key == GLFW_KEY_U && action == GLFW_PRESS) {
+        octaves ++;
+    }
+    cout << "H : " << H << endl;
     cout << "Lacunarity : " << lacunarity << endl;
     cout << "Offset : " << offset << endl;
     cout << "Frequency : " << frequency << endl;
     cout << "Octaves : " << octaves << endl;
-    cout << "Amplitude : " << amplitude << endl;*/
+    cout << "Amplitude : " << amplitude << endl;
     cout << "Displ  : " << displ.x << " ; " << displ.y << endl;
     terrain.Refresh(perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves, displ));
     //Just acces mKeyMap and call the callback function.
