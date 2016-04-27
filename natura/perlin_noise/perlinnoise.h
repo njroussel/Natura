@@ -17,12 +17,12 @@ public:
         int tex = frameBuffer.Init(mWidth, mHeight);
         frameBuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves);
+        quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves, glm::vec2(0.0, 0.0));
         frameBuffer.Unbind();
         return tex;
     }
 
-    int refreshNoise(uint32_t width, uint32_t height, float H, float frequency, float lacunarity, float offset, int octaves) {
+    int refreshNoise(uint32_t width, uint32_t height, float H, float frequency, float lacunarity, float offset, int octaves, glm::vec2 displ) {
         mWidth = width;
         mHeight = height;
         frameBuffer.Cleanup();
@@ -30,7 +30,7 @@ public:
 
         frameBuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves);
+        quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves, displ);
         frameBuffer.Unbind();
         return tex;
     }

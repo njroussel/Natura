@@ -4,6 +4,7 @@ in vec2 uv;
 
 out vec3 color;
 
+uniform vec2 displacement;
 uniform float frequency ;
 uniform float H;
 uniform float offset;
@@ -82,6 +83,6 @@ float multifractal(vec2 point) {
 }
 
 void main(){
-    vec2 point = vec2((uv[0]), (uv[1]));
+    vec2 point = vec2((uv[0]+displacement.x), (uv[1]+displacement.y));
     color = vec3(multifractal(point), 0.0f, 0.0f);
 }

@@ -5,7 +5,7 @@ in vec3 normal_mv;
 in vec3 light_dir;
 
 out vec3 color;
-#define noise_size 16
+#define noise_size 4
 uniform vec2 quad_indices;
 uniform sampler2D perlin_tex;
 uniform sampler1D colormap;

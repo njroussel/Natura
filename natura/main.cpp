@@ -14,7 +14,7 @@
 
 using namespace glm;
 
-Terrain terrain(16, 64);
+Terrain terrain(4, 64);
 
 int window_width = 800;
 int window_height = 600;
@@ -38,6 +38,7 @@ float offset = 1.0f;
 float frequency = 0.64f;
 int octaves = 6;
 float amplitude = 0.95f;
+glm::vec2 displ(0.0, 0.0);
 
 void Init() {
     trackball = new Trackball();
@@ -118,7 +119,7 @@ void resize_callback(GLFWwindow *window, int width, int height) {
     window_height = height;
     projection->reGenerateMatrix((GLfloat) window_width / window_height);
     glViewport(0, 0, window_width, window_height);
-    terrain.Refresh(perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves));
+    terrain.Refresh(perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves, displ));
 }
 
 void ErrorCallback(int error, const char *description) {
@@ -162,13 +163,26 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
     if ((key >= 49 && key <= 57) && action == GLFW_PRESS) {
         octaves = key - 49;
     }
-    cout << "H : " << H << endl;
+    if (key == GLFW_KEY_LEFT && action == GLFW_PRESS) {
+        displ.x -= 128;
+    }
+    if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS) {
+        displ.x += 128;
+    }
+    if (key == GLFW_KEY_UP && action == GLFW_PRESS) {
+        displ.y -= 128;
+    }
+    if (key == GLFW_KEY_DOWN && action == GLFW_PRESS) {
+        displ.y += 128;
+    }
+    /*cout << "H : " << H << endl;
     cout << "Lacunarity : " << lacunarity << endl;
     cout << "Offset : " << offset << endl;
     cout << "Frequency : " << frequency << endl;
     cout << "Octaves : " << octaves << endl;
-    cout << "Amplitude : " << amplitude << endl;
-    terrain.Refresh(perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves));
+    cout << "Amplitude : " << amplitude << endl;*/
+    cout << "Displ  : " << displ.x << " ; " << displ.y << endl;
+    terrain.Refresh(perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves, displ));
     //Just acces mKeyMap and call the callback function.
 }
 
