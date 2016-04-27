@@ -9,13 +9,13 @@
 #include "../../../external/glm/detail/type_mat.hpp"
 #include "../../../external/glm/gtc/matrix_transform.hpp"
 
-#define CHUNK_SIDE_TILE_COUNT 4
+#define CHUNK_SIDE_TILE_COUNT 8
 
 class Chunk {
 public:
     Chunk(glm::vec2 pos, uint32_t quad_res, PerlinNoise *perlinNoise){
         m_position = pos;
-        m_perlin_noise = new PerlinNoise(800, 600);
+        m_perlin_noise = new PerlinNoise(800,600);
         for (int i = 0 ; i < CHUNK_SIDE_TILE_COUNT ; i ++){
             for (int j = 0 ; j < CHUNK_SIDE_TILE_COUNT ; j ++) {
                 m_tiles[i][j] = new Grid(quad_res, glm::vec2(i, j));

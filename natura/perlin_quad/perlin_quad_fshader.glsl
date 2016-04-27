@@ -83,6 +83,6 @@ float multifractal(vec2 point) {
 }
 
 void main(){
-    vec2 point = vec2((uv[0]+displacement.x), (uv[1]+displacement.y));
+    vec2 point = vec2((uv[0]+displacement.x*2), (uv[1]+displacement.y*2));
     color = vec3(multifractal(point), 0.0f, 0.0f);
 }

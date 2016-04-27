@@ -3,7 +3,7 @@
 in vec2 position;
 
 out vec2 uv;
-#define noise_size 4
+#define noise_size 8
 uniform vec2 quad_indices;
 uniform mat4 projection;
 uniform mat4 model;
