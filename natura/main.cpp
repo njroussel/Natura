@@ -51,9 +51,8 @@ void Init() {
 
     view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
 
-    grid_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
-    grid_model_matrix = translate(grid_model_matrix, vec3(-1.0f, 0.0f, -1.0f));
-    grid_model_matrix = scale(grid_model_matrix, vec3(2.0, 1.0, 2.0f));
+    grid_model_matrix = translate(grid_model_matrix, vec3(-1.0f, -0.25f, -1.0f));
+    grid_model_matrix = scale(grid_model_matrix, vec3(2.0, 2.0, 2.0f));
 
     int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
     terrain.Init(perlinNoiseTex);
