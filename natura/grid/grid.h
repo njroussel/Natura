@@ -11,14 +11,16 @@ private:
     GLuint vertex_buffer_object_position_;  // memory buffer for positions
     GLuint vertex_buffer_object_index_;     // memory buffer for indices
     GLuint program_id_;                     // GLSL shader program ID
-    GLuint texture_id_;                     // texture ID
-    GLuint texture_id_2_;                   // texture ID 2
+    GLuint texture_perlin_id_;              // texture ID
+    GLuint texture_grass_id_;               // texture ID
+    GLuint texture_rock_id_;                // texture ID
     GLuint num_indices_;                    // number of vertices to render
     GLuint M_id_;                           // model matrix ID
     GLuint V_id_;                           // view matrix ID
     GLuint P_id_;                           // proj matrix ID
     uint32_t mSideNbPoints;                 // grids side X nb of vertices;
     bool mCleanedUp;                        // check if the grid is cleaned before its destruction.
+
 
 public:
 
@@ -33,7 +35,7 @@ public:
     }
 
     void setTextureId(int id){
-        this->texture_id_ = id;
+        this->texture_perlin_id_ = id;
     }
 
     void Cleanup() {
@@ -44,7 +46,7 @@ public:
         glDeleteBuffers(1, &vertex_buffer_object_index_);
         glDeleteVertexArrays(1, &vertex_array_id_);
         glDeleteProgram(program_id_);
-        glDeleteTextures(1, &texture_id_);
+        glDeleteTextures(1, &texture_perlin_id_);
     }
 
     void Init(GLuint texture_) {
@@ -143,32 +145,83 @@ public:
             P_id_ = glGetUniformLocation(program_id_, "projection");
         }
 
-        //binding textures
+        //binding perlin texture
         {
             //perlin texture
-            this->texture_id_ = texture_;
+            this->texture_perlin_id_ = texture_;
             //glBindTexture(GL_TEXTURE_2D, texture_id_);
             glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"),
                         0 /*GL_TEXTURE0*/);
+        }
 
-            //temporary color texture
-            const int ColormapSize = 4;
-            //GLfloat tex[3 * ColormapSize] = {0.0, 0.2, 0.45, 158.0f / 255.0f, 181.0f / 255.0f, 210.0f / 255.0f};
-            GLfloat tex[3 * ColormapSize] = {225.0f / 255.0f, 197.0f / 255.0f, 64.0f / 255.0f,
-                                             20.0f / 255.0f, 152.0f / 255.0f, 29.0f / 255.0f,
-                                             181.0f / 255.0f, 181.0f / 255.0f, 177.0f / 255.0f,
-                                             232.0f / 255.0f, 239.0f / 255.0f, 233.0f / 255.0f};
+        {
+            // load rock texture
+            int width;
+            int height;
+            int nb_component;
+            string filename = "grass.tga";
+            // set stb_image to have the same coordinates as OpenGL
+            stbi_set_flip_vertically_on_load(1);
+            unsigned char *image = stbi_load(filename.c_str(), &width,
+                                             &height, &nb_component, 0);
 
-            glGenTextures(1, &texture_id_2_);
-            glBindTexture(GL_TEXTURE_1D, texture_id_2_);
-            glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, ColormapSize, 0, GL_RGB, GL_FLOAT, tex);
-            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_1D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            GLuint tex_id = glGetUniformLocation(program_id_, "colormap");
-            glUniform1i(tex_id, 1 /*GL_TEXTURE0*/);
-            // check_error_gl();
+            if (image == nullptr) {
+                throw (string("Failed to load texture"));
+            }
 
+            glGenTextures(1, &texture_grass_id_);
+            glBindTexture(GL_TEXTURE_2D, texture_grass_id_);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+            if (nb_component == 3) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
+                             GL_RGB, GL_UNSIGNED_BYTE, image);
+            } else if (nb_component == 4) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                             GL_RGBA, GL_UNSIGNED_BYTE, image);
+            }
+
+            GLuint tex_id = glGetUniformLocation(program_id_, "grass_tex");
+            glUniform1i(tex_id, 1 /*GL_TEXTURE1*/);
+
+            // cleanup
+            stbi_image_free(image);
+        }
+
+        {
+            // load rock texture
+            int width;
+            int height;
+            int nb_component;
+            string filename = "rock.tga";
+            // set stb_image to have the same coordinates as OpenGL
+            stbi_set_flip_vertically_on_load(1);
+            unsigned char *image = stbi_load(filename.c_str(), &width,
+                                             &height, &nb_component, 0);
+
+            if (image == nullptr) {
+                throw (string("Failed to load texture"));
+            }
+
+            glGenTextures(1, &texture_rock_id_);
+            glBindTexture(GL_TEXTURE_2D, texture_rock_id_);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+            if (nb_component == 3) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
+                             GL_RGB, GL_UNSIGNED_BYTE, image);
+            } else if (nb_component == 4) {
+                glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                             GL_RGBA, GL_UNSIGNED_BYTE, image);
+            }
+
+            GLuint tex_id = glGetUniformLocation(program_id_, "rock_tex");
+            glUniform1i(tex_id, 2 /*GL_TEXTURE2*/);
+
+            // cleanup
+            stbi_image_free(image);
         }
 
         // to avoid the current object being polluted
@@ -190,11 +243,13 @@ public:
         glUniformMatrix4fv(P_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
 
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture_id_);
-
+        glBindTexture(GL_TEXTURE_2D, texture_perlin_id_);
 
         glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_1D, texture_id_2_);
+        glBindTexture(GL_TEXTURE_2D, texture_grass_id_);
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, texture_rock_id_);
 
         // draw
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

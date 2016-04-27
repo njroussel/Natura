@@ -65,7 +65,6 @@ void Display() {
     const float time = glfwGetTime();
 
     terrain.Draw(amplitude, time, trackball->matrix() * grid_model_matrix, view_matrix, projection->perspective());
-    //perlinNoise.Draw(H);
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
