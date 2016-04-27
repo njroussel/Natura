@@ -3,25 +3,25 @@
 #include <cstdint>
 #include <deque>
 #include "../grid/grid.h"
+#include "chunk/chunk.h"
 
 
 class Terrain {
 public:
-    Terrain(uint32_t side_quad_count, uint32_t quad_side_size) {
-        for (size_t i = 0 ; i < side_quad_count ; i ++) {
-            std::deque<Grid> row;
-            for (size_t j = 0 ; j < side_quad_count ; j ++) {
-                Grid grid(quad_side_size, glm::vec2(i, j));
-                row.push_back(grid);
+    Terrain(uint32_t chunk_per_side, uint32_t quad_side_size, PerlinNoise *perlinNoise) {
+        for (int i = 0 ; i < chunk_per_side; i ++) {
+            std::deque<Chunk> row;
+            for (int j = 0 ; j < chunk_per_side; j ++) {
+                row.push_back(Chunk(glm::vec2(i, j), quad_side_size, perlinNoise));
             }
-            m_quads.push_back(row);
+            m_chunks.push_back(row);
         }
     }
 
-    void Init(int tex){
-        for (size_t i = 0 ; i < m_quads.size() ; i ++) {
-            for (size_t j = 0 ; j < m_quads.size() ; j ++) {
-                m_quads[i][j].Init(tex);
+    void Init(){
+        for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
+            for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
+                m_chunks[i][j].Init();
             }
         }
     }
@@ -30,31 +30,31 @@ public:
      * Refresh the terrain grid, takes the new texture Id of the new perlin noise.
      */
     void Refresh(int tex_id){
-        for (size_t i = 0 ; i < m_quads.size() ; i ++) {
-            for (size_t j = 0 ; j < m_quads.size() ; j ++) {
-                m_quads[i][j].setTextureId(tex_id);
+        /*for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
+            for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
+                m_chunks[i][j].setTextureId(tex_id);
             }
-        }
+        }*/
     }
 
     void Draw(float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
-        for (size_t i = 0 ; i < m_quads.size() ; i ++) {
-            for (size_t j = 0 ; j < m_quads.size() ; j ++) {
-                m_quads[i][j].Draw(amplitude, time, glm::translate(model, glm::vec3(i, 0, j)), view, projection);
+        for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
+            for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
+                m_chunks[i][j].Draw(amplitude, time, glm::translate(model, glm::vec3(i*CHUNK_SIDE_TILE_COUNT, 0.0, j*CHUNK_SIDE_TILE_COUNT)), view, projection);
             }
         }
     }
 
     void Cleanup(){
-        for (size_t i = 0 ; i < m_quads.size() ; i ++) {
-            for (size_t j = 0 ; j < m_quads.size() ; j ++) {
-                m_quads[i][j].Cleanup();
+        for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
+            for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
+                m_chunks[i][j].Cleanup();
             }
         }
     }
 
 private:
-    std::deque<std::deque<Grid>> m_quads;
+    std::deque<std::deque<Chunk>> m_chunks;
 };
