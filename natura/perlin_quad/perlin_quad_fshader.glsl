@@ -77,7 +77,7 @@ float multifractal(vec2 point) {
         tmpFreq *= lacunarity;
     	amplitude *= H;
     	range += amplitude;
-    	sum += (perlinNoise(point, tmpFreq) * 2 + offset) * amplitude;
+    	sum += ((1.0 - abs(perlinNoise(point, tmpFreq))) * 2 + offset) * amplitude;
     }
     return sum / range;
 }
