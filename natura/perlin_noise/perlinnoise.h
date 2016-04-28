@@ -1,11 +1,12 @@
 #pragma once
 
 #include <cstdint>
+#include <GL/glew.h>
 #include "../perlin_quad/perlin_quad.h"
 #include "../framebuffer.h"
 #include "../misc/observer_subject/subject.h"
 
-enum class PerlinProperty {H, LACUNARITY, OFFSET, FREQUENCY, OCTAVE};
+enum class PerlinNoiseProperty {H, LACUNARITY, OFFSET, FREQUENCY, OCTAVE};
 
 class PerlinNoise : public Subject{
 public:
@@ -26,30 +27,49 @@ public:
         return tex;
     }
 
-    void setProperty(PerlinProperty prop, float value){
+    void setProperty(PerlinNoiseProperty prop, float value){
         switch (prop) {
-            case PerlinProperty::H :
+            case PerlinNoiseProperty::H :
                 m_H = value;
                 break;
 
-            case PerlinProperty::LACUNARITY :
+            case PerlinNoiseProperty::LACUNARITY :
                 m_lacunarity = value;
                 break;
 
-            case PerlinProperty::OFFSET :
+            case PerlinNoiseProperty::OFFSET :
                 m_offset = value;
                 break;
 
-            case PerlinProperty::FREQUENCY :
+            case PerlinNoiseProperty::FREQUENCY :
                 m_frequency = value;
                 break;
 
-            case PerlinProperty::OCTAVE :
+            case PerlinNoiseProperty::OCTAVE :
                 m_octaves = static_cast<int>(value);
                 break;
         }
         /* Notify the chunks. */
         notify();
+    }
+
+    float getProperty(PerlinNoiseProperty prop){
+        switch (prop) {
+            case PerlinNoiseProperty::H :
+                return m_H;
+
+            case PerlinNoiseProperty::LACUNARITY :
+                return m_lacunarity;
+
+            case PerlinNoiseProperty::OFFSET :
+                return m_offset;
+
+            case PerlinNoiseProperty::FREQUENCY :
+                return m_frequency;
+
+            case PerlinNoiseProperty::OCTAVE :
+                return m_octaves;
+        }
     }
 
     void Cleanup() {

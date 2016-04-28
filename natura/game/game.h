@@ -77,7 +77,7 @@ private:
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height);
-        m_terrain = new Terrain(2, 64, m_perlinNoise);
+        m_terrain = new Terrain(1, 64, m_perlinNoise);
         m_skybox = new Cube();
 
 
@@ -160,23 +160,78 @@ private:
     }
 
     static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-        if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-            glfwSetWindowShouldClose(window, GL_TRUE);
-        }
-        if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-            m_displ.x -= 0.2;
-        }
-        if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-            m_displ.x += 0.2;
-        }
-        if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-            m_displ.y -= 0.2;
-        }
-        if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
-            m_displ.y += 0.2;
+        if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+            switch (key) {
+                case GLFW_KEY_LEFT:
+                    m_displ.x -= 0.2;
+                    break;
+
+                case GLFW_KEY_RIGHT:
+                    m_displ.x += 0.2;
+                    break;
+
+                case GLFW_KEY_UP:
+                    m_displ.y -= 0.2;
+                    break;
+
+                case GLFW_KEY_DOWN:
+                    m_displ.y += 0.2;
+                    break;
+
+                case GLFW_KEY_ESCAPE:
+                    glfwSetWindowShouldClose(window, GL_TRUE);
+                    break;
+
+                case GLFW_KEY_H:
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::H, m_perlinNoise->getProperty(PerlinNoiseProperty::H) + .05f);
+                    break;
+
+                case GLFW_KEY_N:
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::H, m_perlinNoise->getProperty(PerlinNoiseProperty::H) - .05f);
+                    break;
+
+                case GLFW_KEY_F:
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::FREQUENCY, m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) + 0.1f);
+                    break;
+
+                case GLFW_KEY_V:
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::FREQUENCY, m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) - 0.1f);
+                    break;
+
+                case GLFW_KEY_O:
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::OFFSET, m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) + 0.05);
+                    break;
+
+                case GLFW_KEY_L:
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::OFFSET, m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) - 0.05);
+                    break;
+
+                case GLFW_KEY_I:
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::LACUNARITY, m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) + 0.05f);
+                    break;
+
+                case GLFW_KEY_K:
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::LACUNARITY, m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) - 0.05f);
+                    break;
+
+                case GLFW_KEY_A:
+                    m_amplitude += 0.1f;
+                    break;
+
+                case GLFW_KEY_Z:
+                    m_amplitude -= 0.1f;
+                    break;
+
+                case GLFW_KEY_J:
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::OCTAVE, m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) - 1);
+                    break;
+
+                case GLFW_KEY_U:
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::OCTAVE, m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) + 1);
+                    break;
+            }
         }
         cout << "Displ  : " << m_displ.x << " ; " << m_displ.y << endl;
-        m_terrain->Refresh(m_perlinNoise->generateNoise(m_displ));
     }
 };
 

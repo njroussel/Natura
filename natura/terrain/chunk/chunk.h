@@ -9,12 +9,12 @@
 
 #define CHUNK_SIDE_TILE_COUNT 4
 
+
 class Chunk : public Observer{
 public:
     Chunk(glm::vec2 pos, uint32_t quad_res, PerlinNoise *perlinNoise){
         m_position = pos;
         m_perlin_noise = perlinNoise;
-        m_perlin_noise->attach(this);
         for (int i = 0 ; i < CHUNK_SIDE_TILE_COUNT ; i ++){
             for (int j = 0 ; j < CHUNK_SIDE_TILE_COUNT ; j ++) {
                 m_tiles[i][j] = new Grid(quad_res, glm::vec2(i, j));
@@ -31,6 +31,7 @@ public:
     }
 
     void Init(){
+        m_perlin_noise->attach(this);
         float H = 0.4f;
         float lacunarity = 2.0f;
         float offset = 1.0f;
@@ -63,8 +64,8 @@ public:
         }
     }
 
-    void update(){
-        glDeleteTextures(1, &(GLuint)m_chunk_noise_tex_id);
+    virtual void update(){
+        glDeleteTextures(1, (GLuint*)(&m_chunk_noise_tex_id));
         m_chunk_noise_tex_id = m_perlin_noise->generateNoise(m_position);
         for (size_t i = 0 ; i < CHUNK_SIDE_TILE_COUNT ; i ++){
             for (size_t j = 0 ; j < CHUNK_SIDE_TILE_COUNT ; j ++) {
