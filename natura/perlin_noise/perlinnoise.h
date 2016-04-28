@@ -12,24 +12,10 @@ public:
         mHeight = height;
     }
 
-    int generateNoise(float H, float frequency, float lacunarity, float offset, int octaves, glm::vec2 displ) {
+    int generateNoise(glm::vec2 displ) {
         quad.Init();
         FrameBuffer frameBuffer;
         int tex = frameBuffer.Init(mWidth, mHeight);
-        frameBuffer.Bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves, displ);
-        frameBuffer.Unbind();
-        frameBuffer.Cleanup();
-        return tex;
-    }
-
-    int refreshNoise(uint32_t width, uint32_t height, float H, float frequency, float lacunarity, float offset, int octaves, glm::vec2 displ) {
-        mWidth = width;
-        mHeight = height;
-        FrameBuffer frameBuffer;
-        int tex = frameBuffer.Init(width, height);
-
         frameBuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves, displ);
@@ -51,6 +37,11 @@ private:
     uint32_t mWidth;
     uint32_t mHeight;
     PerlinQuad quad;
+    float H = 0.35f;
+    float lacunarity = 2.4f;
+    float offset = -0.2f;
+    float frequency = 2.04f;
+    int octaves = 8;
 };
 
 

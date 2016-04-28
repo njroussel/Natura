@@ -21,5 +21,5 @@ file(GLOB SHADERS
 
 deploy_shaders_to_build_dir(${SHADERS})
 
-add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS} terrain/chunk/chunk.h)
+add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS} terrain/chunk/chunk.h game/game.h)
 target_link_libraries(${EXERCISENAME} ${COMMON_LIBS})
