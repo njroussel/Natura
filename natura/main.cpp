@@ -15,10 +15,10 @@
 
 using namespace glm;
 
-Terrain terrain(512);
+Terrain terrain(4, 64);
 
-int window_width = 800;
-int window_height = 600;
+int window_width = 1000;
+int window_height = 700;
 
 
 mat4 view_matrix;
@@ -41,6 +41,7 @@ float offset = 1.0f;
 float frequency = 0.64f;
 int octaves = 6;
 float amplitude = 0.95f;
+glm::vec2 displ(0.0, 0.0);
 
 void Init() {
     trackball = new Trackball();
@@ -54,7 +55,7 @@ void Init() {
 
     view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
 
-    grid_model_matrix = translate(grid_model_matrix, vec3(-1.0f, -0.25f, -1.0f));
+    grid_model_matrix = translate(grid_model_matrix, vec3(-4.0f, -0.25f, -4.0f));
     grid_model_matrix = scale(grid_model_matrix, vec3(2.0, 2.0, 2.0f));
 
     int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
@@ -121,7 +122,7 @@ void resize_callback(GLFWwindow *window, int width, int height) {
     window_height = height;
     projection->reGenerateMatrix((GLfloat) window_width / window_height);
     glViewport(0, 0, window_width, window_height);
-    terrain.Refresh(perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves));
+    terrain.Refresh(perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves, displ));
 }
 
 void ErrorCallback(int error, const char *description) {
@@ -165,13 +166,32 @@ void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods
     if ((key >= 49 && key <= 57) && action == GLFW_PRESS) {
         octaves = key - 49;
     }
+    if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        displ.x -= 0.2;
+    }
+    if (key == GLFW_KEY_RIGHT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        displ.x += 0.2;
+    }
+    if (key == GLFW_KEY_UP && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        displ.y -= 0.2;
+    }
+    if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+        displ.y += 0.2;
+    }
+    if (key == GLFW_KEY_J && action == GLFW_PRESS) {
+        octaves --;
+    }
+    if (key == GLFW_KEY_U && action == GLFW_PRESS) {
+        octaves ++;
+    }
     cout << "H : " << H << endl;
     cout << "Lacunarity : " << lacunarity << endl;
     cout << "Offset : " << offset << endl;
     cout << "Frequency : " << frequency << endl;
     cout << "Octaves : " << octaves << endl;
     cout << "Amplitude : " << amplitude << endl;
-    terrain.Refresh(perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves));
+    cout << "Displ  : " << displ.x << " ; " << displ.y << endl;
+    terrain.Refresh(perlinNoise.refreshNoise(window_width, window_height, H, frequency, lacunarity, offset, octaves, displ));
     //Just acces mKeyMap and call the callback function.
 }
 
