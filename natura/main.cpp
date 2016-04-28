@@ -11,6 +11,7 @@
 #include "perlin_noise/perlinnoise.h"
 #include "projection.h"
 #include "keyboard.h"
+#include "skybox/cube.h"
 
 using namespace glm;
 
@@ -26,6 +27,8 @@ mat4 grid_model_matrix;
 Trackball *trackball;
 PerlinNoise perlinNoise(window_width, window_height);
 Projection *projection;
+
+Cube skybox;
 
 //TODO : Used for zoom - cleanup
 float old_y;
@@ -56,6 +59,7 @@ void Init() {
 
     int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
     terrain.Init(perlinNoiseTex);
+    skybox.Init();
 }
 
 void Display() {
@@ -65,6 +69,7 @@ void Display() {
     const float time = glfwGetTime();
 
     terrain.Draw(amplitude, time, trackball->matrix() * grid_model_matrix, view_matrix, projection->perspective());
+    skybox.Draw(projection->perspective() *view_matrix * trackball->matrix());
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
