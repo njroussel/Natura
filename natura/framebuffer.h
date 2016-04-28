@@ -75,7 +75,7 @@ public:
     }
 
     void Cleanup() {
-        glDeleteTextures(1, &color_texture_id_);
+        //glDeleteTextures(1, &color_texture_id_);
         glDeleteRenderbuffers(1, &depth_render_buffer_id_);
         glBindFramebuffer(GL_FRAMEBUFFER, 0 /*UNBIND*/);
         glDeleteFramebuffers(1, &framebuffer_object_id_);
