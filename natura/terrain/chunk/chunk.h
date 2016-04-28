@@ -1,6 +1,4 @@
-#ifndef NATURA_CHUNK_H
-#define NATURA_CHUNK_H
-
+#pragma once
 #include "../../perlin_noise/perlinnoise.h"
 #include "../../../external/glm/detail/type_vec.hpp"
 #include "../../../external/glm/detail/type_vec2.hpp"
@@ -38,7 +36,7 @@ public:
         float frequency = 0.64f;
         int octaves = 6;
         float amplitude = 0.95f;
-        m_chunk_noise_tex_id = m_perlin_noise->generateNoise(H, frequency, lacunarity, offset, octaves, glm::vec2(m_position.x, m_position.y));
+        m_chunk_noise_tex_id = m_perlin_noise->generateNoise(glm::vec2(m_position.x, m_position.y));
         for (int i = 0 ; i < CHUNK_SIDE_TILE_COUNT ; i ++) {
             for (int j = 0 ; j < CHUNK_SIDE_TILE_COUNT ; j ++) {
                 m_tiles[i][j]->Init(m_chunk_noise_tex_id);
@@ -70,5 +68,3 @@ private:
     Grid *m_tiles[CHUNK_SIDE_TILE_COUNT][CHUNK_SIDE_TILE_COUNT];
     int m_chunk_noise_tex_id;
 };
-
-#endif //NATURA_CHUNK_H

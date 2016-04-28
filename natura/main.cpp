@@ -5,13 +5,7 @@
 // contains helper functions such as shader compiler
 #include "icg_helper.h"
 
-#include <glm/gtc/matrix_transform.hpp>
-#include "terrain/terrain.h"
 #include "trackball.h"
-#include "perlin_noise/perlinnoise.h"
-#include "projection.h"
-#include "keyboard.h"
-#include "skybox/cube.h"
 #include "game/game.h"
 
 using namespace glm;

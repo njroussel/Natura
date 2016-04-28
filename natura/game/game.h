@@ -1,10 +1,11 @@
-#ifndef NATURA_GAME_H
-#define NATURA_GAME_H
+#pragma once
 
 #include "../projection.h"
 #include "../perlin_noise/perlinnoise.h"
 #include "../trackball.h"
 #include "../../external/glm/detail/type_mat.hpp"
+#include "../skybox/cube.h"
+#include "../terrain/terrain.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 class Game{
@@ -12,6 +13,7 @@ public:
     Game(GLFWwindow *window) {
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
+        m_amplitude = 1.05f;
         // set the callback for escape key
         glfwSetKeyCallback(m_window, keyCallback);
 
@@ -46,28 +48,28 @@ public:
 
 private:
     /* Window size */
-    int m_window_width;
-    int m_window_height;
-    GLFWwindow *m_window;
+    static int m_window_width;
+    static int m_window_height;
+    static GLFWwindow *m_window;
 
     /* Camera and view */
-    glm::mat4 m_view_matrix;
-    glm::mat4 m_grid_model_matrix;
-    Projection *m_projection;
+    static glm::mat4 m_view_matrix;
+    static glm::mat4 m_grid_model_matrix;
+    static Projection *m_projection;
 
-    Trackball *m_trackball;
+    static Trackball *m_trackball;
 
     /* Perlin noise generator for the game. */
-    PerlinNoise *m_perlinNoise;
+    static PerlinNoise *m_perlinNoise;
 
     /* Terrain and sky */
-    Terrain *m_terrain;
-    float m_amplitude = 1.05f;
-    Cube *m_skybox;
+    static Terrain *m_terrain;
+    static float m_amplitude;
+    static Cube *m_skybox;
 
     //TODO : Used for zoom - cleanup
-    float m_old_y;
-    glm::vec2 m_displ;
+    static float m_old_y;
+    static glm::vec2 m_displ;
 
 
     /* Private function. */
@@ -75,7 +77,8 @@ private:
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height);
-        m_terrain = new Terrain(4, 64, m_perlinNoise);
+        m_terrain = new Terrain(2, 64, m_perlinNoise);
+        m_skybox = new Cube();
 
 
         // sets background color b
@@ -105,7 +108,7 @@ private:
     }
 
     // transforms glfw screen coordinates into normalized OpenGL coordinates.
-    vec2 TransformScreenCoords(GLFWwindow *window, int x, int y) {
+    static vec2 TransformScreenCoords(GLFWwindow *window, int x, int y) {
         // the framebuffer and the window doesn't necessarily have the same size
         // i.e. hidpi screens. so we need to get the correct one
         int width;
@@ -115,7 +118,7 @@ private:
                     1.0f - 2.0f * (float) y / height);
     }
 
-    void MouseButton(GLFWwindow *window, int button, int action, int mod) {
+    static void MouseButton(GLFWwindow *window, int button, int action, int mod) {
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
             double x_i, y_i;
             glfwGetCursorPos(window, &x_i, &y_i);
@@ -132,7 +135,7 @@ private:
         }
     }
 
-    void MousePos(GLFWwindow *window, double x, double y) {
+    static void MousePos(GLFWwindow *window, double x, double y) {
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
             vec2 p = TransformScreenCoords(window, x, y);
             m_trackball->recomputeMatrixAfterDrag(p.x, p.y);
@@ -148,7 +151,7 @@ private:
     }
 
     // Gets called when the windows/framebuffer is resized.
-    void resize_callback(GLFWwindow *window, int width, int height) {
+    static void resize_callback(GLFWwindow *window, int width, int height) {
         m_window_width = width;
         m_window_height = height;
         m_projection->reGenerateMatrix((GLfloat) m_window_width / m_window_height);
@@ -156,43 +159,10 @@ private:
         m_terrain->Refresh(m_perlinNoise->generateNoise(m_displ));
     }
 
-    void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
         if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
             glfwSetWindowShouldClose(window, GL_TRUE);
         }
-        /*if (key == GLFW_KEY_H && action == GLFW_PRESS) {
-            H += 0.05f;
-        }
-        if (key == GLFW_KEY_N && action == GLFW_PRESS) {
-            H -= 0.05f;
-        }
-        if (key == GLFW_KEY_F && action == GLFW_PRESS) {
-            frequency += 0.1f;
-        }
-        if (key == GLFW_KEY_V && action == GLFW_PRESS) {
-            frequency -= 0.1f;
-        }
-        if (key == GLFW_KEY_O && action == GLFW_PRESS) {
-            offset += 0.05;
-        }
-        if (key == GLFW_KEY_L && action == GLFW_RELEASE) {
-            offset -= 0.05;
-        }
-        if (key == GLFW_KEY_I && action == GLFW_PRESS) {
-            lacunarity += 0.05f;
-        }
-        if (key == GLFW_KEY_K && action == GLFW_PRESS) {
-            lacunarity -= 0.05f;
-        }
-        if (key == GLFW_KEY_A && action == GLFW_PRESS) {
-            amplitude += 0.1f;
-        }
-        if (key == GLFW_KEY_Z && action == GLFW_PRESS) {
-            amplitude -= 0.1f;
-        }
-        if ((key >= 49 && key <= 57) && action == GLFW_PRESS) {
-            octaves = key - 49;
-        }*/
         if (key == GLFW_KEY_LEFT && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
             m_displ.x -= 0.2;
         }
@@ -205,15 +175,30 @@ private:
         if (key == GLFW_KEY_DOWN && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
             m_displ.y += 0.2;
         }
-        /*if (key == GLFW_KEY_J && action == GLFW_PRESS) {
-            octaves --;
-        }
-        if (key == GLFW_KEY_U && action == GLFW_PRESS) {
-            octaves ++;
-        }*/
         cout << "Displ  : " << m_displ.x << " ; " << m_displ.y << endl;
         m_terrain->Refresh(m_perlinNoise->generateNoise(m_displ));
     }
 };
 
-#endif //NATURA_GAME_H
+int Game::m_window_width;
+int Game::m_window_height;
+GLFWwindow *Game::m_window;
+
+/* Camera and view */
+glm::mat4 Game::m_view_matrix;
+glm::mat4 Game::m_grid_model_matrix;
+Projection *Game::m_projection;
+
+Trackball *Game::m_trackball;
+
+/* Perlin noise generator for the game. */
+PerlinNoise *Game::m_perlinNoise;
+
+/* Terrain and sky */
+Terrain *Game::m_terrain;
+float Game::m_amplitude;
+Cube *Game::m_skybox;
+
+//TODO : Used for zoom - cleanup
+float Game::m_old_y;
+glm::vec2 Game::m_displ;
