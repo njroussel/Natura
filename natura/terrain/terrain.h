@@ -16,9 +16,11 @@ public:
             }
             m_chunks.push_back(row);
         }
+        m_skybox = new Cube();
     }
 
     void Init(){
+        m_skybox->Init();
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
             for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
                 m_chunks[i][j].Init();
@@ -40,6 +42,7 @@ public:
     void Draw(float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
+        m_skybox->Draw(projection * view * model);
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
             for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
                 m_chunks[i][j].Draw(amplitude, time, glm::translate(model, glm::vec3(i*CHUNK_SIDE_TILE_COUNT, 0.0, j*CHUNK_SIDE_TILE_COUNT)), view, projection);
@@ -57,4 +60,5 @@ public:
 
 private:
     std::deque<std::deque<Chunk>> m_chunks;
+    Cube* m_skybox;
 };

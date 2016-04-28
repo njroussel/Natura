@@ -65,7 +65,6 @@ private:
     /* Terrain and sky */
     static Terrain *m_terrain;
     static float m_amplitude;
-    static Cube *m_skybox;
 
     //TODO : Used for zoom - cleanup
     static float m_old_y;
@@ -78,7 +77,6 @@ private:
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height);
         m_terrain = new Terrain(1, 64, m_perlinNoise);
-        m_skybox = new Cube();
 
 
         // sets background color b
@@ -94,7 +92,6 @@ private:
 
         //int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
         m_terrain->Init(/*perlinNoiseTex*/);
-        m_skybox->Init();
     }
 
     void Display() {
@@ -104,7 +101,6 @@ private:
         const float time = glfwGetTime();
 
         m_terrain->Draw(m_amplitude, time, m_trackball->matrix() * m_grid_model_matrix, m_view_matrix, m_projection->perspective());
-        m_skybox->Draw(m_projection->perspective() * m_view_matrix * m_trackball->matrix());
     }
 
     // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -252,7 +248,6 @@ PerlinNoise *Game::m_perlinNoise;
 /* Terrain and sky */
 Terrain *Game::m_terrain;
 float Game::m_amplitude;
-Cube *Game::m_skybox;
 
 //TODO : Used for zoom - cleanup
 float Game::m_old_y;
