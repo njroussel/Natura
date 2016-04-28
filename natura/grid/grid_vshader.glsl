@@ -1,9 +1,9 @@
 #version 330
+#define noise_size 4.0f
 
 in vec2 position;
 
 out vec2 uv;
-#define noise_size 4
 uniform vec2 quad_indices;
 uniform mat4 projection;
 uniform mat4 model;
@@ -13,11 +13,9 @@ uniform float amplitude;
 uniform vec3 light_pos;
 
 out vec3 light_dir;
-out vec3 normal_mv;
 out mat4 MV;
 
 void main() {
-    uv = position;
     vec2 pos_2d = position;
     pos_2d.x += quad_indices.x;
     pos_2d.y += quad_indices.y;
@@ -33,5 +31,6 @@ void main() {
 
     light_dir = -vec3(vpoint_mv);
     light_dir = normalize(light_dir);
+    uv = pos_2d;
 }
 
