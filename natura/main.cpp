@@ -11,9 +11,6 @@
 using namespace glm;
 
 
-
-
-
 //calibration values
 
 void ErrorCallback(int error, const char *description) {
