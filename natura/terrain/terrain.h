@@ -28,17 +28,6 @@ public:
         }
     }
 
-    /**
-     * Refresh the terrain grid, takes the new texture Id of the new perlin noise.
-     */
-    void Refresh(int tex_id){
-        /*for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
-            for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
-                m_chunks[i][j].setTextureId(tex_id);
-            }
-        }*/
-    }
-
     void Draw(float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {

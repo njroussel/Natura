@@ -1,6 +1,7 @@
 #pragma once
 
 #include "observer.h"
+#include "message.h"
 #include <vector>
 
 class Subject{
@@ -9,9 +10,9 @@ public:
         m_observers.push_back(obs);
     }
 
-    void notify(){
+    void notify(Message msg){
         for (Observer *obs : m_observers){
-            obs->update();
+            obs->update(msg);
         }
     }
 

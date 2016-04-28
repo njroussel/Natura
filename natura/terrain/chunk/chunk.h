@@ -64,7 +64,8 @@ public:
         }
     }
 
-    virtual void update(){
+    virtual void update(Message &msg){
+        /* We simply ignore the message as we know that it comes from the Perlin Noise. */
         glDeleteTextures(1, (GLuint*)(&m_chunk_noise_tex_id));
         m_chunk_noise_tex_id = m_perlin_noise->generateNoise(m_position);
         for (size_t i = 0 ; i < CHUNK_SIDE_TILE_COUNT ; i ++){

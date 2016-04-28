@@ -152,7 +152,6 @@ private:
         m_window_height = height;
         m_projection->reGenerateMatrix((GLfloat) m_window_width / m_window_height);
         glViewport(0, 0, m_window_width, m_window_height);
-        m_terrain->Refresh(m_perlinNoise->generateNoise(m_displ));
     }
 
     static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {

@@ -1,6 +1,8 @@
 #pragma once
 
+#include "message.h"
+
 class Observer {
 public:
-    virtual void update() = 0;
+    virtual void update(Message &msg) = 0;
 };
