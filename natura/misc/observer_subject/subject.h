@@ -9,7 +9,7 @@ public:
         m_observers.push_back(obs);
     }
 
-    virtual void notify(){
+    void notify(){
         for (Observer *obs : m_observers){
             obs->update();
         }
