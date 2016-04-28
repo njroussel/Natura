@@ -1,7 +1,7 @@
 #pragma once
 
 #include "observer.h"
-#include "message.h"
+#include "messages/message.h"
 #include <vector>
 
 class Subject{

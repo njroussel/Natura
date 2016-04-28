@@ -1,6 +1,6 @@
 #pragma once
 
-#include "message.h"
+#include "messages/message.h"
 
 class Observer {
 public:
