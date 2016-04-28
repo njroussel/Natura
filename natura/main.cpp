@@ -35,12 +35,12 @@ float old_y;
 
 
 //calibration values
-float H = 0.4f;
-float lacunarity = 2.0f;
-float offset = 1.0f;
-float frequency = 0.64f;
-int octaves = 6;
-float amplitude = 0.95f;
+float H = 0.35f;
+float lacunarity = 2.4f;
+float offset = -0.2f;
+float frequency = 2.04f;
+int octaves = 8;
+float amplitude = 1.05f;
 glm::vec2 displ(0.0, 0.0);
 
 void Init() {
