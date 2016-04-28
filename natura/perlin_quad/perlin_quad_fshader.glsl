@@ -79,7 +79,7 @@ float multifractal(vec2 point) {
     	range += amplitude;
     	sum += ((1.0 - abs(perlinNoise(point, tmpFreq))) * 2 + offset) * amplitude;
     }
-    return sum / range;
+    return (sum / range);
 }
 
 void main(){

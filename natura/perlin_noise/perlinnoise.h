@@ -14,29 +14,31 @@ public:
 
     int generateNoise(float H, float frequency, float lacunarity, float offset, int octaves, glm::vec2 displ) {
         quad.Init();
+        FrameBuffer frameBuffer;
         int tex = frameBuffer.Init(mWidth, mHeight);
         frameBuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves, displ);
         frameBuffer.Unbind();
+        frameBuffer.Cleanup();
         return tex;
     }
 
     int refreshNoise(uint32_t width, uint32_t height, float H, float frequency, float lacunarity, float offset, int octaves, glm::vec2 displ) {
         mWidth = width;
         mHeight = height;
-        frameBuffer.Cleanup();
+        FrameBuffer frameBuffer;
         int tex = frameBuffer.Init(width, height);
 
         frameBuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves, displ);
         frameBuffer.Unbind();
+        frameBuffer.Cleanup();
         return tex;
     }
 
     void Cleanup() {
-        frameBuffer.Cleanup();
         quad.Cleanup();
     }
 
@@ -48,7 +50,6 @@ public:
 private:
     uint32_t mWidth;
     uint32_t mHeight;
-    FrameBuffer frameBuffer;
     PerlinQuad quad;
 };
 

@@ -11,30 +11,35 @@
 #include "perlin_noise/perlinnoise.h"
 #include "projection.h"
 #include "keyboard.h"
+#include "skybox/cube.h"
 
 using namespace glm;
 
+
+int window_width = 1000;
+int window_height = 700;
+
+
 mat4 view_matrix;
 mat4 grid_model_matrix;
-int window_width = 800;
-int window_height = 600;
 Trackball *trackball;
 PerlinNoise perlinNoise(window_width, window_height);
 Projection *projection;
 
-Terrain terrain(2, 64, &perlinNoise);
+Terrain terrain(4, 64, &perlinNoise);
+Cube skybox;
 
 //TODO : Used for zoom - cleanup
 float old_y;
 
 
 //calibration values
-float H = 0.4f;
-float lacunarity = 2.0f;
-float offset = 1.0f;
-float frequency = 0.64f;
-int octaves = 6;
-float amplitude = 0.95f;
+float H = 0.35f;
+float lacunarity = 2.4f;
+float offset = -0.2f;
+float frequency = 2.04f;
+int octaves = 8;
+float amplitude = 1.05f;
 glm::vec2 displ(0.0, 0.0);
 
 void Init() {
@@ -49,12 +54,12 @@ void Init() {
 
     view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
 
-    grid_model_matrix = translate(mat4(1.0f), vec3(0.0f, -0.25f, 0.0f));
-    grid_model_matrix = translate(grid_model_matrix, vec3(-1.0f, 0.0f, -1.0f));
-    grid_model_matrix = scale(grid_model_matrix, vec3(2.0, 1.0, 2.0f));
+    grid_model_matrix = translate(grid_model_matrix, vec3(-4.0f, -0.25f, -4.0f));
+    grid_model_matrix = scale(grid_model_matrix, vec3(2.0, 2.0, 2.0f));
 
     //int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
     terrain.Init(/*perlinNoiseTex*/);
+    skybox.Init();
 }
 
 void Display() {
@@ -64,7 +69,7 @@ void Display() {
     const float time = glfwGetTime();
 
     terrain.Draw(amplitude, time, trackball->matrix() * grid_model_matrix, view_matrix, projection->perspective());
-    //perlinNoise.Draw(H);
+    skybox.Draw(projection->perspective() *view_matrix * trackball->matrix());
 }
 
 // transforms glfw screen coordinates into normalized OpenGL coordinates.
