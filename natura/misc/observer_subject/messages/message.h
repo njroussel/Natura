@@ -5,7 +5,7 @@ class Subject;
 
 class Message {
 public:
-    enum class Type{EMPTY, PERLIN_PROP_CHANGE, KEYBOARD_HANDLER_INPUT};
+    enum class Type{EMPTY, PERLIN_PROP_CHANGE, KEYBOARD_HANDLER_INPUT, MOUSE_BUTTON_INPUT};
 
     Message(){
         m_type = Message::Type::EMPTY;

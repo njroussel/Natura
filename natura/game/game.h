@@ -8,11 +8,12 @@
 #include "../terrain/terrain.h"
 #include "../misc/observer_subject/messages/keyboard_handler_message.h"
 #include "../misc/io/input/keyboard/keyboard_handler.h"
+#include "../misc/io/input/mouse/mouse_button_handler.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 class Game : public Observer{
 public:
-    Game(GLFWwindow *window) : m_keyboard_handler(window){
+    Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window){
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
         m_amplitude = 1.05f;
@@ -23,7 +24,6 @@ public:
         glfwSetFramebufferSizeCallback(m_window, resize_callback);
 
         // set the mouse press and position callback
-        glfwSetMouseButtonCallback(m_window, MouseButton);
         glfwSetCursorPosCallback(m_window, MousePos);
 
         Init();
@@ -41,6 +41,7 @@ public:
 
     void run(){
         m_keyboard_handler.attach(this);
+        m_mouse_button_handler.attach(this);
         // render loop
         while (!glfwWindowShouldClose(m_window)) {
             Display();
@@ -50,11 +51,17 @@ public:
     }
 
     void update(Message *msg){
-        if (msg->getType() == Message::Type::KEYBOARD_HANDLER_INPUT){
-            keyCallback(reinterpret_cast<KeyboardHandlerMessage *>(msg));
-        }
-        else{
-            throw std::string("Error : Unexpected message in class Game");
+        switch (msg->getType()) {
+            case Message::Type::KEYBOARD_HANDLER_INPUT :
+                keyCallback(reinterpret_cast<KeyboardHandlerMessage *>(msg));
+                break;
+
+            case Message::Type::MOUSE_BUTTON_INPUT :
+                mouseButtonCallback(
+                        reinterpret_cast<MouseButtonHandlerMessage *>(msg));
+                break;
+            default:
+                throw std::string("Error : Unexpected message in class Game");
         }
     }
 
@@ -84,6 +91,7 @@ private:
 
     /* Input handlers */
     KeyboardHandler m_keyboard_handler;
+    MouseButtonHandler m_mouse_button_handler;
 
 
     /* Private function. */
@@ -129,7 +137,10 @@ private:
                     1.0f - 2.0f * (float) y / height);
     }
 
-    static void MouseButton(GLFWwindow *window, int button, int action, int mod) {
+    void mouseButtonCallback(MouseButtonHandlerMessage *message) {
+        int button = message->getButton();
+        int action = message->getAction();
+        GLFWwindow *window = message->getWindow();
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
             double x_i, y_i;
             glfwGetCursorPos(window, &x_i, &y_i);
