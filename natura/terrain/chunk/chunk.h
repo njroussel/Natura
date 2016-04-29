@@ -65,13 +65,17 @@ public:
     }
 
     virtual void update(Message &msg){
-        /* We simply ignore the message as we know that it comes from the Perlin Noise. */
-        glDeleteTextures(1, (GLuint*)(&m_chunk_noise_tex_id));
-        m_chunk_noise_tex_id = m_perlin_noise->generateNoise(m_position);
-        for (size_t i = 0 ; i < CHUNK_SIDE_TILE_COUNT ; i ++){
-            for (size_t j = 0 ; j < CHUNK_SIDE_TILE_COUNT ; j ++) {
-                m_tiles[i][j]->setTextureId(m_chunk_noise_tex_id);
+        if (msg.getType() == Message::Type::PERLIN_PROP_CHANGE) {
+            glDeleteTextures(1, (GLuint *) (&m_chunk_noise_tex_id));
+            m_chunk_noise_tex_id = m_perlin_noise->generateNoise(m_position);
+            for (size_t i = 0; i < CHUNK_SIDE_TILE_COUNT; i++) {
+                for (size_t j = 0; j < CHUNK_SIDE_TILE_COUNT; j++) {
+                    m_tiles[i][j]->setTextureId(m_chunk_noise_tex_id);
+                }
             }
+        }
+        else {
+            throw std::string("Error unexpected message type.");
         }
     }
 

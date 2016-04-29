@@ -50,7 +50,7 @@ public:
                 break;
         }
         /* Notify the chunks. */
-        notify(Message(this));
+        notify(Message(this, Message::Type::PERLIN_PROP_CHANGE));
     }
 
     float getProperty(PerlinNoiseProperty prop){
