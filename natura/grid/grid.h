@@ -170,7 +170,7 @@ public:
     }
 
 
-    void Draw(float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
+    void Draw(glm::vec2 indices, float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
@@ -181,7 +181,7 @@ public:
         glUniformMatrix4fv(M_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(model));
         glUniformMatrix4fv(V_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(view));
         glUniformMatrix4fv(P_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
-        glUniform2fv(glGetUniformLocation(program_id_, "quad_indices"), ONE, glm::value_ptr(m_indices));
+        glUniform2fv(glGetUniformLocation(program_id_, "quad_indices"), ONE, glm::value_ptr(indices));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_perlin_id_);
