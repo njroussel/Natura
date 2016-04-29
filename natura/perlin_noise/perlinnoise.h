@@ -5,6 +5,7 @@
 #include "../perlin_quad/perlin_quad.h"
 #include "../framebuffer.h"
 #include "../misc/observer_subject/subject.h"
+#include "../misc/observer_subject/messages/perlin_noise_prop_changed_message.h"
 
 enum class PerlinNoiseProperty {H, LACUNARITY, OFFSET, FREQUENCY, OCTAVE};
 
@@ -50,7 +51,7 @@ public:
                 break;
         }
         /* Notify the chunks. */
-        notify(Message(this, Message::Type::PERLIN_PROP_CHANGE));
+        notify(PerlinNoisePropChangedMessage());
     }
 
     float getProperty(PerlinNoiseProperty prop){

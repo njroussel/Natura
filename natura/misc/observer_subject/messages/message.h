@@ -5,22 +5,16 @@ class Subject;
 
 class Message {
 public:
-    enum class Type{EMPTY, PERLIN_PROP_CHANGE};
+    enum class Type{EMPTY, PERLIN_PROP_CHANGE, KEYBOARD_HANDLER_INPUT};
 
-    Message(Subject *from, Message::Type type = Message::Type::EMPTY){
-        m_type = type;
-        m_sender = from;
-    }
-
-    Subject *getSender(){
-        return m_sender;
+    Message(){
+        m_type = Message::Type::EMPTY;
     }
 
     Message::Type getType(){
         return m_type;
     }
 
-private:
-    Subject *m_sender;
+protected:
     Message::Type m_type;
 };

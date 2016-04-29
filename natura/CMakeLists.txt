@@ -21,5 +21,5 @@ file(GLOB SHADERS
 
 deploy_shaders_to_build_dir(${SHADERS})
 
-add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS} terrain/chunk/chunk.h game/game.h misc/observer_subject/observer.h misc/observer_subject/subject.h misc/observer_subject/messages/message.h)
+add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS} terrain/chunk/chunk.h game/game.h misc/observer_subject/observer.h misc/observer_subject/subject.h misc/observer_subject/messages/message.h misc/io/input/keyboard/keyboard_handler.h misc/observer_subject/messages/keyboard_handler_message.h misc/observer_subject/messages/perlin_noise_prop_changed_message.h)
 target_link_libraries(${EXERCISENAME} ${COMMON_LIBS})
