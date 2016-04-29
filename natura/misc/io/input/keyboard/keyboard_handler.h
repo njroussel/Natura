@@ -12,14 +12,16 @@ public:
     }
 
     static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods){
-        m_inner_subject.notify(KeyboardHandlerMessage(key, scancode, action, mods));
+        Message *m = new KeyboardHandlerMessage(window, key, scancode, action, mods);
+        m_inner_subject.notify(m);
+        delete m;
     }
 
     virtual void attach(Observer *obs){
         m_inner_subject.attach(obs);
     }
 
-    virtual void notify(Message msg){
+    virtual void notify(Message *msg){
         m_inner_subject.notify(msg);
     }
 

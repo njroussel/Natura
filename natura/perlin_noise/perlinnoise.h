@@ -51,7 +51,9 @@ public:
                 break;
         }
         /* Notify the chunks. */
-        notify(PerlinNoisePropChangedMessage());
+        Message *m = new PerlinNoisePropChangedMessage();
+        notify(m);
+        delete m;
     }
 
     float getProperty(PerlinNoiseProperty prop){

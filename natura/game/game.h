@@ -6,16 +6,18 @@
 #include "../../external/glm/detail/type_mat.hpp"
 #include "../skybox/cube.h"
 #include "../terrain/terrain.h"
+#include "../misc/observer_subject/messages/keyboard_handler_message.h"
+#include "../misc/io/input/keyboard/keyboard_handler.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-class Game{
+class Game : public Observer{
 public:
-    Game(GLFWwindow *window) {
+    Game(GLFWwindow *window) : m_keyboard_handler(window){
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
         m_amplitude = 1.05f;
         // set the callback for escape key
-        glfwSetKeyCallback(m_window, keyCallback);
+//        glfwSetKeyCallback(m_window, keyCallback);
 
         // set the framebuffer resize callback
         glfwSetFramebufferSizeCallback(m_window, resize_callback);
@@ -38,11 +40,21 @@ public:
     }
 
     void run(){
+        m_keyboard_handler.attach(this);
         // render loop
         while (!glfwWindowShouldClose(m_window)) {
             Display();
             glfwSwapBuffers(m_window);
             glfwPollEvents();
+        }
+    }
+
+    void update(Message *msg){
+        if (msg->getType() == Message::Type::KEYBOARD_HANDLER_INPUT){
+            keyCallback(reinterpret_cast<KeyboardHandlerMessage *>(msg));
+        }
+        else{
+            throw std::string("Error : Unexpected message in class Game");
         }
     }
 
@@ -69,6 +81,9 @@ private:
     //TODO : Used for zoom - cleanup
     static float m_old_y;
     static glm::vec2 m_displ;
+
+    /* Input handlers */
+    KeyboardHandler m_keyboard_handler;
 
 
     /* Private function. */
@@ -154,7 +169,10 @@ private:
         glViewport(0, 0, m_window_width, m_window_height);
     }
 
-    static void keyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    void keyCallback(KeyboardHandlerMessage *message) {
+        GLFWwindow *window = message->getWindow();
+        int key = message->getKey();
+        int action = message->getAction();
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
             switch (key) {
                 case GLFW_KEY_LEFT:
@@ -224,6 +242,8 @@ private:
                 case GLFW_KEY_U:
                     m_perlinNoise->setProperty(PerlinNoiseProperty::OCTAVE, m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) + 1);
                     break;
+
+                default:break;
             }
         }
         cout << "Displ  : " << m_displ.x << " ; " << m_displ.y << endl;

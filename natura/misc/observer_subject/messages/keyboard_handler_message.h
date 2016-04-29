@@ -5,12 +5,17 @@
 class KeyboardHandlerMessage : public Message{
 
 public:
-    KeyboardHandlerMessage(int key, int scancode, int action, int mods) : Message() {
+    KeyboardHandlerMessage(GLFWwindow *window, int key, int scancode, int action, int mods) : Message() {
         m_type = Message::Type::KEYBOARD_HANDLER_INPUT;
+        m_window = window;
         m_key = key;
         m_scancode = scancode;
         m_action = action;
         m_mods = mods;
+    }
+
+    GLFWwindow *getWindow(){
+        return m_window;
     }
 
     int getKey(){
@@ -30,6 +35,7 @@ public:
     }
 
 private:
+    GLFWwindow *m_window;
     int m_key;
     int m_scancode;
     int m_action;

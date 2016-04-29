@@ -10,7 +10,7 @@ public:
         m_observers.push_back(obs);
     }
 
-    virtual void notify(Message msg){
+    virtual void notify(Message *msg){
         for (Observer *obs : m_observers){
             obs->update(msg);
         }

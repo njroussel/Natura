@@ -64,8 +64,8 @@ public:
         }
     }
 
-    virtual void update(Message &msg){
-        if (msg.getType() == Message::Type::PERLIN_PROP_CHANGE) {
+    virtual void update(Message *msg){
+        if (msg->getType() == Message::Type::PERLIN_PROP_CHANGE) {
             glDeleteTextures(1, (GLuint *) (&m_chunk_noise_tex_id));
             m_chunk_noise_tex_id = m_perlin_noise->generateNoise(m_position);
             for (size_t i = 0; i < CHUNK_SIDE_TILE_COUNT; i++) {
