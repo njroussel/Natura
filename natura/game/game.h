@@ -7,9 +7,9 @@
 #include "../skybox/cube.h"
 #include "../terrain/terrain.h"
 #include "../misc/observer_subject/messages/keyboard_handler_message.h"
-#include "../misc/io/input/keyboard/keyboard_handler.h"
-#include "../misc/io/input/mouse/mouse_button_handler.h"
-#include "../misc/io/input/mouse/mouse_cursor_handler.h"
+#include "../misc/io/input/handlers/keyboard/keyboard_handler.h"
+#include "../misc/io/input/handlers/mouse/mouse_button_handler.h"
+#include "../misc/io/input/handlers/mouse/mouse_cursor_handler.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 class Game : public Observer{

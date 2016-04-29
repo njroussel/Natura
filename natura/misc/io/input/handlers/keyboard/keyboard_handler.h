@@ -2,9 +2,9 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include "../../../observer_subject/subject.h"
-#include "../../../observer_subject/messages/keyboard_handler_message.h"
-#include "../handlers/handler.h"
+#include "../../../../observer_subject/subject.h"
+#include "../../../../observer_subject/messages/keyboard_handler_message.h"
+#include "../handler.h"
 
 class KeyboardHandler : public Handler{
 public:
