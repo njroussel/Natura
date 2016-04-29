@@ -9,11 +9,12 @@
 #include "../misc/observer_subject/messages/keyboard_handler_message.h"
 #include "../misc/io/input/keyboard/keyboard_handler.h"
 #include "../misc/io/input/mouse/mouse_button_handler.h"
+#include "../misc/io/input/mouse/mouse_cursor_handler.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 class Game : public Observer{
 public:
-    Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window){
+    Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window), m_mouse_cursor_handler(window){
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
         m_amplitude = 1.05f;
@@ -23,8 +24,6 @@ public:
         // set the framebuffer resize callback
         glfwSetFramebufferSizeCallback(m_window, resize_callback);
 
-        // set the mouse press and position callback
-        glfwSetCursorPosCallback(m_window, MousePos);
 
         Init();
 
@@ -42,6 +41,7 @@ public:
     void run(){
         m_keyboard_handler.attach(this);
         m_mouse_button_handler.attach(this);
+        m_mouse_cursor_handler.attach(this);
         // render loop
         while (!glfwWindowShouldClose(m_window)) {
             Display();
@@ -60,6 +60,11 @@ public:
                 mouseButtonCallback(
                         reinterpret_cast<MouseButtonHandlerMessage *>(msg));
                 break;
+
+            case Message::Type::MOUSE_CURSOR_INPUT :
+                mouseCursorCallback(reinterpret_cast<MouseCursorHandlerMessage *>(msg));
+                break;
+
             default:
                 throw std::string("Error : Unexpected message in class Game");
         }
@@ -92,6 +97,7 @@ private:
     /* Input handlers */
     KeyboardHandler m_keyboard_handler;
     MouseButtonHandler m_mouse_button_handler;
+    MouseCursorHandler m_mouse_cursor_handler;
 
 
     /* Private function. */
@@ -157,7 +163,10 @@ private:
         }
     }
 
-    static void MousePos(GLFWwindow *window, double x, double y) {
+    void mouseCursorCallback(MouseCursorHandlerMessage *message) {
+        GLFWwindow *window = message->getWindow();
+        double x = message->getCoordX();
+        double y = message->getCoordY();
         if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
             vec2 p = TransformScreenCoords(window, x, y);
             m_trackball->recomputeMatrixAfterDrag(p.x, p.y);

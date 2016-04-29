@@ -9,6 +9,7 @@
 #include "game/game.h"
 #include "misc/io/input/keyboard/keyboard_handler.h"
 #include "misc/io/input/mouse/mouse_button_handler.h"
+#include "misc/io/input/mouse/mouse_cursor_handler.h"
 
 using namespace glm;
 
