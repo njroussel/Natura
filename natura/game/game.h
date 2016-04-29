@@ -19,16 +19,7 @@ public:
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
         m_amplitude = 1.05f;
-        // set the callback for escape key
-//        glfwSetKeyCallback(m_window, keyCallback);
-
-        // set the framebuffer resize callback
-
-
         Init();
-
-        // update the window size with the framebuffer size (on hidpi screens the
-        // framebuffer is bigger)
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
         resize_callback(&m);
@@ -78,27 +69,27 @@ public:
 
 private:
     /* Window size */
-    static int m_window_width;
-    static int m_window_height;
-    static GLFWwindow *m_window;
+    int m_window_width;
+    int m_window_height;
+    GLFWwindow *m_window;
 
     /* Camera and view */
-    static glm::mat4 m_view_matrix;
-    static glm::mat4 m_grid_model_matrix;
-    static Projection *m_projection;
+    glm::mat4 m_view_matrix;
+    glm::mat4 m_grid_model_matrix;
+    Projection *m_projection;
 
-    static Trackball *m_trackball;
+    Trackball *m_trackball;
 
     /* Perlin noise generator for the game. */
-    static PerlinNoise *m_perlinNoise;
+    PerlinNoise *m_perlinNoise;
 
     /* Terrain and sky */
-    static Terrain *m_terrain;
-    static float m_amplitude;
+    Terrain *m_terrain;
+    float m_amplitude;
 
     //TODO : Used for zoom - cleanup
-    static float m_old_y;
-    static glm::vec2 m_displ;
+    float m_old_y;
+    glm::vec2 m_displ;
 
     /* Input handlers */
     KeyboardHandler m_keyboard_handler;
@@ -278,25 +269,3 @@ private:
         cout << "Displ  : " << m_displ.x << " ; " << m_displ.y << endl;
     }
 };
-
-int Game::m_window_width;
-int Game::m_window_height;
-GLFWwindow *Game::m_window;
-
-/* Camera and view */
-glm::mat4 Game::m_view_matrix;
-glm::mat4 Game::m_grid_model_matrix;
-Projection *Game::m_projection;
-
-Trackball *Game::m_trackball;
-
-/* Perlin noise generator for the game. */
-PerlinNoise *Game::m_perlinNoise;
-
-/* Terrain and sky */
-Terrain *Game::m_terrain;
-float Game::m_amplitude;
-
-//TODO : Used for zoom - cleanup
-float Game::m_old_y;
-glm::vec2 Game::m_displ;
