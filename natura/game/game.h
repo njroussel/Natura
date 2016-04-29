@@ -10,11 +10,12 @@
 #include "../misc/io/input/handlers/keyboard/keyboard_handler.h"
 #include "../misc/io/input/handlers/mouse/mouse_button_handler.h"
 #include "../misc/io/input/handlers/mouse/mouse_cursor_handler.h"
+#include "../misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 class Game : public Observer{
 public:
-    Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window), m_mouse_cursor_handler(window){
+    Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window), m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window){
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
         m_amplitude = 1.05f;
@@ -22,7 +23,6 @@ public:
 //        glfwSetKeyCallback(m_window, keyCallback);
 
         // set the framebuffer resize callback
-        glfwSetFramebufferSizeCallback(m_window, resize_callback);
 
 
         Init();
@@ -30,7 +30,8 @@ public:
         // update the window size with the framebuffer size (on hidpi screens the
         // framebuffer is bigger)
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
-        resize_callback(window, m_window_width, m_window_height);
+        FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
+        resize_callback(&m);
     }
     ~Game() {
         m_perlinNoise->Cleanup();
@@ -42,6 +43,7 @@ public:
         m_keyboard_handler.attach(this);
         m_mouse_button_handler.attach(this);
         m_mouse_cursor_handler.attach(this);
+        m_frame_buffer_size_handler.attach(this);
         // render loop
         while (!glfwWindowShouldClose(m_window)) {
             Display();
@@ -63,6 +65,10 @@ public:
 
             case Message::Type::MOUSE_CURSOR_INPUT :
                 mouseCursorCallback(reinterpret_cast<MouseCursorHandlerMessage *>(msg));
+                break;
+
+            case Message::Type::FRAMEBUFFER_SIZE_CHANGE :
+                resize_callback(reinterpret_cast<FrameBufferSizeHandlerMessage *>(msg));
                 break;
 
             default:
@@ -98,6 +104,7 @@ private:
     KeyboardHandler m_keyboard_handler;
     MouseButtonHandler m_mouse_button_handler;
     MouseCursorHandler m_mouse_cursor_handler;
+    FrameBufferSizeHandler m_frame_buffer_size_handler;
 
 
     /* Private function. */
@@ -182,7 +189,9 @@ private:
     }
 
     // Gets called when the windows/framebuffer is resized.
-    static void resize_callback(GLFWwindow *window, int width, int height) {
+    void resize_callback(FrameBufferSizeHandlerMessage *message) {
+        int width = message->getWidth();
+        int height = message->getHeight();
         m_window_width = width;
         m_window_height = height;
         m_projection->reGenerateMatrix((GLfloat) m_window_width / m_window_height);
