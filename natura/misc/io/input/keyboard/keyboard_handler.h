@@ -4,8 +4,9 @@
 #include <GLFW/glfw3.h>
 #include "../../../observer_subject/subject.h"
 #include "../../../observer_subject/messages/keyboard_handler_message.h"
+#include "../handlers/handler.h"
 
-class KeyboardHandler : public Subject{
+class KeyboardHandler : public Handler{
 public:
     KeyboardHandler(GLFWwindow *window){
         glfwSetKeyCallback(window, keyCallback);
@@ -16,17 +17,4 @@ public:
         m_inner_subject.notify(m);
         delete m;
     }
-
-    virtual void attach(Observer *obs){
-        m_inner_subject.attach(obs);
-    }
-
-    virtual void notify(Message *msg){
-        m_inner_subject.notify(msg);
-    }
-
-private:
-    static Subject m_inner_subject;
 };
-
-Subject KeyboardHandler::m_inner_subject;
