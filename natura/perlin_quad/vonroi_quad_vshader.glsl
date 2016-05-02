@@ -2,12 +2,12 @@
 
 in vec3 vpoint;
 
-out vec2 uv;
+out vec3 uv;
 
 uniform mat4 MVP;
 uniform float H;
 
 void main() {
-    uv = vec2(MVP * vec4(vpoint * 4.0f, 1.0));
+    uv = vec3(MVP * vec4(vpoint * 4.0f, 1.0));
     gl_Position = MVP * vec4(vpoint, 1.0);
 }

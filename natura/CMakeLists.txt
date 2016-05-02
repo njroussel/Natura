@@ -9,7 +9,12 @@ file(GLOB TEXTURES
         grid/rock.tga
         grid/snow.tga
         grid/sand.tga
-        skybox/skybox_texture.tga)
+        skybox/top.tga
+        skybox/left.tga
+        skybox/right.tga
+        skybox/back.tga
+        skybox/bottom.tga
+        skybox/front.tga)
 copy_files_once(${TEXTURES})
 
 # list all the files you want to copy everytime

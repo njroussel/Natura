@@ -15,6 +15,7 @@ public:
     int generateNoise(float H, float frequency, float lacunarity, float offset, int octaves) {
         quad.Init();
         int tex = frameBuffer.Init(mWidth, mHeight);
+
         frameBuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         quad.Draw(IDENTITY_MATRIX, H, frequency, lacunarity, offset, octaves, glm::vec2(0.0, 0.0));
@@ -36,7 +37,7 @@ public:
     }
 
     void Cleanup() {
-        frameBuffer.Cleanup();
+        frameBuffer.Cleanup();p
         quad.Cleanup();
     }
 

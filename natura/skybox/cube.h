@@ -98,6 +98,7 @@ class Cube {
         GLuint program_id_;             // GLSL shader program ID
         GLuint vertex_buffer_object_;   // memory buffer
         GLuint texture_id_;             // texture ID
+        GLuint texture_id_cube;             // texture ID
         glm::mat4 model_matrix_;        // model matrix
 
     public:
@@ -182,11 +183,68 @@ class Cube {
 
             }
 
+            {
+                glGenTextures (1, &texture_id_cube);
+                glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id_cube);
+
+                // format cube map texture
+                glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+                glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+                // load each image and copy into a side of the cube-map texture
+                assert (
+                        load_cube_map_side (texture_id_cube, GL_TEXTURE_CUBE_MAP_NEGATIVE_Z, "front.tga"));
+                assert (
+                        load_cube_map_side (texture_id_cube, GL_TEXTURE_CUBE_MAP_POSITIVE_Z, "back.tga"));
+                assert (
+                        load_cube_map_side (texture_id_cube, GL_TEXTURE_CUBE_MAP_POSITIVE_Y, "top.tga"));
+                assert (
+                        load_cube_map_side (texture_id_cube, GL_TEXTURE_CUBE_MAP_NEGATIVE_Y, "bottom.tga"));
+                assert (
+                        load_cube_map_side (texture_id_cube, GL_TEXTURE_CUBE_MAP_NEGATIVE_X, "right.tga"));
+                assert (
+                        load_cube_map_side (texture_id_cube, GL_TEXTURE_CUBE_MAP_POSITIVE_X, "left.tga"));
+
+                GLuint tex_id = glGetUniformLocation(program_id_, "tex_cube");
+                glUniform1i(tex_id, 1 /*GL_TEXTURE0*/);
+
+                // cleanup
+                glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+            }
+
             // create the model matrix
             model_matrix_ = IDENTITY_MATRIX;
             model_matrix_ = glm::translate(model_matrix_,
                                            glm::vec3(0.0f, 0.0f, 0.6f));
         }
+
+    bool load_cube_map_side (GLuint texture, GLenum side_target, const char* file_name) {
+
+        int x, y, n;
+        int force_channels = 4;
+        unsigned char* image = stbi_load(file_name,
+                                         &x, &y, &n, 0);
+
+        if (!image) {
+            fprintf (stderr, "ERROR: could not load %s\n", file_name);
+            return false;
+        }
+
+
+        if(n == 3) {
+            glTexImage2D(side_target, 0, GL_RGB, x, y, 0,
+                         GL_RGB, GL_UNSIGNED_BYTE, image);
+        } else if(n == 4) {
+            glTexImage2D(side_target, 0, GL_RGBA, x, y, 0,
+                         GL_RGBA, GL_UNSIGNED_BYTE, image);
+        }
+
+        free (image);
+        return true;
+    }
 
         void Cleanup() {
             glBindVertexArray(0);
@@ -205,12 +263,18 @@ class Cube {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture_id_);
 
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id_cube);
+
 
             // setup MVP
             mat4 model = scale(model_matrix_, vec3(40.0f));
             glm::mat4 MVP = view_projection * model;
             GLuint MVP_id = glGetUniformLocation(program_id_, "MVP");
             glUniformMatrix4fv(MVP_id, 1, GL_FALSE, value_ptr(MVP));
+
+            GLuint M_id = glGetUniformLocation(program_id_, "M");
+            glUniformMatrix4fv(M_id, 1, GL_FALSE, value_ptr(model));
 
             // draw
             glDrawArrays(GL_TRIANGLES,0, NbCubeVertices);

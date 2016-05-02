@@ -1,10 +1,11 @@
 #version 330 core
 uniform mat4 MVP;
+uniform mat4 M;
 in vec3 vpoint;
-in vec2 vtexcoord;
-out vec2 uv;
+out vec3 uv;
 
 void main(){
-    gl_Position =  MVP * vec4(vpoint,1); ///< spin-circ
-    uv = vtexcoord;
+    vec4 pos = MVP * vec4(vpoint, 1.0f);
+    gl_Position =  pos;
+    uv = vec3(M * vec4(vpoint, 1.0f));
 }

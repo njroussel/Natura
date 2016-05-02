@@ -27,7 +27,6 @@ void main() {
     vec4 vpoint_mv = MV * vec4(pos_3d, 1.0);
 
     gl_Position = projection * vpoint_mv;
-    //gl_Position = vec4(position.x, 0.0f, position.y, 1.0f);
 
     light_dir = -vec3(vpoint_mv);
     light_dir = normalize(light_dir);
