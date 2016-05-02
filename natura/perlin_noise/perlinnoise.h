@@ -20,6 +20,7 @@ public:
         quad.Init();
         FrameBuffer frameBuffer;
         int tex = frameBuffer.Init(mWidth, mHeight);
+
         frameBuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         quad.Draw(IDENTITY_MATRIX, m_H, m_frequency, m_lacunarity, m_offset, m_octaves, displ);
