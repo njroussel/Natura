@@ -89,6 +89,7 @@ private:
     float m_offset = -0.2f;
     float m_frequency = 2.04f;
     int m_octaves = 8;
+    float m_amplitude = 1.05f;
 };
 
 

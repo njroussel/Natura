@@ -65,11 +65,11 @@ private:
     vec3 m_position;
     vec2 m_rotation;
     mat4 m_matrix;
-    float m_movement_factor = 0.01f;
+    float m_movement_factor = 0.04f;
 
     void ComputeMovement() {
-        vec3 forward_direction = normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
-                                                sin(radians(m_rotation.x)) * cos(radians(m_rotation.x)),
+        vec3 forward_direction = normalize(vec3(-cos(radians(m_rotation.x )) * sin(radians(m_rotation.y)),
+                                                sin(radians(m_rotation.x)) * cos(radians(m_rotation.x - 90.0f)),
                                                 cos(radians(m_rotation.x)) * cos(radians(m_rotation.y))));
 
         vec3 left_direction = vec3(cos(radians(m_rotation.y)),

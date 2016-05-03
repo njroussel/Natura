@@ -136,6 +136,7 @@ private:
         //tick 60 times per second
         if (time - m_last_time > 1 / 60.0f) {
             m_camera->CalculateMatrix();
+            m_last_time = time;
         }
 
         //draw as often as possible

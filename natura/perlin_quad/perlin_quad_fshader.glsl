@@ -94,15 +94,15 @@ vec2 cellular2x2 ( vec2 P) {
 }
 
 float multifractal(vec2 point) {
-    float sum = (1 - abs(perlinNoise(point, frequency)));
-    float amplitude = 1.0;
+    float sum = perlinNoise(point, frequency)*2;
+    float amplitude = 1.f;
     float range = 2.f;
     float tmpFreq = frequency;
     for (int i = 1; i < octaves; i++) {
         tmpFreq *= lacunarity;
     	amplitude *= H;
     	range += amplitude;
-    	sum += (1 - abs(perlinNoise(point, tmpFreq)) * 2 + offset) * amplitude;
+    	sum += ((1.0 - abs(perlinNoise(point, tmpFreq))) * 2 + offset) * amplitude;
     }
     return (sum / range);
 }
