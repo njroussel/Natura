@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../projection.h"
+#include "../camera/camera.h"
 #include "../perlin_noise/perlinnoise.h"
 #include "../trackball.h"
 #include "../../external/glm/detail/type_mat.hpp"
@@ -13,9 +14,10 @@
 #include "../misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-class Game : public Observer{
+class Game : public Observer {
 public:
-    Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window), m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window){
+    Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window),
+                               m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window) {
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
         m_amplitude = 1.05f;
@@ -24,13 +26,14 @@ public:
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
         resize_callback(&m);
     }
+
     ~Game() {
         m_perlinNoise->Cleanup();
         m_terrain->Cleanup();
         delete m_perlinNoise;
     }
 
-    void run(){
+    void run() {
         m_keyboard_handler.attach(this);
         m_mouse_button_handler.attach(this);
         m_mouse_cursor_handler.attach(this);
@@ -43,7 +46,7 @@ public:
         }
     }
 
-    void update(Message *msg){
+    void update(Message *msg) {
         switch (msg->getType()) {
             case Message::Type::KEYBOARD_HANDLER_INPUT :
                 keyCallback(reinterpret_cast<KeyboardHandlerMessage *>(msg));
@@ -68,13 +71,16 @@ public:
     }
 
 private:
+    double m_last_mouse_xpos, m_last_mouse_ypos;
+    float m_last_time;
+
     /* Window size */
     int m_window_width;
     int m_window_height;
     GLFWwindow *m_window;
 
     /* Camera and view */
-    glm::mat4 m_view_matrix;
+    Camera *m_camera;
     glm::mat4 m_grid_model_matrix;
     Projection *m_projection;
 
@@ -87,8 +93,6 @@ private:
     Terrain *m_terrain;
     float m_amplitude;
 
-    //TODO : Used for zoom - cleanup
-    float m_old_y;
     glm::vec2 m_displ;
 
     /* Input handlers */
@@ -100,6 +104,9 @@ private:
 
     /* Private function. */
     void Init() {
+        vec3 starting_camera_position = vec3(0.0f, 0.0f, -4.0f);
+        vec2 starting_camera_rotation = vec2(0.0f);
+        m_camera = new Camera(&starting_camera_position, &starting_camera_rotation);
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height);
@@ -111,8 +118,6 @@ private:
 
         // enable depth test.
         glEnable(GL_DEPTH_TEST);
-
-        m_view_matrix = translate(mat4(1.0f), vec3(0.0f, 0.0f, -4.0f));
 
         m_grid_model_matrix = translate(m_grid_model_matrix, vec3(-4.0f, -0.25f, -4.0f));
         m_grid_model_matrix = scale(m_grid_model_matrix, vec3(2.0, 2.0, 2.0f));
@@ -127,7 +132,17 @@ private:
 
         const float time = glfwGetTime();
 
-        m_terrain->Draw(m_amplitude, time, m_trackball->matrix() * m_grid_model_matrix, m_view_matrix, m_projection->perspective());
+
+        //tick
+        if (time - m_last_time > 1 / 60.0f) {
+            //draw
+            m_camera->CalculateMatrix();
+        }
+
+
+        m_terrain->Draw(m_amplitude, time, m_grid_model_matrix, m_camera->GetMatrix(),
+                        m_projection->perspective());
+
     }
 
     // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -148,16 +163,8 @@ private:
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
             double x_i, y_i;
             glfwGetCursorPos(window, &x_i, &y_i);
-            vec2 p = TransformScreenCoords(window, x_i, y_i);
-            m_trackball->BeginDrag(p.x, p.y);
-        }
-
-        if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS) {
-            double x_i, y_i;
-            glfwGetCursorPos(window, &x_i, &y_i);
-            vec2 p = TransformScreenCoords(window, x_i, y_i);
-            // Store the current state of the y position matrix.
-            m_old_y = p.y;
+            m_last_mouse_xpos = x_i;
+            m_last_mouse_ypos = y_i;
         }
     }
 
@@ -165,17 +172,16 @@ private:
         GLFWwindow *window = message->getWindow();
         double x = message->getCoordX();
         double y = message->getCoordY();
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-            vec2 p = TransformScreenCoords(window, x, y);
-            m_trackball->recomputeMatrixAfterDrag(p.x, p.y);
-        }
-
-        // zoom
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_RIGHT) == GLFW_PRESS) {
-            vec2 p = TransformScreenCoords(window, x, y);
-            float newZoom = p.y - m_old_y;
-            m_view_matrix = glm::translate(m_view_matrix, vec3(0, 0, newZoom * 5.0));
-            m_old_y = p.y;
+        if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+            double diffx = x - m_last_mouse_xpos; //check the difference between the current x and the last x position
+            double diffy = y - m_last_mouse_ypos; //check the difference between the current y and the last y position
+            m_last_mouse_xpos = x; //set lastx to the current x position
+            m_last_mouse_ypos = y; //set lasty to the current y position
+            float xrot =
+                    (float) diffy * 0.1f; //set the xrot to xrot with the addition of the difference in the y position
+            float yrot =
+                    (float) diffx * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
+            m_camera->AddRotation(vec2(xrot, yrot));
         }
     }
 
@@ -193,6 +199,48 @@ private:
         GLFWwindow *window = message->getWindow();
         int key = message->getKey();
         int action = message->getAction();
+        if (action == GLFW_PRESS) {
+            switch (key) {
+                case GLFW_KEY_W: {
+                    m_camera->SetMovement(DIRECTION::Forward, true);
+                    break;
+                }
+                case GLFW_KEY_S : {
+                    m_camera->SetMovement(DIRECTION::Backward, true);
+                    break;
+
+                }
+                case GLFW_KEY_A : {
+                    m_camera->SetMovement(DIRECTION::Left, true);
+                    break;
+                }
+                case GLFW_KEY_D: {
+                    m_camera->SetMovement(DIRECTION::Right, true);
+                    break;
+                }
+            }
+        }
+        if (action == GLFW_RELEASE) {
+            switch (key) {
+                case GLFW_KEY_W: {
+                    m_camera->SetMovement(DIRECTION::Forward, false);
+                    break;
+                }
+                case GLFW_KEY_S : {
+                    m_camera->SetMovement(DIRECTION::Backward, false);
+                    break;
+
+                }
+                case GLFW_KEY_A : {
+                    m_camera->SetMovement(DIRECTION::Left, false);
+                    break;
+                }
+                case GLFW_KEY_D: {
+                    m_camera->SetMovement(DIRECTION::Right, false);
+                    break;
+                }
+            }
+        }
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
             switch (key) {
                 case GLFW_KEY_LEFT:
@@ -216,56 +264,66 @@ private:
                     break;
 
                 case GLFW_KEY_H:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::H, m_perlinNoise->getProperty(PerlinNoiseProperty::H) + .05f);
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::H,
+                                               m_perlinNoise->getProperty(PerlinNoiseProperty::H) + .05f);
                     break;
 
                 case GLFW_KEY_N:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::H, m_perlinNoise->getProperty(PerlinNoiseProperty::H) - .05f);
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::H,
+                                               m_perlinNoise->getProperty(PerlinNoiseProperty::H) - .05f);
                     break;
 
                 case GLFW_KEY_F:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::FREQUENCY, m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) + 0.1f);
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::FREQUENCY,
+                                               m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) + 0.1f);
                     break;
 
                 case GLFW_KEY_V:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::FREQUENCY, m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) - 0.1f);
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::FREQUENCY,
+                                               m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) - 0.1f);
                     break;
 
                 case GLFW_KEY_O:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::OFFSET, m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) + 0.05);
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::OFFSET,
+                                               m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) + 0.05);
                     break;
 
                 case GLFW_KEY_L:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::OFFSET, m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) - 0.05);
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::OFFSET,
+                                               m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) - 0.05);
                     break;
 
                 case GLFW_KEY_I:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::LACUNARITY, m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) + 0.05f);
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::LACUNARITY,
+                                               m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) + 0.05f);
                     break;
 
                 case GLFW_KEY_K:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::LACUNARITY, m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) - 0.05f);
-                    break;
-
-                case GLFW_KEY_A:
-                    m_amplitude += 0.1f;
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::LACUNARITY,
+                                               m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) - 0.05f);
                     break;
 
                 case GLFW_KEY_Z:
+                    m_amplitude += 0.1f;
+                    break;
+
+                case GLFW_KEY_X:
                     m_amplitude -= 0.1f;
                     break;
 
                 case GLFW_KEY_J:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::OCTAVE, m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) - 1);
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::OCTAVE,
+                                               m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) - 1);
                     break;
 
                 case GLFW_KEY_U:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::OCTAVE, m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) + 1);
+                    m_perlinNoise->setProperty(PerlinNoiseProperty::OCTAVE,
+                                               m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) + 1);
                     break;
 
-                default:break;
+                default:
+                    break;
             }
         }
-        cout << "Displ  : " << m_displ.x << " ; " << m_displ.y << endl;
     }
 };
