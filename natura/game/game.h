@@ -220,7 +220,7 @@ private:
                     break;
                 }
             }
-            m_terrain->ExpandTerrain(m_camera->getPosition());
+            //m_terrain->ExpandTerrain(m_camera->getPosition());
         }
         if (action == GLFW_RELEASE) {
             switch (key) {
@@ -241,27 +241,26 @@ private:
                     m_camera->SetMovement(DIRECTION::Right, false);
                     break;
                 }
-            }
-            m_terrain->ExpandTerrain(m_camera->getPosition());
-        }
-        if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-            switch (key) {
                 case GLFW_KEY_LEFT:
-                    m_displ.x -= 0.2;
+                    m_terrain->_expand(Terrain::Direction::WEST);
                     break;
 
                 case GLFW_KEY_RIGHT:
-                    m_displ.x += 0.2;
+                    m_terrain->_expand(Terrain::Direction::EST);
                     break;
 
                 case GLFW_KEY_UP:
-                    m_displ.y -= 0.2;
+                    m_terrain->_expand(Terrain::Direction::NORTH);
                     break;
 
                 case GLFW_KEY_DOWN:
-                    m_displ.y += 0.2;
+                    m_terrain->_expand(Terrain::Direction::SOUTH);
                     break;
-
+            }
+            //m_terrain->ExpandTerrain(m_camera->getPosition());
+        }
+        if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+            switch (key) {
                 case GLFW_KEY_ESCAPE:
                     glfwSetWindowShouldClose(window, GL_TRUE);
                     break;

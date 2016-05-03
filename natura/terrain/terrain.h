@@ -23,7 +23,7 @@ public:
     void Init(){
         m_skybox->Init();
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
-            for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
+            for (size_t j = 0 ; j < m_chunks[i].size() ; j ++) {
                 m_chunks[i][j]->Init();
             }
         }
@@ -34,7 +34,7 @@ public:
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         m_skybox->Draw(projection * view * model);
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
-            for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
+            for (size_t j = 0 ; j < m_chunks[i].size() ; j ++) {
                 m_chunks[i][j]->Draw(amplitude, time, glm::translate(model, glm::vec3(i*CHUNK_SIDE_TILE_COUNT, 0.0, j*CHUNK_SIDE_TILE_COUNT)), view, projection);
             }
         }
@@ -42,7 +42,7 @@ public:
 
     void Cleanup(){
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
-            for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
+            for (size_t j = 0 ; j < m_chunks[i].size() ; j ++) {
                 m_chunks[i][j]->Cleanup();
                 delete m_chunks[i][j];
             }
@@ -50,7 +50,8 @@ public:
     }
 
     void ExpandTerrain(glm::vec3 cam_pos){
-        const uint32_t edge_threshold = 2;
+        const uint32_t edge_threshold = 1;
+        cam_pos /= CHUNK_SIDE_TILE_COUNT;
         if (cam_pos.x < edge_threshold){
             _expand(Direction::WEST);
         }
@@ -65,11 +66,6 @@ public:
         }
     }
 
-private:
-    ChunkFactory m_chunk_factory;
-    std::deque<std::deque<Chunk *>> m_chunks;
-    Cube* m_skybox;
-
     enum Direction {NORTH, SOUTH, EST, WEST};
 
     void _expand(Direction dir){
@@ -78,18 +74,34 @@ private:
                 m_chunks.push_front(std::deque<Chunk*>(m_chunks[0].size(), NULL));
                 for (int i = 0 ; i < m_chunks[0].size() ; i ++){
                     m_chunks[0][i] = m_chunk_factory.createChunk(glm::vec2(0, i));
+                    m_chunks[0][i]->Init();
                 }
                 break;
 
             case SOUTH:
                 m_chunks.push_back(std::deque<Chunk*>(m_chunks[0].size(), NULL));
                 for (int i = 0 ; i < m_chunks[0].size() ; i ++){
-                    m_chunks[m_chunks.size()-1][i] = m_chunk_factory.createChunk(glm::vec2(0, i));
+                    m_chunks[m_chunks.size()-1][i] = m_chunk_factory.createChunk(glm::vec2(m_chunks.size()-1, i));
+                    m_chunks[m_chunks.size()-1][i]->Init();
                 }
                 break;
 
-            case EST:break;
-            case WEST:break;
+            case EST:
+                for (int i = 0 ; i < m_chunks.size() ; i ++){
+                    m_chunks[i].push_front(m_chunk_factory.createChunk(glm::vec2(i, 0)));
+                    m_chunks[i][0]->Init();
+                }
+                break;
+            case WEST:
+                for (int i = 0 ; i < m_chunks.size() ; i ++){
+                    m_chunks[i].push_back(m_chunk_factory.createChunk(glm::vec2(i, 0)));
+                    m_chunks[i][m_chunks[i].size()-1]->Init();
+                }break;
         }
     }
+
+private:
+    ChunkFactory m_chunk_factory;
+    std::deque<std::deque<Chunk *>> m_chunks;
+    Cube* m_skybox;
 };
