@@ -39,7 +39,7 @@ public:
         m_matrix = glm::translate(m_matrix, m_position);
     }
 
-    mat4& GetMatrix() {
+    mat4 &GetMatrix() {
         return m_matrix;
     }
 
@@ -49,6 +49,7 @@ public:
 
     void AddRotation(vec2 &rotation) {
         m_rotation += rotation;
+        cout << m_rotation.x << "   " << m_rotation.y << endl;
     }
 
     void SetMovement(DIRECTION::ENUM direction, bool boolean) {
@@ -64,8 +65,8 @@ private:
     float m_movement_factor = 0.04f;
 
     void ComputeMovement() {
-        vec3 forward_direction = normalize(vec3(-cos(radians(m_rotation.x )) * sin(radians(m_rotation.y)),
-                                                sin(radians(m_rotation.x)) * cos(radians(m_rotation.x - 90.0f)),
+        vec3 forward_direction = normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
+                                                sin(radians(m_rotation.x)),
                                                 cos(radians(m_rotation.x)) * cos(radians(m_rotation.y))));
 
         vec3 left_direction = vec3(cos(radians(m_rotation.y)),
