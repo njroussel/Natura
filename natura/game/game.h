@@ -219,6 +219,7 @@ private:
                     break;
                 }
             }
+            m_terrain->ExpandTerrain(m_camera->getPosition());
         }
         if (action == GLFW_RELEASE) {
             switch (key) {
@@ -240,6 +241,7 @@ private:
                     break;
                 }
             }
+            m_terrain->ExpandTerrain(m_camera->getPosition());
         }
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
             switch (key) {

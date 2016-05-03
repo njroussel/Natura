@@ -49,8 +49,47 @@ public:
         }
     }
 
+    void ExpandTerrain(glm::vec3 cam_pos){
+        const uint32_t edge_threshold = 2;
+        if (cam_pos.x < edge_threshold){
+            _expand(Direction::WEST);
+        }
+        if (cam_pos.x > m_chunks[0].size() - edge_threshold){
+            _expand(Direction::EST);
+        }
+        if (cam_pos.y < edge_threshold){
+            _expand(Direction::NORTH);
+        }
+        if (cam_pos.y > m_chunks.size() - edge_threshold){
+            _expand(Direction::SOUTH);
+        }
+    }
+
 private:
     ChunkFactory m_chunk_factory;
     std::deque<std::deque<Chunk *>> m_chunks;
     Cube* m_skybox;
+
+    enum Direction {NORTH, SOUTH, EST, WEST};
+
+    void _expand(Direction dir){
+        switch (dir) {
+            case NORTH:
+                m_chunks.push_front(std::deque<Chunk*>(m_chunks[0].size(), NULL));
+                for (int i = 0 ; i < m_chunks[0].size() ; i ++){
+                    m_chunks[0][i] = m_chunk_factory.createChunk(glm::vec2(0, i));
+                }
+                break;
+
+            case SOUTH:
+                m_chunks.push_back(std::deque<Chunk*>(m_chunks[0].size(), NULL));
+                for (int i = 0 ; i < m_chunks[0].size() ; i ++){
+                    m_chunks[m_chunks.size()-1][i] = m_chunk_factory.createChunk(glm::vec2(0, i));
+                }
+                break;
+
+            case EST:break;
+            case WEST:break;
+        }
+    }
 };
