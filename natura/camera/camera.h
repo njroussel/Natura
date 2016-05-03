@@ -17,9 +17,9 @@ class Camera {
 
 public:
 
-    Camera(vec3 *starting_position, vec2 *starting_rotation) {
-        m_position = vec3(starting_position->x, starting_position->y, starting_position->z);
-        m_rotation = vec2(starting_rotation->x, starting_rotation->y);
+    Camera(vec3 &starting_position, vec2 &starting_rotation) {
+        m_position = vec3(starting_position.x, starting_position.y, starting_position.z);
+        m_rotation = vec2(starting_rotation.x, starting_rotation.y);
         m_matrix = IDENTITY_MATRIX;
 
         for (int i = 0; i < m_moving_size; i++) {
@@ -39,15 +39,15 @@ public:
         m_matrix = glm::translate(m_matrix, m_position);
     }
 
-    mat4 GetMatrix() {
+    mat4& GetMatrix() {
         return m_matrix;
     }
 
-    void SetRotation(vec2 new_rotation) {
+    void SetRotation(vec2 &new_rotation) {
         m_rotation = new_rotation;
     }
 
-    void AddRotation(vec2 rotation) {
+    void AddRotation(vec2 &rotation) {
         m_rotation += rotation;
     }
 

@@ -25,7 +25,6 @@ private:
     bool mCleanedUp;                        // check if the grid is cleaned before its destruction.
     glm::vec2 m_indices;                    // Tile indices on the terrain.
 
-
 public:
 
     Grid(uint32_t sideSize, glm::vec2 indices) {

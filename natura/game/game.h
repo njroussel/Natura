@@ -106,7 +106,7 @@ private:
     void Init() {
         vec3 starting_camera_position = vec3(0.0f, 0.0f, -4.0f);
         vec2 starting_camera_rotation = vec2(0.0f);
-        m_camera = new Camera(&starting_camera_position, &starting_camera_rotation);
+        m_camera = new Camera(starting_camera_position, starting_camera_rotation);
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height);
@@ -133,13 +133,12 @@ private:
         const float time = glfwGetTime();
 
 
-        //tick
+        //tick 60 times per second
         if (time - m_last_time > 1 / 60.0f) {
-            //draw
             m_camera->CalculateMatrix();
         }
 
-
+        //draw as often as possible
         m_terrain->Draw(m_amplitude, time, m_grid_model_matrix, m_camera->GetMatrix(),
                         m_projection->perspective());
 
@@ -181,7 +180,8 @@ private:
                     (float) diffy * 0.1f; //set the xrot to xrot with the addition of the difference in the y position
             float yrot =
                     (float) diffx * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
-            m_camera->AddRotation(vec2(xrot, yrot));
+            vec2 tmp = vec2(xrot, yrot);
+            m_camera->AddRotation(tmp);
         }
     }
 
