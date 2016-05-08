@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <deque>
 #include "../grid/grid.h"
+#include "../axis/axis.h"
 #include "chunk/chunk.h"
 #include "chunk/chunk_generation/chunk_factory.h"
 
@@ -21,6 +22,8 @@ public:
     }
 
     void Init(){
+        m_water_grid.Init();
+        m_axis.Init();
         m_skybox->Init();
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
             for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
@@ -33,9 +36,15 @@ public:
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         m_skybox->Draw(projection * view * model);
+        m_axis.Draw(model, view, projection);
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
             for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
                 m_chunks[i][j]->Draw(amplitude, time, glm::translate(model, glm::vec3(i*CHUNK_SIDE_TILE_COUNT, 0.0, j*CHUNK_SIDE_TILE_COUNT)), view, projection);
+            }
+        }
+        for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
+            for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
+                m_water_grid.Draw(time/8.f, glm::translate(glm::scale(model, glm::vec3(CHUNK_SIDE_TILE_COUNT)), glm::vec3(i, -.1f, 1.f+j)), view, projection);
             }
         }
     }
@@ -50,7 +59,9 @@ public:
     }
 
 private:
+    WaterGrid m_water_grid;
     ChunkFactory m_chunk_factory;
     std::deque<std::deque<Chunk *>> m_chunks;
     Cube* m_skybox;
+    Axis m_axis;
 };

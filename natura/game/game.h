@@ -20,7 +20,7 @@ public:
                                m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window) {
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
-        m_amplitude = 1.05f;
+        m_amplitude = 4.25f;
         Init();
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
@@ -102,6 +102,7 @@ private:
     FrameBufferSizeHandler m_frame_buffer_size_handler;
 
 
+
     /* Private function. */
     void Init() {
         vec3 starting_camera_position = vec3(0.0f, 0.0f, -4.0f);
@@ -110,7 +111,7 @@ private:
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height);
-        m_terrain = new Terrain(1, 64, m_perlinNoise);
+        m_terrain = new Terrain(4, 64, m_perlinNoise);
 
 
         // sets background color b
@@ -119,7 +120,8 @@ private:
         // enable depth test.
         glEnable(GL_DEPTH_TEST);
 
-        m_grid_model_matrix = translate(m_grid_model_matrix, vec3(-4.0f, -0.25f, -4.0f));
+        m_grid_model_matrix = IDENTITY_MATRIX;
+        //m_grid_model_matrix = translate(m_grid_model_matrix, vec3(-4.0f, -0.25f, -4.0f));
         m_grid_model_matrix = scale(m_grid_model_matrix, vec3(2.0, 2.0, 2.0f));
 
         //int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
@@ -325,6 +327,12 @@ private:
                 default:
                     break;
             }
+            cout << "Ampl.  : " << m_amplitude << endl;
+            cout << "H      : " << m_perlinNoise->getProperty(PerlinNoiseProperty::H) << endl;
+            cout << "Freq   : " << m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) << endl;
+            cout << "Offset : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) << endl;
+            cout << "Lac.   : " << m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) << endl;
+            cout << "Octave : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) << endl;
         }
     }
 };
