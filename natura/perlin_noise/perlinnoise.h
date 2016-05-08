@@ -85,11 +85,10 @@ private:
     uint32_t mHeight;
     PerlinQuad quad;
     float m_H = 0.35f;
-    float m_lacunarity = 2.4f;
-    float m_offset = -0.2f;
-    float m_frequency = 2.04f;
-    int m_octaves = 8;
-    float m_amplitude = 1.05f;
+    float m_lacunarity = 2.8f;
+    float m_offset = 0.8f;
+    float m_frequency = 0.44f;
+    int m_octaves = 6;
 };
 
 
