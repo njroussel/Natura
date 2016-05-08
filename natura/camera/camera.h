@@ -56,6 +56,10 @@ public:
         m_moving[direction] = boolean;
     }
 
+    glm::vec3 getPosition() {
+        return m_position;
+    }
+
 private:
     static const size_t m_moving_size = 4;
     bool m_moving[m_moving_size];
