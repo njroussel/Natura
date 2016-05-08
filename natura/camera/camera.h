@@ -65,7 +65,7 @@ private:
     vec3 m_position;
     vec2 m_rotation;
     mat4 m_matrix;
-    float m_movement_factor = 0.04f;
+    float m_movement_factor = 0.1f;
 
     void ComputeMovement() {
         vec3 forward_direction = normalize(vec3(-cos(radians(m_rotation.x )) * sin(radians(m_rotation.y)),

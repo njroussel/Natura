@@ -14,6 +14,9 @@
 #include "../misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+
+#define TERRAIN_SCALE 2.0f
+
 class Game : public Observer {
 public:
     Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window),
@@ -104,13 +107,25 @@ private:
 
     /* Private function. */
     void Init() {
-        vec3 starting_camera_position = vec3(0.0f, 0.0f, -4.0f);
-        vec2 starting_camera_rotation = vec2(0.0f);
+        const bool top_down_view = true;
+        const int TERRAIN_SIZE = 5;
+        const float cam_posxy = TERRAIN_SCALE * ((float)(TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
+        cout << "Campos : " << cam_posxy << endl;
+        vec3 starting_camera_position;
+        vec2 starting_camera_rotation;
+        if (top_down_view) {
+            starting_camera_position = vec3(-cam_posxy, -40.0f, 0/*-cam_posxy*/);
+            starting_camera_rotation = vec2(90.0f, 0.f);
+        }
+        else {
+            starting_camera_position = vec3(-cam_posxy, -5.0f, -cam_posxy);
+            starting_camera_rotation = vec2(0.0f);
+        }
         m_camera = new Camera(starting_camera_position, starting_camera_rotation);
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height);
-        m_terrain = new Terrain(1, 64, m_perlinNoise);
+        m_terrain = new Terrain(TERRAIN_SIZE, 64, m_perlinNoise);
 
 
         // sets background color b
@@ -118,9 +133,9 @@ private:
 
         // enable depth test.
         glEnable(GL_DEPTH_TEST);
-
-        m_grid_model_matrix = translate(m_grid_model_matrix, vec3(-4.0f, -0.25f, -4.0f));
-        m_grid_model_matrix = scale(m_grid_model_matrix, vec3(2.0, 2.0, 2.0f));
+        m_grid_model_matrix = IDENTITY_MATRIX;
+        //m_grid_model_matrix = translate(m_grid_model_matrix, vec3(-4.0f, -0.25f, -4.0f));
+        m_grid_model_matrix = scale(m_grid_model_matrix, vec3(TERRAIN_SCALE, TERRAIN_SCALE, TERRAIN_SCALE));
 
         //int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
         m_terrain->Init(/*perlinNoiseTex*/);
@@ -140,6 +155,8 @@ private:
         }
 
         //draw as often as possible
+        m_terrain->ExpandTerrain(m_camera->getPosition());
+        //m_terrain->_expand(Terrain::Direction::EST);
         m_terrain->Draw(m_amplitude, time, m_grid_model_matrix, m_camera->GetMatrix(),
                         m_projection->perspective());
 
@@ -220,7 +237,6 @@ private:
                     break;
                 }
             }
-            //m_terrain->ExpandTerrain(m_camera->getPosition());
         }
         if (action == GLFW_RELEASE) {
             switch (key) {
@@ -241,7 +257,7 @@ private:
                     m_camera->SetMovement(DIRECTION::Right, false);
                     break;
                 }
-                case GLFW_KEY_LEFT:
+                /*case GLFW_KEY_LEFT:
                     m_terrain->_expand(Terrain::Direction::WEST);
                     break;
 
@@ -255,9 +271,8 @@ private:
 
                 case GLFW_KEY_DOWN:
                     m_terrain->_expand(Terrain::Direction::SOUTH);
-                    break;
+                    break;*/
             }
-            //m_terrain->ExpandTerrain(m_camera->getPosition());
         }
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
             switch (key) {
