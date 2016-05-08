@@ -21,12 +21,6 @@ public:
 
     void Init(){
         m_perlin_noise->attach(this);
-        float H = 0.4f;
-        float lacunarity = 2.0f;
-        float offset = 1.0f;
-        float frequency = 0.64f;
-        int octaves = 6;
-        float amplitude = 0.95f;
         m_chunk_noise_tex_id = m_perlin_noise->generateNoise(glm::vec2(m_position.x, m_position.y));
         m_base_tile.Init(m_chunk_noise_tex_id);
     }
