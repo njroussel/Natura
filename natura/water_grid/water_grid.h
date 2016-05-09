@@ -12,7 +12,7 @@ private:
     GLuint program_id_;                     // GLSL shader program ID
     GLuint texture_id_;                     // texture ID
     GLuint num_indices_;                    // number of vertices to render
-    GLuint MVP_id_;                         // model, view, proj matrix ID
+    GLuint MV_id;                         // model, view, proj matrix ID
 
 public:
     void Init() {
@@ -94,7 +94,29 @@ public:
         }
 
         // other uniforms
-        MVP_id_ = glGetUniformLocation(program_id_, "MVP");
+        MV_id = glGetUniformLocation(program_id_, "MV");
+
+        glm::vec3 La = glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 Ld = glm::vec3(1.0f, 1.0f, 1.0f);
+        glm::vec3 light_pos = glm::vec3(0.0f, 100.0f, 0.0f);
+
+        GLuint La_id = glGetUniformLocation(program_id_, "La");
+        GLuint Ld_id = glGetUniformLocation(program_id_, "Ld");
+        GLuint light_pos_id = glGetUniformLocation(program_id_, "light_pos");
+
+        glUniform3fv(La_id, ONE, glm::value_ptr(La));
+        glUniform3fv(Ld_id, ONE, glm::value_ptr(Ld));
+        glUniform3fv(light_pos_id, ONE, glm::value_ptr(light_pos));
+
+        glm::vec3 ka = glm::vec3(0.5f, 0.5f, 0.5f);
+        glm::vec3 kd = glm::vec3(0.5f, 0.5f, 0.5f);
+
+        GLuint ka_id = glGetUniformLocation(program_id_, "ka");
+        GLuint kd_id = glGetUniformLocation(program_id_, "kd");
+        GLuint alpha_id = glGetUniformLocation(program_id_, "alpha");
+
+        glUniform3fv(ka_id, ONE, glm::value_ptr(ka));
+        glUniform3fv(kd_id, ONE, glm::value_ptr(kd));
 
         // to avoid the current object being polluted
         glBindVertexArray(0);
@@ -111,18 +133,20 @@ public:
         glDeleteTextures(1, &texture_id_);
     }
 
-    void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
+    void Draw(glm::vec2 pos, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
 
-        // setup MVP
-        glm::mat4 MVP = projection * view * model;
-        glUniformMatrix4fv(MVP_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(MVP));
+        // setup MV
+        glm::mat4 MV = view * model;
+        glUniformMatrix4fv(MV_id, ONE, DONT_TRANSPOSE, glm::value_ptr(MV));
+        glUniformMatrix4fv(glGetUniformLocation(program_id_, "projection"), ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
 
         // pass the current time stamp to the shader.
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
+        glUniform2fv(glGetUniformLocation(program_id_, "chunk_pos"), ONE, glm::value_ptr(pos));
 
         // draw
         // TODO 5: for debugging it can be helpful to draw only the wireframe.

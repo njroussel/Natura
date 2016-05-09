@@ -6,6 +6,7 @@
 #include "../axis/axis.h"
 #include "chunk/chunk.h"
 #include "chunk/chunk_generation/chunk_factory.h"
+#include "../water_grid/water_grid.h"
 
 
 class Terrain {
@@ -44,7 +45,7 @@ public:
         }
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
             for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
-                m_water_grid.Draw(time/8.f, glm::translate(glm::scale(model, glm::vec3(CHUNK_SIDE_TILE_COUNT)), glm::vec3(i, -.1f, 1.f+j)), view, projection);
+                m_water_grid.Draw(glm::vec2(i*CHUNK_SIDE_TILE_COUNT, j*CHUNK_SIDE_TILE_COUNT), time/8.f, glm::translate(glm::scale(model, glm::vec3(CHUNK_SIDE_TILE_COUNT)), glm::vec3(i, -.1f, j)), view, projection);
             }
         }
     }
