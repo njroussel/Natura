@@ -34,7 +34,7 @@ public:
     void Draw(float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
-        glm::mat4 _m = model;//glm::translate(model, glm::vec3(-m_offset.x*CHUNK_SIDE_TILE_COUNT, 0, -m_offset.y*CHUNK_SIDE_TILE_COUNT));
+        glm::mat4 _m = glm::translate(model, glm::vec3(m_offset.x*CHUNK_SIDE_TILE_COUNT, 0, m_offset.y*CHUNK_SIDE_TILE_COUNT));
         m_skybox->Draw(projection * view * _m);
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
             for (size_t j = 0 ; j < m_chunks[i].size() ; j ++) {
@@ -60,23 +60,15 @@ public:
         cam_pos = abs(cam_pos);
         cam_pos.x = (int) cam_pos.x;
         cam_pos.z = (int) cam_pos.z;
-        cout << "cam_pos : " << cam_pos.x << " , " << cam_pos.z << endl;
-        /*if (cam_pos.z < edge_threshold){
-            m_offset.x ++;
-            _expand(Direction::WEST);
-        }
-        else if (cam_pos.z > m_chunks[0].size() - edge_threshold){
-            m_offset.x --;
-            _expand(Direction::EST);
-        }*/
-         if (cam_pos.x < edge_threshold){
-            m_offset.x --;
-            _expand(Direction::NORTH);
-        }
-        else if (cam_pos.x > m_chunks.size() - edge_threshold){
-            m_offset.x ++;
-            _expand(Direction::SOUTH);
-        }
+        //cout << "cam_pos : " << cam_pos.x << " , " << cam_pos.z << endl;
+        if (cam_pos.z < edge_threshold)
+            _expand(Terrain::Direction::NORTH);
+        else if (cam_pos.z > m_chunks[0].size() - 1 - edge_threshold)
+            _expand(Terrain::Direction::SOUTH);
+        else if (cam_pos.x < edge_threshold)
+            _expand(Terrain::Direction::WEST);
+        else if (cam_pos.x > m_chunks.size() - 1 - edge_threshold)
+            _expand(Terrain::Direction::EST);
     }
 
     enum Direction {NORTH, SOUTH, EST, WEST};
