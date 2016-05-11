@@ -73,6 +73,12 @@ public:
 
     enum Direction {NORTH, SOUTH, EST, WEST};
 
+private:
+    ChunkFactory m_chunk_factory;
+    std::deque<std::deque<Chunk *>> m_chunks;
+    Cube* m_skybox;
+    glm::vec2 m_offset;
+
     void _expand(Direction dir){
         switch (dir) {
             case SOUTH: {
@@ -118,10 +124,4 @@ public:
             }
         }
     }
-
-private:
-    ChunkFactory m_chunk_factory;
-    std::deque<std::deque<Chunk *>> m_chunks;
-    Cube* m_skybox;
-    glm::vec2 m_offset;
 };
