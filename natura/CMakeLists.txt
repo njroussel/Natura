@@ -9,6 +9,7 @@ file(GLOB TEXTURES
         grid/rock.tga
         grid/snow.tga
         grid/sand.tga
+        grid/water.tga
         skybox/top.tga
         skybox/left.tga
         skybox/right.tga

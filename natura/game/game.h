@@ -21,7 +21,7 @@ public:
                                m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window) {
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
-        m_amplitude = 8.25f;
+        m_amplitude = 9.05f;
         Init();
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);

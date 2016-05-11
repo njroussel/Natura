@@ -12,6 +12,7 @@ uniform sampler2D grass_tex;
 uniform sampler2D rock_tex;
 uniform sampler2D snow_tex;
 uniform sampler2D sand_tex;
+uniform sampler2D water_tex;
 uniform vec3 La, Ld;
 uniform vec3 ka, kd;
 
@@ -34,21 +35,25 @@ void main() {
     vec3 rockColor = texture(rock_tex, pos_2d* 10.0f).rgb;
     vec3 snowColor = texture(snow_tex, pos_2d* 5).rgb;
     vec3 sandColor = texture(sand_tex, pos_2d* 5).rgb;
+    vec3 waterColor = texture(water_tex, pos_2d* 5).rgb;
 
-    if(height > 0.8){
+    if(height > 0.9){
         color = snowColor;
     }
-    else if (height > 0.75){
-        color = mix(rockColor, snowColor, getPercentage(height, 0.75f, 0.8f));
+    else if (height > 0.85){
+        color = mix(rockColor, snowColor, getPercentage(height, 0.85f, 0.9f));
     }
-    else if (height > 0.5){
-        color = mix(grassColor, rockColor, getPercentage(height, 0.5f, 0.75f));
+    else if (height > 0.65){
+        color = mix(grassColor, rockColor, getPercentage(height, 0.65f, 0.85f));
     }
-    else if( height > 0.45f){
-        color = mix(sandColor, grassColor, getPercentage(height, 0.45f, 0.5f));
+    else if( height > 0.5f){
+        color = mix(sandColor, grassColor, getPercentage(height, 0.5f, 0.65f));
+    }
+    else if (height > 0.35f){
+        color = mix(waterColor, sandColor, getPercentage(height, 0.35f, 0.5f));
     }
     else{
-        color = sandColor;
+        color = waterColor;
     }
 
     float epsilon = 0.005f;

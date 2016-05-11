@@ -17,6 +17,7 @@ private:
     GLuint texture_rock_id_;                // texture ID
     GLuint texture_snow_id_;                // texture ID
     GLuint texture_sand_id_;                // texture ID
+    GLuint texture_deep_water_id_;                // texture ID
     GLuint num_indices_;                    // number of vertices to render
     GLuint M_id_;                           // model matrix ID
     GLuint V_id_;                           // view matrix ID
@@ -162,6 +163,7 @@ public:
         loadTexture("rock.tga", &texture_rock_id_, 2, glGetUniformLocation(program_id_, "rock_tex"));
         loadTexture("snow.tga", &texture_snow_id_, 3, glGetUniformLocation(program_id_, "snow_tex"));
         loadTexture("sand.tga", &texture_sand_id_, 4, glGetUniformLocation(program_id_, "sand_tex"));
+        loadTexture("water.tga", &texture_deep_water_id_, 5, glGetUniformLocation(program_id_, "water_tex"));
 
         // to avoid the current object being polluted
         glBindVertexArray(0);
@@ -196,6 +198,9 @@ public:
 
         glActiveTexture(GL_TEXTURE4);
         glBindTexture(GL_TEXTURE_2D, texture_sand_id_);
+
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, texture_deep_water_id_);
 
         // draw
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
