@@ -112,7 +112,7 @@ private:
         vec3 starting_camera_position;
         vec2 starting_camera_rotation;
         if (top_down_view) {
-            starting_camera_position = vec3(-cam_posxy, -40.0f, -cam_posxy);
+            starting_camera_position = vec3(-cam_posxy, -20.0f, -cam_posxy);
             starting_camera_rotation = vec2(90.0f, 0.f);
         }
         else {
