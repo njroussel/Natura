@@ -157,7 +157,7 @@ private:
         //draw as often as possible
         m_terrain->ExpandTerrain(m_camera->getPosition());
         //m_terrain->_expand(Terrain::Direction::SOUTH);
-        m_terrain->Draw(m_amplitude, time, m_grid_model_matrix, m_camera->GetMatrix(),
+        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), m_grid_model_matrix, m_camera->GetMatrix(),
                         m_projection->perspective());
 
     }
