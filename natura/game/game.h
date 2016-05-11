@@ -21,7 +21,7 @@ public:
                                m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window) {
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
-        m_amplitude = 4.25f;
+        m_amplitude = 8.25f;
         Init();
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
@@ -107,7 +107,7 @@ private:
     /* Private function. */
     void Init() {
         const bool top_down_view = true;
-        const int TERRAIN_SIZE = 5;
+        const int TERRAIN_SIZE = 10;
         const float cam_posxy = TERRAIN_SCALE * ((float)(TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
         cout << "Campos : " << cam_posxy << endl;
         vec3 starting_camera_position;
@@ -124,7 +124,7 @@ private:
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height);
-        m_terrain = new Terrain(TERRAIN_SIZE, 16, m_perlinNoise);
+        m_terrain = new Terrain(TERRAIN_SIZE, 8, m_perlinNoise);
 
 
         // sets background color b
@@ -337,6 +337,14 @@ private:
                                                m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) + 1);
                     break;
 
+                case GLFW_KEY_G:
+                    m_terrain->water_height += 0.05f;
+                    break;
+
+                case GLFW_KEY_B:
+                    m_terrain->water_height -= 0.05f;
+                    break;
+
                 default:
                     break;
             }
@@ -346,6 +354,7 @@ private:
             cout << "Offset : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) << endl;
             cout << "Lac.   : " << m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) << endl;
             cout << "Octave : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) << endl;
+            cout << "Water h: " << m_terrain->water_height << endl;
         }
     }
 };
