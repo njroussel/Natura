@@ -85,7 +85,8 @@ private:
                 m_offset.y ++;
                 for (int i = 0 ; i < m_chunks.size() ; i ++){
                     m_chunks[i].pop_front();
-                    m_chunks[i].push_back(m_chunk_factory.createChunk(glm::vec2(m_offset.x + i, m_chunks[i].size()-1 + m_offset.y)));
+                    /* NOTE : The +1 in the indice y is important to avoid an off-by-one error. */
+                    m_chunks[i].push_back(m_chunk_factory.createChunk(glm::vec2(m_offset.x + i, m_chunks[i].size()-1 + 1 + m_offset.y)));
                     m_chunks[i][m_chunks[i].size()-1]->Init();
                 }
                 break;
