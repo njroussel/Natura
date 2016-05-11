@@ -6,7 +6,7 @@
 #include "chunk/chunk.h"
 #include "chunk/chunk_generation/chunk_factory.h"
 
-
+#define TERRAIN_SCALE 2.0f
 
 class Terrain {
 public:
@@ -34,8 +34,7 @@ public:
     void Draw(float amplitude, float time, glm::vec3 cam_pos, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
-        // TODO : Replace 2.f by TERRAIN_SCALE
-        m_skybox->Draw(projection * view * glm::translate(model, -cam_pos/2.f));
+        m_skybox->Draw(projection * view * glm::translate(model, -cam_pos/TERRAIN_SCALE));
         glm::mat4 _m = glm::translate(model, glm::vec3(m_offset.x*CHUNK_SIDE_TILE_COUNT, 0, m_offset.y*CHUNK_SIDE_TILE_COUNT));
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
             for (size_t j = 0 ; j < m_chunks[i].size() ; j ++) {
@@ -56,7 +55,7 @@ public:
     void ExpandTerrain(glm::vec3 cam_pos){
         const uint32_t edge_threshold = 1;
         cam_pos /= CHUNK_SIDE_TILE_COUNT;
-        cam_pos /= 2; // TODO : Change to TERRAIN_SCALE
+        cam_pos /= TERRAIN_SCALE;
         cam_pos += glm::vec3(m_offset.x, 0, m_offset.y);
         cam_pos = abs(cam_pos);
         cam_pos.x = (int) cam_pos.x;

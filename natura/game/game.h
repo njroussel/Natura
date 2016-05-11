@@ -15,8 +15,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 
-#define TERRAIN_SCALE 2.0f
-
 class Game : public Observer {
 public:
     Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window),
