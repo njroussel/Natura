@@ -56,6 +56,10 @@ public:
         }
     }
 
+    glm::vec2 getPosition() {
+        return m_position;
+    }
+
 private:
     Grid m_base_tile;
     glm::vec2 m_position;
