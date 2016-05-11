@@ -114,7 +114,7 @@ private:
         vec3 starting_camera_position;
         vec2 starting_camera_rotation;
         if (top_down_view) {
-            starting_camera_position = vec3(-cam_posxy, -40.0f, 0/*-cam_posxy*/);
+            starting_camera_position = vec3(-cam_posxy, -40.0f, -cam_posxy);
             starting_camera_rotation = vec2(90.0f, 0.f);
         }
         else {
@@ -155,8 +155,8 @@ private:
         }
 
         //draw as often as possible
-        m_terrain->ExpandTerrain(m_camera->getPosition());
-        //m_terrain->_expand(Terrain::Direction::EST);
+        //m_terrain->ExpandTerrain(m_camera->getPosition());
+        m_terrain->_expand(Terrain::Direction::SOUTH);
         m_terrain->Draw(m_amplitude, time, m_grid_model_matrix, m_camera->GetMatrix(),
                         m_projection->perspective());
 
