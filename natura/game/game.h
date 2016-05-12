@@ -108,6 +108,7 @@ private:
     void Init() {
         const bool top_down_view = true;
         const int TERRAIN_SIZE = 10;
+        const int VERT_PER_GRID_SIDE = 8;
         const float cam_posxy = TERRAIN_SCALE * ((float)(TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
         cout << "Campos : " << cam_posxy << endl;
         vec3 starting_camera_position;
@@ -124,7 +125,7 @@ private:
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height);
-        m_terrain = new Terrain(TERRAIN_SIZE, 8, m_perlinNoise);
+        m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
 
 
         // sets background color b
@@ -137,6 +138,8 @@ private:
         m_grid_model_matrix = scale(m_grid_model_matrix, vec3(TERRAIN_SCALE, TERRAIN_SCALE, TERRAIN_SCALE));
 
         //int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
+        BASE_TILE = new Grid(VERT_PER_GRID_SIDE, glm::vec2(0, 0));
+        BASE_TILE->Init(0);
         m_terrain->Init(/*perlinNoiseTex*/);
     }
 
