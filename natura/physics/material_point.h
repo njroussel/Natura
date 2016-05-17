@@ -32,6 +32,10 @@ public:
         _update_pos();
     }
 
+    bool isMoving(){
+        return m_speed != glm::vec3(0, 0, 0);
+    }
+
 private:
     float m_mass;
     float m_max_speed;
