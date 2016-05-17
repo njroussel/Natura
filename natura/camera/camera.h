@@ -43,6 +43,51 @@ public:
         return m_matrix;
     }
 
+#define print_vec3(vec)\
+    printf(#vec " = %f ; %f ; %f\n", vec.x, vec.y, vec.z)
+
+#define print_vec2(vec)\
+    printf(#vec " = %f ; %f\n", vec.x, vec.y)
+
+    void LookAt(glm::vec3 target) {
+        glm::vec3 pos = - m_position;
+        /*float dx = target.x - pos.x;
+        float dz = target.z - pos.z;
+        float dy = target.y - pos.y;
+        //m_rotation.y = atan(dx/dz);
+        //m_rotation.x = atan(dy/dz);
+        cout << "Pos = " << pos.x << "    " << pos.y << "    " << pos.z << endl;
+
+        glm::vec3 forw = -getForwardDirection();
+        glm::vec3 ray = target - pos;
+
+        glm::vec2 fyz = normalize(glm::vec2(forw.y, forw.z));
+        glm::vec2 ryz = normalize(glm::vec2(ray.y, ray.z));
+
+        print_vec3(forw);
+        print_vec3(ray);
+        print_vec2(fyz);
+        print_vec2(ryz);
+        float d = acos(dot(fyz, ryz));
+        cout << "angle. = " << d << endl;
+        m_rotation.x = d;
+        cout << "New Rot. = " << m_rotation.x << endl;*/
+
+        float dz = pos.z - target.z;
+        float dy = pos.y - target.y;
+        cout << "dz = " << dz << endl;
+        cout << "dy = " << dy << endl;
+        cout << "angle = " << degrees(atan(dy/dz))  << endl;
+        m_rotation.x = degrees(atan(dy/dz));
+
+        float dx = pos.x - target.x;
+        m_rotation.y = -degrees(atan(dx/dz));
+        cout << "dz = " << dz << endl;
+        cout << "dx = " << dx << endl;
+        cout << "angle = " << -degrees(atan(dx/dz))  << endl;
+
+    }
+
     void SetRotation(vec2 &new_rotation) {
         m_rotation = new_rotation;
     }
@@ -69,13 +114,8 @@ private:
     float m_movement_factor = 0.4f;
 
     void ComputeMovement() {
-        vec3 forward_direction = normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
-                                                sin(radians(m_rotation.x)),
-                                                cos(radians(m_rotation.x)) * cos(radians(m_rotation.y))));
-
-        vec3 left_direction = vec3(cos(radians(m_rotation.y)),
-                                   0,
-                                   sin(radians(m_rotation.y)));;
+        glm::vec3 forward_direction = getForwardDirection();
+        vec3 left_direction = getLeftDirection();
 
         if (m_moving[DIRECTION::ENUM::Forward]) {
             m_position += m_movement_factor * forward_direction;
@@ -89,6 +129,21 @@ private:
         if (m_moving[DIRECTION::ENUM::Right]) {
             m_position += m_movement_factor * -left_direction;
         }
+    }
+
+    glm::vec3 getForwardDirection() {
+        return normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
+                                                sin(radians(m_rotation.x)),
+                                                cos(radians(m_rotation.x)) * cos(radians(m_rotation.y))));
+
+    }
+
+    glm::vec3 getLeftDirection() {
+        return vec3(cos(radians(m_rotation.y)), 0, sin(radians(m_rotation.y)));
+    }
+
+    glm::vec3 getUpVector(){
+        return normalize(cross(getForwardDirection(), getLeftDirection()));
     }
 };
 

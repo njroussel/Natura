@@ -113,8 +113,8 @@ private:
         vec3 starting_camera_position;
         vec2 starting_camera_rotation;
         if (top_down_view) {
-            starting_camera_position = vec3(-cam_posxy, -20.0f, -cam_posxy);
-            starting_camera_rotation = vec2(90.0f, 0.f);
+            starting_camera_position = vec3(0, -0.5, -0.5);
+            starting_camera_rotation = vec2(0.0f, 40.f);
         }
         else {
             starting_camera_position = vec3(-cam_posxy, -5.0f, -cam_posxy);
@@ -345,16 +345,21 @@ private:
                     m_terrain->water_height -= 0.05f;
                     break;
 
+                case GLFW_KEY_SPACE:
+                    cout << "KEKED" << endl;
+                    m_camera->LookAt(glm::vec3(0, 0, 0));
+                    break;
+
                 default:
                     break;
             }
-            cout << "Ampl.  : " << m_amplitude << endl;
+            /*cout << "Ampl.  : " << m_amplitude << endl;
             cout << "H      : " << m_perlinNoise->getProperty(PerlinNoiseProperty::H) << endl;
             cout << "Freq   : " << m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) << endl;
             cout << "Offset : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) << endl;
             cout << "Lac.   : " << m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) << endl;
             cout << "Octave : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) << endl;
-            cout << "Water h: " << m_terrain->water_height << endl;
+            cout << "Water h: " << m_terrain->water_height << endl;*/
         }
     }
 };
