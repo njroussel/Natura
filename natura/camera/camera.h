@@ -7,10 +7,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdint>
 
-struct DIRECTION {
-    enum ENUM {
-        Forward = 0, Backward = 1, Left = 2, Right = 3
-    };
+typedef enum DIRECTION {
+    Forward = 0, Backward = 1
 };
 
 
@@ -22,9 +20,7 @@ public:
         m_rotation = vec2(starting_rotation.x, starting_rotation.y);
         m_matrix = IDENTITY_MATRIX;
 
-        for (int i = 0; i < m_moving_size; i++) {
-            m_moving[i] = false;
-        }
+        allowBackwardsSpeed(false);
     }
 
     ~Camera() {
@@ -88,32 +84,46 @@ public:
 
     }
 
-    void SetRotation(vec2 &new_rotation) {
-        m_rotation = new_rotation;
-        vec3 forward_direction = normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
-                                                sin(radians(m_rotation.x)),
-                                                cos(radians(m_rotation.x)) * cos(radians(m_rotation.y))));
-
-        setAccelerationVector(forward_direction);
-    }
-
     void AddRotation(vec2 &rotation) {
         m_rotation += rotation;
-        setAccelerationVector(getForwardDirection());
+        if (isMoving()){
+            if (isSlowingDown()){
+                cout << "Slowing down" << endl;
+                if (m_direction == Forward)
+                    forceDirection(-getForwardDirection());
+                else
+                    forceDirection(getForwardDirection());
+            }
+            else{
+                if (m_direction == Forward)
+                    forceDirection(getForwardDirection());
+                else
+                    forceDirection(-getForwardDirection());
+            }
+        }
     }
 
-    void SetMovement(DIRECTION::ENUM direction, bool boolean) {
-        if (boolean)
-            setAccelerationVector(getForwardDirection());
-        m_moving[direction] = boolean;
+    void SetMovement(DIRECTION direction, bool boolean) {
+            m_direction = direction;
+        if (boolean) {
+            if (direction == DIRECTION::Forward)
+                setAccelerationVector(getForwardDirection());
+            else
+                setAccelerationVector(-getForwardDirection());
+        }
+        else {
+            if (m_direction == DIRECTION::Forward)
+                setAccelerationVector(-getForwardDirection());
+            else
+                setAccelerationVector(getForwardDirection());
+        }
     }
 
 private:
-    static const size_t m_moving_size = 4;
-    bool m_moving[m_moving_size];
+    float m_movement_factor = 4.f;
     vec2 m_rotation;
     mat4 m_matrix;
-    float m_movement_factor = 0.4f;
+    DIRECTION m_direction;
 
     glm::vec3 getForwardDirection() {
         return normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
