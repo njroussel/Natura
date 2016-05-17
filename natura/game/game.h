@@ -107,7 +107,7 @@ private:
     /* Private function. */
     void Init() {
         const bool top_down_view = true;
-        const int TERRAIN_SIZE = 10;
+        const int TERRAIN_SIZE = 5;
         const float cam_posxy = TERRAIN_SCALE * ((float)(TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
         cout << "Campos : " << cam_posxy << endl;
         vec3 starting_camera_position;
@@ -227,14 +227,6 @@ private:
                     break;
 
                 }
-                case GLFW_KEY_A : {
-                    m_camera->SetMovement(DIRECTION::Left, true);
-                    break;
-                }
-                case GLFW_KEY_D: {
-                    m_camera->SetMovement(DIRECTION::Right, true);
-                    break;
-                }
             }
         }
         if (action == GLFW_RELEASE) {
@@ -247,14 +239,6 @@ private:
                     m_camera->SetMovement(DIRECTION::Backward, false);
                     break;
 
-                }
-                case GLFW_KEY_A : {
-                    m_camera->SetMovement(DIRECTION::Left, false);
-                    break;
-                }
-                case GLFW_KEY_D: {
-                    m_camera->SetMovement(DIRECTION::Right, false);
-                    break;
                 }
                 /*case GLFW_KEY_LEFT:
                     m_terrain->_expand(Terrain::Direction::WEST);
@@ -349,6 +333,28 @@ private:
                     cout << "KEKED" << endl;
                     m_camera->LookAt(glm::vec3(0, 0, 0));
                     break;
+
+                case GLFW_KEY_A : {
+                    glm::vec2 rot = vec2(0, -1);
+                    m_camera->AddRotation(rot);
+                    break;
+                }
+                case GLFW_KEY_D: {
+                    glm::vec2 rot = vec2(0, 1);
+                    m_camera->AddRotation(rot);
+                    break;
+                }
+
+                case GLFW_KEY_Q : {
+                    glm::vec2 rot = vec2(-1, 0);
+                    m_camera->AddRotation(rot);
+                    break;
+                }
+                case GLFW_KEY_E: {
+                    glm::vec2 rot = vec2(1, 0);
+                    m_camera->AddRotation(rot);
+                    break;
+                }
 
                 default:
                     break;
