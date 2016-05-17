@@ -31,7 +31,7 @@ void main() {
 
 
     float height = ((texture(perlin_tex, pos_2d).r) + 1.0f) / 2.0f;
-    vec3 grassColor = texture(grass_tex, pos_2d* 5.0f).rgb;
+    vec3 grassColor = texture(grass_tex, pos_2d* 30.f).rgb;
     vec3 rockColor = texture(rock_tex, pos_2d* 10.0f).rgb;
     vec3 snowColor = texture(snow_tex, pos_2d* 5).rgb;
     vec3 sandColor = texture(sand_tex, pos_2d* 5).rgb;

@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "icg_helper.h"
+#include "../physics/material_point.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdint>
 
@@ -13,12 +14,11 @@ struct DIRECTION {
 };
 
 
-class Camera {
+class Camera : public MaterialPoint{
 
 public:
 
-    Camera(vec3 &starting_position, vec2 &starting_rotation) {
-        m_position = vec3(starting_position.x, starting_position.y, starting_position.z);
+    Camera(vec3 &starting_position, vec2 &starting_rotation) : MaterialPoint(1.0, starting_position){
         m_rotation = vec2(starting_rotation.x, starting_rotation.y);
         m_matrix = IDENTITY_MATRIX;
 
@@ -31,12 +31,12 @@ public:
     }
 
     void CalculateMatrix() {
-        ComputeMovement();
+        //ComputeMovement();
 
         m_matrix = IDENTITY_MATRIX;
         m_matrix = glm::rotate(m_matrix, radians(m_rotation.x), vec3(1.0f, 0.0f, 0.0f));
         m_matrix = glm::rotate(m_matrix, radians(m_rotation.y), vec3(0.0f, 1.0f, 0.0f));
-        m_matrix = glm::translate(m_matrix, m_position);
+        m_matrix = glm::translate(m_matrix, getPosition());
     }
 
     mat4 &GetMatrix() {
@@ -50,7 +50,7 @@ public:
     printf(#vec " = %f ; %f\n", vec.x, vec.y)
 
     void LookAt(glm::vec3 target) {
-        glm::vec3 pos = - m_position;
+        glm::vec3 pos = - getPosition();
         /*float dx = target.x - pos.x;
         float dz = target.z - pos.z;
         float dy = target.y - pos.y;
@@ -90,46 +90,30 @@ public:
 
     void SetRotation(vec2 &new_rotation) {
         m_rotation = new_rotation;
+        vec3 forward_direction = normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
+                                                sin(radians(m_rotation.x)),
+                                                cos(radians(m_rotation.x)) * cos(radians(m_rotation.y))));
+
+        setAccelerationVector(forward_direction);
     }
 
     void AddRotation(vec2 &rotation) {
         m_rotation += rotation;
-        cout << m_rotation.x << "   " << m_rotation.y << endl;
+        setAccelerationVector(getForwardDirection());
     }
 
     void SetMovement(DIRECTION::ENUM direction, bool boolean) {
+        if (boolean)
+            setAccelerationVector(getForwardDirection());
         m_moving[direction] = boolean;
-    }
-
-    glm::vec3 getPosition() {
-        return m_position;
     }
 
 private:
     static const size_t m_moving_size = 4;
     bool m_moving[m_moving_size];
-    vec3 m_position;
     vec2 m_rotation;
     mat4 m_matrix;
     float m_movement_factor = 0.4f;
-
-    void ComputeMovement() {
-        glm::vec3 forward_direction = getForwardDirection();
-        vec3 left_direction = getLeftDirection();
-
-        if (m_moving[DIRECTION::ENUM::Forward]) {
-            m_position += m_movement_factor * forward_direction;
-        }
-        if (m_moving[DIRECTION::ENUM::Backward]) {
-            m_position += m_movement_factor * -forward_direction;
-        }
-        if (m_moving[DIRECTION::ENUM::Left]) {
-            m_position += m_movement_factor * left_direction;
-        }
-        if (m_moving[DIRECTION::ENUM::Right]) {
-            m_position += m_movement_factor * -left_direction;
-        }
-    }
 
     glm::vec3 getForwardDirection() {
         return normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),

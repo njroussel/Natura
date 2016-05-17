@@ -170,7 +170,6 @@ public:
         glUseProgram(0);
     }
 
-
     void Draw(glm::vec2 indices, float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
@@ -244,3 +243,5 @@ public:
         stbi_image_free(image);
     }
 };
+
+Grid *BASE_TILE;
