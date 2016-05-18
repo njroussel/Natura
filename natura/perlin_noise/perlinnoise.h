@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include <GL/glew.h>
+#include <bits/stl_deque.h>
 #include "../perlin_quad/perlin_quad.h"
 #include "../framebuffer.h"
 #include "../misc/observer_subject/subject.h"
@@ -11,21 +12,39 @@ enum class PerlinNoiseProperty {H, LACUNARITY, OFFSET, FREQUENCY, OCTAVE};
 
 class PerlinNoise : public Subject{
 public:
-    PerlinNoise(uint32_t width, uint32_t height) {
+    PerlinNoise(uint32_t width, uint32_t height, glm::vec2 cache_size) {
         mWidth = width;
         mHeight = height;
+
+        for (int i = 0 ; i < cache_size.y ; i ++){
+            m_frame_buffers.push_back(std::deque<FrameBuffer> (static_cast<unsigned long> (cache_size.x), FrameBuffer()));
+        }
+        m_terrain_offset = glm::vec2(0,0);
+        m_cache_size = cache_size;
+    }
+
+    void Init(){
+        for (int i = 0 ; i < m_frame_buffers.size() ; i ++){
+            for (int j = 0 ; j < m_frame_buffers[i].size() ; j ++){
+                m_frame_buffers[i][j].Init(mWidth, mHeight);
+            }
+        }
+        quad.Init();
     }
 
     int generateNoise(glm::vec2 displ) {
-        quad.Init();
-        FrameBuffer frameBuffer;
-        int tex = frameBuffer.Init(mWidth, mHeight);
+        glm::vec2 id = displ - m_terrain_offset;
+        FrameBuffer frameBuffer = m_frame_buffers[(int)id.y][(int)id.x];
+        cout << "generateNoise : " << endl;
+        cout << "displ  = " << displ.x << " " << displ.y << endl;
+        cout << "id = " << id.x << " " << id.y << endl;
+        int tex = frameBuffer.getTextureId();
 
         frameBuffer.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         quad.Draw(IDENTITY_MATRIX, m_H, m_frequency, m_lacunarity, m_offset, m_octaves, displ);
         frameBuffer.Unbind();
-        frameBuffer.Cleanup();
+        //frameBuffer.Cleanup();
         return tex;
     }
 
@@ -76,11 +95,46 @@ public:
         }
     }
 
+    void setTerrainOffset(glm::vec2 offset){
+        glm::vec2 dir = m_terrain_offset - offset;
+        m_terrain_offset = offset;
+        if (dir.y > 0){
+            cout << "< 0" << endl;
+            m_frame_buffers.push_front(m_frame_buffers[m_frame_buffers.size()-1]);
+            m_frame_buffers.pop_back();
+        }
+        else if (dir.y < 0){
+            cout << "> 0" << endl;
+            m_frame_buffers.push_back(m_frame_buffers[0]);
+            m_frame_buffers.pop_front();
+        }
+        else if (dir.x < 0){
+            for (int i = 0 ; i < m_frame_buffers.size() ; i ++){
+                m_frame_buffers[i].push_back(m_frame_buffers[i][0]);
+                m_frame_buffers[i].pop_front();
+            }
+        }
+        else if (dir.x > 0){
+            for (int i = 0 ; i < m_frame_buffers.size() ; i ++){
+                m_frame_buffers[i].push_front(m_frame_buffers[i][m_frame_buffers.size()-1]);
+                m_frame_buffers[i].pop_back();
+            }
+        }
+    }
+
     void Cleanup() {
         quad.Cleanup();
+        for (int i = 0 ; i < m_frame_buffers.size() ; i ++){
+            for (int j = 0 ; j < m_frame_buffers[i].size() ; j ++){
+                m_frame_buffers[i][j].Cleanup();
+            }
+        }
     }
 
 private:
+    std::deque<std::deque<FrameBuffer> > m_frame_buffers;
+    glm::vec2 m_terrain_offset;
+    glm::vec2 m_cache_size;
     uint32_t mWidth;
     uint32_t mHeight;
     PerlinQuad quad;

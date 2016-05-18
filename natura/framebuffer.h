@@ -74,6 +74,10 @@ public:
         return color_texture_id_;
     }
 
+    int getTextureId() {
+        return color_texture_id_;
+    }
+
     void Cleanup() {
         //glDeleteTextures(1, &color_texture_id_);
         glDeleteRenderbuffers(1, &depth_render_buffer_id_);
