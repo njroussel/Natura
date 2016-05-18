@@ -23,12 +23,13 @@ public:
         }
         m_skybox = new Cube();
         m_offset = glm::vec2(0, 0);
+        m_perlin_noise = perlinNoise;
     }
 
     void Init(){
         m_water_grid.Init();
         m_axis.Init();
-        m_skybox->Init();
+        //m_skybox->Init();
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
             for (size_t j = 0 ; j < m_chunks[i].size() ; j ++) {
                 m_chunks[i][j]->Init();
@@ -86,6 +87,7 @@ public:
     float water_height = WATER_HEIGHT;
 
 private:
+    PerlinNoise *m_perlin_noise;
     WaterGrid m_water_grid;
     ChunkFactory m_chunk_factory;
     std::deque<std::deque<Chunk *>> m_chunks;
@@ -97,6 +99,7 @@ private:
         switch (dir) {
             case SOUTH: {
                 m_offset.y ++;
+                m_perlin_noise->setTerrainOffset(m_offset);
                 for (int i = 0 ; i < m_chunks.size() ; i ++){
                     m_chunks[i].pop_front();
                     /* NOTE : The +1 in the indice y is important to avoid an off-by-one error. */
@@ -108,6 +111,7 @@ private:
 
             case NORTH: {
                 m_offset.y --;
+                m_perlin_noise->setTerrainOffset(m_offset);
                 for (int i = 0 ; i < m_chunks.size() ; i ++){
                     m_chunks[i].pop_back();
                     m_chunks[i].push_front(m_chunk_factory.createChunk(glm::vec2(m_offset.x + i, m_offset.y)));
@@ -120,6 +124,7 @@ private:
                 m_chunks.pop_back();
                 m_chunks.push_front(std::deque<Chunk *>(m_chunks[0].size(), NULL));
                 m_offset.x --;
+                m_perlin_noise->setTerrainOffset(m_offset);
                 for (int i = 0 ; i < m_chunks[0].size() ; i ++){
                     m_chunks[0][i] = m_chunk_factory.createChunk(glm::vec2(m_offset.x, i + m_offset.y));
                     m_chunks[0][i]->Init();
@@ -131,6 +136,7 @@ private:
                 m_chunks.pop_front();
                 m_chunks.push_back(std::deque<Chunk *>(m_chunks[0].size(), NULL));
                 m_offset.x ++;
+                m_perlin_noise->setTerrainOffset(m_offset);
                 for (int i = 0 ; i < m_chunks[0].size() ; i ++){
                     m_chunks[m_chunks.size()-1][i] = m_chunk_factory.createChunk(glm::vec2(m_chunks.size()-1 + m_offset.x, i + m_offset.y));
                     m_chunks[m_chunks.size()-1][i]->Init();

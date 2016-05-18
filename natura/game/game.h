@@ -124,7 +124,7 @@ private:
         m_camera = new Camera(starting_camera_position, starting_camera_rotation);
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
-        m_perlinNoise = new PerlinNoise(m_window_width, m_window_height);
+        m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
         m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
 
 
@@ -140,6 +140,7 @@ private:
         //int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
         BASE_TILE = new Grid(VERT_PER_GRID_SIDE, glm::vec2(0, 0));
         BASE_TILE->Init(0);
+        m_perlinNoise->Init();
         m_terrain->Init(/*perlinNoiseTex*/);
     }
 

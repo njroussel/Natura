@@ -41,7 +41,7 @@ public:
 
     virtual void update(Message *msg){
         if (msg->getType() == Message::Type::PERLIN_PROP_CHANGE) {
-            glDeleteTextures(1, (GLuint *) (&m_chunk_noise_tex_id));
+            //glDeleteTextures(1, (GLuint *) (&m_chunk_noise_tex_id));
             m_chunk_noise_tex_id = m_perlin_noise->generateNoise(m_position);
         }
         else {
