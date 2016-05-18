@@ -338,7 +338,7 @@ private:
                     //m_camera->LookAt(glm::vec3(0, 0, 0));
                     break;
 
-                /*case GLFW_KEY_A : {
+                case GLFW_KEY_A : {
                     glm::vec2 rot = vec2(0, -1);
                     m_camera->AddRotation(rot);
                     break;
@@ -358,7 +358,7 @@ private:
                     glm::vec2 rot = vec2(1, 0);
                     m_camera->AddRotation(rot);
                     break;
-                }*/
+                }
 
                 default:
                     break;

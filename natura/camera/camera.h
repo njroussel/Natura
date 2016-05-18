@@ -17,7 +17,6 @@ public:
     Camera(vec3 &starting_position, vec2 &starting_rotation) : MaterialPoint(1.0, starting_position){
         m_rotation = vec2(starting_rotation.x, starting_rotation.y);
         m_matrix = IDENTITY_MATRIX;
-        m_forward_dir = getForwardDirection();
         m_pressed[Forward] = false;
         m_pressed[Backward] = false;
 
@@ -37,6 +36,18 @@ public:
         return m_matrix;
     }
 
+    void AddRotation(vec2 &rotation) {
+        m_rotation += rotation;
+        if (m_rotation.x < -85.f)
+            m_rotation.x = -85.f;
+        if (m_rotation.x > 85)
+            m_rotation.x = 85.f;
+        if (isMoving()){
+            forceDirection(getForwardDirection());
+        }
+        _update_acc();
+    }
+
     void setAcceleration(DIRECTION dir){
         m_pressed[dir] = true;
         _update_acc();
@@ -50,8 +61,6 @@ public:
 private:
     glm::vec2 m_rotation;
     glm::mat4 m_matrix;
-    glm::vec3 m_forward_dir;
-    DIRECTION m_direction;
     bool m_pressed[2];
 
     glm::vec3 getForwardDirection() {
