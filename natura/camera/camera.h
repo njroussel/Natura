@@ -12,7 +12,84 @@ typedef enum DIRECTION {
 };
 
 
-class Camera : public MaterialPoint{
+class Camera : public MaterialPoint {
+public:
+    Camera(vec3 &starting_position, vec2 &starting_rotation) : MaterialPoint(1.0, starting_position){
+        m_rotation = vec2(starting_rotation.x, starting_rotation.y);
+        m_matrix = IDENTITY_MATRIX;
+        m_forward_dir = getForwardDirection();
+        m_pressed[Forward] = false;
+        m_pressed[Backward] = false;
+
+        allowBackwardsSpeed(false);
+    }
+
+    void CalculateMatrix() {
+        //ComputeMovement();
+
+        m_matrix = IDENTITY_MATRIX;
+        m_matrix = glm::rotate(m_matrix, radians(m_rotation.x), vec3(1.0f, 0.0f, 0.0f));
+        m_matrix = glm::rotate(m_matrix, radians(m_rotation.y), vec3(0.0f, 1.0f, 0.0f));
+        m_matrix = glm::translate(m_matrix, getPosition());
+    }
+
+    mat4 &GetMatrix() {
+        return m_matrix;
+    }
+
+    void setAcceleration(DIRECTION dir){
+        m_pressed[dir] = true;
+        _update_acc();
+    }
+
+    void stopAcceleration(DIRECTION dir){
+        m_pressed[dir] = false;
+        _update_acc();
+    }
+
+private:
+    glm::vec2 m_rotation;
+    glm::mat4 m_matrix;
+    glm::vec3 m_forward_dir;
+    DIRECTION m_direction;
+    bool m_pressed[2];
+
+    glm::vec3 getForwardDirection() {
+        return normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
+                              sin(radians(m_rotation.x)),
+                              cos(radians(m_rotation.x)) * cos(radians(m_rotation.y))));
+
+    }
+
+    void _update_acc(){
+        if (m_pressed[Forward] && m_pressed[Backward]){
+            setAccelerationVector(glm::vec3(0, 0, 0));
+        }
+        else if (m_pressed[Forward]) {
+            setAccelerationVector(getForwardDirection());
+        }
+        else if (m_pressed[Backward]) {
+            setAccelerationVector(-getForwardDirection());
+        }
+        else {
+            cout << "All false" << endl;
+            if (isMoving()){
+                cout << "   Moving " << endl;
+                glm::vec3 speed = getSpeedVector();
+                glm::vec3 acc = getAccelerationVector();
+                float theta = dot(speed, acc);
+                cout << "   Theta = " << theta << endl;
+                if (theta > 0){
+                    setAccelerationVector(-acc);
+                }
+            }
+        }
+    }
+
+};
+
+
+/*class Camera : public MaterialPoint{
 
 public:
 
@@ -47,27 +124,6 @@ public:
 
     void LookAt(glm::vec3 target) {
         glm::vec3 pos = - getPosition();
-        /*float dx = target.x - pos.x;
-        float dz = target.z - pos.z;
-        float dy = target.y - pos.y;
-        //m_rotation.y = atan(dx/dz);
-        //m_rotation.x = atan(dy/dz);
-        cout << "Pos = " << pos.x << "    " << pos.y << "    " << pos.z << endl;
-
-        glm::vec3 forw = -getForwardDirection();
-        glm::vec3 ray = target - pos;
-
-        glm::vec2 fyz = normalize(glm::vec2(forw.y, forw.z));
-        glm::vec2 ryz = normalize(glm::vec2(ray.y, ray.z));
-
-        print_vec3(forw);
-        print_vec3(ray);
-        print_vec2(fyz);
-        print_vec2(ryz);
-        float d = acos(dot(fyz, ryz));
-        cout << "angle. = " << d << endl;
-        m_rotation.x = d;
-        cout << "New Rot. = " << m_rotation.x << endl;*/
 
         float dz = pos.z - target.z;
         float dy = pos.y - target.y;
@@ -140,4 +196,6 @@ private:
         return normalize(cross(getForwardDirection(), getLeftDirection()));
     }
 };
+*/
+
 

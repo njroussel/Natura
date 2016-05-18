@@ -202,7 +202,7 @@ private:
             float yrot =
                     (float) diffx * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
             vec2 tmp = vec2(xrot, yrot);
-            m_camera->AddRotation(tmp);
+            //m_camera->AddRotation(tmp);
         }
     }
 
@@ -223,11 +223,11 @@ private:
         if (action == GLFW_PRESS) {
             switch (key) {
                 case GLFW_KEY_W: {
-                    m_camera->SetMovement(DIRECTION::Forward, true);
+                    m_camera->setAcceleration(DIRECTION::Forward);
                     break;
                 }
                 case GLFW_KEY_S : {
-                    m_camera->SetMovement(DIRECTION::Backward, true);
+                    m_camera->setAcceleration(DIRECTION::Backward);
                     break;
 
                 }
@@ -236,11 +236,11 @@ private:
         if (action == GLFW_RELEASE) {
             switch (key) {
                 case GLFW_KEY_W: {
-                    m_camera->SetMovement(DIRECTION::Forward, false);
+                    m_camera->stopAcceleration(DIRECTION::Forward);
                     break;
                 }
                 case GLFW_KEY_S : {
-                    m_camera->SetMovement(DIRECTION::Backward, false);
+                    m_camera->stopAcceleration(DIRECTION::Backward);
                     break;
 
                 }
@@ -335,10 +335,10 @@ private:
 
                 case GLFW_KEY_SPACE:
                     cout << "KEKED" << endl;
-                    m_camera->LookAt(glm::vec3(0, 0, 0));
+                    //m_camera->LookAt(glm::vec3(0, 0, 0));
                     break;
 
-                case GLFW_KEY_A : {
+                /*case GLFW_KEY_A : {
                     glm::vec2 rot = vec2(0, -1);
                     m_camera->AddRotation(rot);
                     break;
@@ -358,7 +358,7 @@ private:
                     glm::vec2 rot = vec2(1, 0);
                     m_camera->AddRotation(rot);
                     break;
-                }
+                }*/
 
                 default:
                     break;

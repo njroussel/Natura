@@ -29,7 +29,7 @@ public:
         /*m_speed = glm::vec3(   m_acceleration.x * curr_speed,
                                 m_acceleration.z * curr_speed,
                                 m_acceleration.y * curr_speed);*/
-        //_update_pos();
+        _update_pos();
     }
 
     void forceDirection(glm::vec3 acc) {
@@ -76,11 +76,16 @@ public:
     }
 
     bool isMoving(){
-        return m_speed != glm::vec3(0, 0, 0);
+        float s = dot(m_speed, m_speed);
+        return s > 0.f;
     }
 
     void allowBackwardsSpeed(bool enable) {
         m_backward_speed = enable;
+    }
+
+    void freeze(){
+        m_speed = glm::vec3(0, 0, 0);
     }
 
 private:
