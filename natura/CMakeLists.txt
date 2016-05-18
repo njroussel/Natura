@@ -15,7 +15,8 @@ file(GLOB TEXTURES
         skybox/right.tga
         skybox/back.tga
         skybox/bottom.tga
-        skybox/front.tga)
+        skybox/front.tga
+        skybox/stormydays_large.tga)
 copy_files_once(${TEXTURES})
 
 # list all the files you want to copy everytime
