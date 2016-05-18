@@ -108,9 +108,8 @@ private:
             m_speed.y *= m_max_speed;
             m_speed.z *= m_max_speed;
         }
-        float epsilon = 0.3;
-        float theta = acos(dot(normalize(m_speed), normalize(m_acceleration)));
-        if (!m_backward_speed && curr_speed < epsilon && (theta > 3.14/2 || theta < -3.14/2)){
+        float epsilon = 0.1;
+        if (!m_backward_speed && (curr_speed < epsilon && isSlowingDown())){
             m_speed = glm::vec3(0, 0, 0);
             m_acceleration = glm::vec3(0, 0, 0);
         }
