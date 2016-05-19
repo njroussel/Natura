@@ -12,6 +12,7 @@
 #include "../misc/io/input/handlers/mouse/mouse_button_handler.h"
 #include "../misc/io/input/handlers/mouse/mouse_cursor_handler.h"
 #include "../misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
+#include "../camera/fps_camera.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 
@@ -22,6 +23,7 @@ public:
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
         m_amplitude = 9.05f;
+        m_camera_mode = FLYTHROUGH;
         Init();
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
@@ -41,6 +43,10 @@ public:
         m_frame_buffer_size_handler.attach(this);
         // render loop
         while (!glfwWindowShouldClose(m_window)) {
+            glm::vec3 pos = m_camera->getPosition();
+            glm::vec2 tmp = glm::vec2(pos.x, pos.z);
+            float h = m_terrain->getHeight(tmp);
+            //m_camera->snapToHeight(h);
             Display();
             glfwSwapBuffers(m_window);
             glfwPollEvents();
@@ -72,6 +78,8 @@ public:
     }
 
 private:
+    enum CameraMode {FLYTHROUGH, FPS};
+
     double m_last_mouse_xpos, m_last_mouse_ypos;
     float m_last_time;
 
@@ -82,6 +90,7 @@ private:
 
     /* Camera and view */
     Camera *m_camera;
+    CameraMode m_camera_mode;
     glm::mat4 m_grid_model_matrix;
     Projection *m_projection;
 
@@ -111,11 +120,11 @@ private:
         const int VERT_PER_GRID_SIDE = 8;
         const float cam_posxy = TERRAIN_SCALE * ((float)(TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
         cout << "Campos : " << cam_posxy << endl;
-        vec3 starting_camera_position;
+        vec3 starting_camera_position = glm::vec3(0, 0, 0);
         vec2 starting_camera_rotation;
         if (top_down_view) {
-            starting_camera_position = vec3(0, -0.5, -0.5);
-            starting_camera_rotation = vec2(0.0f, 40.f);
+            starting_camera_position = vec3(3, 0, -1);
+            starting_camera_rotation = vec2(15.0f, 90.f);
         }
         else {
             starting_camera_position = vec3(-cam_posxy, -5.0f, -cam_posxy);
@@ -202,7 +211,7 @@ private:
             float yrot =
                     (float) diffx * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
             vec2 tmp = vec2(xrot, yrot);
-            //m_camera->AddRotation(tmp);
+            m_camera->AddRotation(tmp);
         }
     }
 
@@ -223,42 +232,45 @@ private:
         if (action == GLFW_PRESS) {
             switch (key) {
                 case GLFW_KEY_W: {
-                    m_camera->setAcceleration(DIRECTION::Forward);
+                    //m_camera->SetMovement(DIRECTION::Forward, true);
+                    m_camera->setAcceleration(Forward);
                     break;
                 }
                 case GLFW_KEY_S : {
-                    m_camera->setAcceleration(DIRECTION::Backward);
+                    //m_camera->SetMovement(DIRECTION::Backward, true);
+                    m_camera->setAcceleration(Backward);
                     break;
-
+                }
+                case GLFW_KEY_A: {
+                    //m_camera->SetMovement(DIRECTION::Left, true);
+                    break;
+                }
+                case GLFW_KEY_D: {
+                    //m_camera->SetMovement(DIRECTION::Right, true);
+                    break;
                 }
             }
         }
         if (action == GLFW_RELEASE) {
             switch (key) {
                 case GLFW_KEY_W: {
-                    m_camera->stopAcceleration(DIRECTION::Forward);
+                    //m_camera->SetMovement(DIRECTION::Forward, false);
+                    m_camera->stopAcceleration(Forward);
                     break;
                 }
                 case GLFW_KEY_S : {
-                    m_camera->stopAcceleration(DIRECTION::Backward);
+                    //m_camera->SetMovement(DIRECTION::Backward, false);
+                    m_camera->stopAcceleration(Backward);
                     break;
-
                 }
-                /*case GLFW_KEY_LEFT:
-                    m_terrain->_expand(Terrain::Direction::WEST);
+                case GLFW_KEY_A: {
+                    //m_camera->SetMovement(DIRECTION::Left, false);
                     break;
-
-                case GLFW_KEY_RIGHT:
-                    m_terrain->_expand(Terrain::Direction::EST);
+                }
+                case GLFW_KEY_D: {
+                    //m_camera->SetMovement(DIRECTION::Right, false);
                     break;
-
-                case GLFW_KEY_UP:
-                    m_terrain->_expand(Terrain::Direction::NORTH);
-                    break;
-
-                case GLFW_KEY_DOWN:
-                    m_terrain->_expand(Terrain::Direction::SOUTH);
-                    break;*/
+                }
             }
         }
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {

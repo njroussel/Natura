@@ -131,6 +131,10 @@ public:
         }
     }
 
+    FrameBuffer *getFrameBufferForChunk(glm::vec2 chunkpos){
+        return &m_frame_buffers[(int)chunkpos.y][(int)chunkpos.x];
+    }
+
 private:
     std::deque<std::deque<FrameBuffer> > m_frame_buffers;
     glm::vec2 m_terrain_offset;

@@ -15,6 +15,7 @@
 #include "axis/axis.h"
 #include "physics/material_point.h"
 #include "camera/camera.h"
+#include "camera/fps_camera.h"
 
 using namespace glm;
 

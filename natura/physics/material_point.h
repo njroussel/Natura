@@ -36,7 +36,6 @@ public:
         float curr_speed = sqrt(dot(m_speed, m_speed));
         float curr_acc = sqrt(dot(m_acceleration, m_acceleration));
         float theta = dot(normalize(acc), normalize(m_acceleration));
-        cout << "theta  = " << theta << endl;
         if (theta < 0){
             m_acceleration = -acc;
         }
@@ -71,7 +70,6 @@ public:
     bool isSlowingDown() {
         //_update_pos();
         float d = dot(normalize(m_speed), normalize(m_acceleration));
-        cout << "d = " << d << endl;
         return d < 0;
     }
 
@@ -88,7 +86,7 @@ public:
         m_speed = glm::vec3(0, 0, 0);
     }
 
-private:
+protected:
     float m_mass;
     float m_max_speed;
     double m_last_refresh; // in seconds
@@ -106,7 +104,6 @@ private:
                                 m_acceleration.z * elapsed_time,
                                 m_acceleration.y * elapsed_time   );
         float curr_speed = sqrt(dot(m_speed, m_speed));
-        cout << "speed = " << curr_speed << endl;
         if (curr_speed > m_max_speed){
             m_speed = normalize(m_speed);
             m_speed.x *= m_max_speed;

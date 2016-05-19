@@ -8,7 +8,7 @@
 #include <cstdint>
 
 typedef enum DIRECTION {
-    Forward = 0, Backward = 1
+    Forward = 0, Backward = 1, Left = 2, Right = 3
 };
 
 
@@ -49,13 +49,21 @@ public:
     }
 
     void setAcceleration(DIRECTION dir){
+        if (dir == Left || dir == Right)
+            return;
         m_pressed[dir] = true;
         _update_acc();
     }
 
     void stopAcceleration(DIRECTION dir){
+        if (dir == Left || dir == Right)
+            return;
         m_pressed[dir] = false;
         _update_acc();
+    }
+
+    void snapToHeight(float h){
+        m_position.z = h;
     }
 
 private:

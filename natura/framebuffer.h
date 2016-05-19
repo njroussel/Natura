@@ -78,6 +78,10 @@ public:
         return color_texture_id_;
     }
 
+    glm::vec2 getSize() {
+        return glm::vec2(width_, height_);
+    }
+
     void Cleanup() {
         //glDeleteTextures(1, &color_texture_id_);
         glDeleteRenderbuffers(1, &depth_render_buffer_id_);
