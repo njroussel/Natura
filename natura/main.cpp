@@ -26,8 +26,8 @@ void ErrorCallback(int error, const char *description) {
 }
 
 int main(int argc, char *argv[]) {
-    int window_width = 1000;
-    int window_height = 700;
+    int window_width = 700;
+    int window_height = 500;
     // GLFW Initialization
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW\n");

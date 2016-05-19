@@ -35,7 +35,7 @@ public:
             std::vector<GLuint> indices;
             int mSideNbPoints = 64;
             float sideX = 1 / float(mSideNbPoints);
-            mSideNbPoints ++; // OFF BY ONE BY @Rimbaut
+            mSideNbPoints ++;
             for (int i = 0; i < mSideNbPoints; i++) {
                 for (int j = 0; j < mSideNbPoints; j++) {
                     vertices.push_back(i * sideX);
@@ -156,12 +156,6 @@ public:
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
         glUniform2fv(glGetUniformLocation(program_id_, "chunk_pos"), ONE, glm::value_ptr(pos));
 
-        // draw
-        // TODO 5: for debugging it can be helpful to draw only the wireframe.
-        // You can do that by uncommenting the next line.
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        // TODO 5: depending on how you set up your vertex index buffer, you
-        // might have to change GL_TRIANGLE_STRIP to GL_TRIANGLES.
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glDisable(GL_CULL_FACE);

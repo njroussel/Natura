@@ -35,9 +35,6 @@ public:
     int generateNoise(glm::vec2 displ) {
         glm::vec2 id = displ - m_terrain_offset;
         FrameBuffer frameBuffer = m_frame_buffers[(int)id.y][(int)id.x];
-        cout << "generateNoise : " << endl;
-        cout << "displ  = " << displ.x << " " << displ.y << endl;
-        cout << "id = " << id.x << " " << id.y << endl;
         int tex = frameBuffer.getTextureId();
 
         frameBuffer.Bind();
