@@ -8,7 +8,7 @@
 #include "chunk/chunk_generation/chunk_factory.h"
 #include "../water_grid/water_grid.h"
 
-#define TERRAIN_SCALE 1.0f
+#define TERRAIN_SCALE 2.0f
 #define WATER_HEIGHT -0.6f
 
 class Terrain {
@@ -41,11 +41,11 @@ public:
     void Draw(float amplitude, float time, glm::vec3 cam_pos, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
-        m_axis_pos.z = 2.f + 2.f* cos(time/4.f);
-        m_axis_pos.x = 0.f ; // 1 + sin(time/4.f);
-        m_axis_pos.y = getHeight(glm::vec2(m_axis_pos.x, m_axis_pos.z));
-        cout << "m_axis_pos : " << m_axis_pos.x << "  " << m_axis_pos.y << "  " << m_axis_pos.z << endl;
-        m_axis.Draw(glm::translate(model, m_axis_pos), view, projection);
+        //m_axis.Draw(model, view, projection);
+        m_axis.Draw(glm::translate(model, glm::vec3(0, 0, 0)), view, projection);
+        m_axis.Draw(glm::translate(model, glm::vec3(1, 0, 0)), view, projection);
+        m_axis.Draw(glm::translate(model, glm::vec3(1, 0, 1)), view, projection);
+        m_axis.Draw(glm::translate(model, glm::vec3(0, 0, 1)), view, projection);
         m_skybox->Draw(projection * view * glm::translate(model, -cam_pos/TERRAIN_SCALE));
         glm::mat4 _m = glm::translate(model, glm::vec3(m_offset.x*CHUNK_SIDE_TILE_COUNT, 0, m_offset.y*CHUNK_SIDE_TILE_COUNT));
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
@@ -71,36 +71,51 @@ public:
 
     void ExpandTerrain(glm::vec3 cam_pos){
         const uint32_t edge_threshold = 1;
+        /* Camera is not affected by the scale
+         * We went through A LOT of pain trying to understand why.
+         */
+        cam_pos /= TERRAIN_SCALE;
+        glm::vec3 old = cam_pos;
         cam_pos = getChunkPos(cam_pos);
-        //cout << "cam_pos : " << cam_pos.x << " , " << cam_pos.z << endl;
-        /*if (cam_pos.z < edge_threshold)
+        cout << "real : " << old.x << " , " << old.z << " | cam_pos : " << cam_pos.x << " , " << cam_pos.z << endl;
+        if (cam_pos.z < edge_threshold) {
             _expand(Terrain::Direction::NORTH);
-        else if (cam_pos.z > m_chunks[0].size() - 1 - edge_threshold)
+            cout << "EXPANSION" << endl;
+        }
+        else if (cam_pos.z > m_chunks[0].size() - 1 - edge_threshold) {
             _expand(Terrain::Direction::SOUTH);
-        else if (cam_pos.x < edge_threshold)
+            cout << "EXPANSION" << endl;
+        }
+        else if (cam_pos.x < edge_threshold) {
             _expand(Terrain::Direction::WEST);
-        else if (cam_pos.x > m_chunks.size() - 1 - edge_threshold)
-            _expand(Terrain::Direction::EST);*/
+            cout << "EXPANSION" << endl;
+        }
+        else if (cam_pos.x > m_chunks.size() - 1 - edge_threshold) {
+            _expand(Terrain::Direction::EST);
+            cout << "EXPANSION" << endl;
+        }
     }
 
     float getHeight(glm::vec2 pos) {
         glm::vec3 tmp = glm::vec3(pos.x, 0, pos.y);
         tmp = getChunkPos(tmp);
-        pos /= TERRAIN_SCALE;
+        //pos /= TERRAIN_SCALE;
         /*m_axis_pos.x = -pos.x;
         m_axis_pos.z = -pos.y;*/
         pos = abs(pos);
         glm::vec2 chunk_idx = glm::vec2(tmp.x, tmp.z);
         FrameBuffer *frameBuffer = m_perlin_noise->getFrameBufferForChunk(chunk_idx);
-        /*cout << " pos = " << pos.x << " " << pos.y;
-        cout << "  | chunck pos = " << chunk_idx.x << " " << chunk_idx.y;*/
+        //cout << " pos = " << pos.x << " " << pos.y;
+        //cout << "  | chunck pos = " << chunk_idx.x << " " << chunk_idx.y;
 
 
         glm::vec2 pos_on_tex = pos - glm::vec2(chunk_idx.x * CHUNK_SIDE_TILE_COUNT, chunk_idx.y * CHUNK_SIDE_TILE_COUNT);
         pos_on_tex.x = abs(pos_on_tex.x);
         pos_on_tex.y = abs(pos_on_tex.y);
-        pos_on_tex.x /= CHUNK_SIDE_TILE_COUNT;
-        pos_on_tex.y /= CHUNK_SIDE_TILE_COUNT;
+        pos_on_tex.x /= (CHUNK_SIDE_TILE_COUNT);
+        pos_on_tex.y /= (CHUNK_SIDE_TILE_COUNT);
+        /*pos_on_tex.x *= TERRAIN_SCALE;
+        pos_on_tex.y *= TERRAIN_SCALE;*/
         pos_on_tex.x *= frameBuffer->getSize().x;
         pos_on_tex.y *= frameBuffer->getSize().y;
         //cout << " | pos on tex = " << pos_on_tex.x << " " << pos_on_tex.y;
@@ -130,7 +145,6 @@ private:
 
     glm::vec3 getChunkPos(glm::vec3 pos){
         pos /= CHUNK_SIDE_TILE_COUNT;
-        pos /= TERRAIN_SCALE;
         pos += glm::vec3(m_offset.x, 0, m_offset.y);
         pos = abs(pos);
         pos.x = (int) pos.x;

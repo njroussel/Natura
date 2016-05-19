@@ -148,5 +148,3 @@ private:
     float m_frequency = 0.1f;
     int m_octaves = 6;
 };
-
-

@@ -45,7 +45,7 @@ public:
         while (!glfwWindowShouldClose(m_window)) {
             glm::vec3 pos = m_camera->getPosition();
             glm::vec2 tmp = glm::vec2(pos.x, pos.z);
-            float h = m_terrain->getHeight(tmp);
+            //float h = m_terrain->getHeight(tmp);
             //m_camera->snapToHeight(h);
             Display();
             glfwSwapBuffers(m_window);
@@ -115,10 +115,10 @@ private:
 
     /* Private function. */
     void Init() {
-        const bool top_down_view = true;
+        const bool top_down_view = false;
         const int TERRAIN_SIZE = 10;
         const int VERT_PER_GRID_SIDE = 8;
-        const float cam_posxy = TERRAIN_SCALE * ((float)(TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
+        const float cam_posxy = 1 * ((float)(TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
         cout << "Campos : " << cam_posxy << endl;
         vec3 starting_camera_position = glm::vec3(0, 0, 0);
         vec2 starting_camera_rotation;
