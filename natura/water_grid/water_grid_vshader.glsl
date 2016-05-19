@@ -1,5 +1,5 @@
 #version 330
-#define PI radians(180)
+#define PI radians(180.0f)
 
 in vec2 position;
 
