@@ -41,11 +41,13 @@ public:
     void Draw(float amplitude, float time, glm::vec3 cam_pos, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
+        m_amplitude = amplitude;
         //m_axis.Draw(model, view, projection);
-        m_axis.Draw(glm::translate(model, glm::vec3(0, 0, 0)), view, projection);
-        m_axis.Draw(glm::translate(model, glm::vec3(1, 0, 0)), view, projection);
-        m_axis.Draw(glm::translate(model, glm::vec3(1, 0, 1)), view, projection);
-        m_axis.Draw(glm::translate(model, glm::vec3(0, 0, 1)), view, projection);
+        glm::vec3 tmp;
+        m_axis.Draw(glm::translate(model, glm::vec3(0, getHeight(glm::vec2(0, 0)), 0)), view, projection);
+        m_axis.Draw(glm::translate(model, glm::vec3(1, getHeight(glm::vec2(1, 0)), 0)), view, projection);
+        m_axis.Draw(glm::translate(model, glm::vec3(1, getHeight(glm::vec2(1, 1)), 1)), view, projection);
+        m_axis.Draw(glm::translate(model, glm::vec3(0, getHeight(glm::vec2(0, 1)), 1)), view, projection);
         m_skybox->Draw(projection * view * glm::translate(model, -cam_pos/TERRAIN_SCALE));
         glm::mat4 _m = glm::translate(model, glm::vec3(m_offset.x*CHUNK_SIDE_TILE_COUNT, 0, m_offset.y*CHUNK_SIDE_TILE_COUNT));
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
@@ -77,8 +79,8 @@ public:
         cam_pos /= TERRAIN_SCALE;
         glm::vec3 old = cam_pos;
         cam_pos = getChunkPos(cam_pos);
-        cout << "real : " << old.x << " , " << old.z << " | cam_pos : " << cam_pos.x << " , " << cam_pos.z << endl;
-        if (cam_pos.z < edge_threshold) {
+        //cout << "real : " << old.x << " , " << old.z << " | cam_pos : " << cam_pos.x << " , " << cam_pos.z << endl;
+        /*if (cam_pos.z < edge_threshold) {
             _expand(Terrain::Direction::NORTH);
             cout << "EXPANSION" << endl;
         }
@@ -93,10 +95,12 @@ public:
         else if (cam_pos.x > m_chunks.size() - 1 - edge_threshold) {
             _expand(Terrain::Direction::EST);
             cout << "EXPANSION" << endl;
-        }
+        }*/
     }
 
     float getHeight(glm::vec2 pos) {
+        //cout << "getHeight : " << pos.x << " " << pos.y << endl;
+        pos -= m_offset;
         glm::vec3 tmp = glm::vec3(pos.x, 0, pos.y);
         tmp = getChunkPos(tmp);
         //pos /= TERRAIN_SCALE;
@@ -125,9 +129,10 @@ public:
         glReadPixels((int)pos_on_tex.x, (int)pos_on_tex.y, 1, 1, GL_RED, GL_FLOAT, &height);
         frameBuffer->Unbind();
         //cout << " | height = " << height << endl;
-        water_height = height -1.f;
         //m_axis_pos.y = height - 0.5;
-        return (height-0.5f)*9.05f;
+        height = (height-0.5f)*m_amplitude;
+        water_height = height;
+        return height;
     }
 
     enum Direction {NORTH, SOUTH, EST, WEST};
@@ -142,6 +147,7 @@ private:
     Cube* m_skybox;
     Axis m_axis;
     glm::vec2 m_offset;
+    float m_amplitude;
 
     glm::vec3 getChunkPos(glm::vec3 pos){
         pos /= CHUNK_SIDE_TILE_COUNT;

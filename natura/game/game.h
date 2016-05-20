@@ -89,7 +89,7 @@ private:
     GLFWwindow *m_window;
 
     /* Camera and view */
-    Camera *m_camera;
+    FPSCamera *m_camera;
     CameraMode m_camera_mode;
     glm::mat4 m_grid_model_matrix;
     Projection *m_projection;
@@ -118,7 +118,7 @@ private:
         const bool top_down_view = false;
         const int TERRAIN_SIZE = 10;
         const int VERT_PER_GRID_SIDE = 8;
-        const float cam_posxy = 1 * ((float)(TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
+        const float cam_posxy = ((float)(TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
         cout << "Campos : " << cam_posxy << endl;
         vec3 starting_camera_position = glm::vec3(0, 0, 0);
         vec2 starting_camera_rotation;
@@ -130,11 +130,11 @@ private:
             starting_camera_position = vec3(-cam_posxy, -5.0f, -cam_posxy);
             starting_camera_rotation = vec2(0.0f);
         }
-        m_camera = new Camera(starting_camera_position, starting_camera_rotation);
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
         m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
+        m_camera = new FPSCamera(starting_camera_position, m_terrain);
 
 
         // sets background color b
@@ -232,13 +232,13 @@ private:
         if (action == GLFW_PRESS) {
             switch (key) {
                 case GLFW_KEY_W: {
-                    //m_camera->SetMovement(DIRECTION::Forward, true);
-                    m_camera->setAcceleration(Forward);
+                    m_camera->SetMovement(DIRECTION::Forward, true);
+                    //m_camera->setAcceleration(Forward);
                     break;
                 }
                 case GLFW_KEY_S : {
-                    //m_camera->SetMovement(DIRECTION::Backward, true);
-                    m_camera->setAcceleration(Backward);
+                    m_camera->SetMovement(DIRECTION::Backward, true);
+                    //m_camera->setAcceleration(Backward);
                     break;
                 }
                 case GLFW_KEY_A: {
@@ -254,13 +254,13 @@ private:
         if (action == GLFW_RELEASE) {
             switch (key) {
                 case GLFW_KEY_W: {
-                    //m_camera->SetMovement(DIRECTION::Forward, false);
-                    m_camera->stopAcceleration(Forward);
+                    m_camera->SetMovement(DIRECTION::Forward, false);
+                    //m_camera->stopAcceleration(Forward);
                     break;
                 }
                 case GLFW_KEY_S : {
-                    //m_camera->SetMovement(DIRECTION::Backward, false);
-                    m_camera->stopAcceleration(Backward);
+                    m_camera->SetMovement(DIRECTION::Backward, false);
+                    //m_camera->stopAcceleration(Backward);
                     break;
                 }
                 case GLFW_KEY_A: {
