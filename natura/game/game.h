@@ -12,6 +12,7 @@
 #include "../misc/io/input/handlers/mouse/mouse_button_handler.h"
 #include "../misc/io/input/handlers/mouse/mouse_cursor_handler.h"
 #include "../misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
+#include "../camera/bezier/bezier_curve.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 
@@ -150,11 +151,24 @@ private:
 
         const float time = glfwGetTime();
 
+        std::vector<glm::vec3> control_points;
+        control_points.push_back(glm::vec3(0, 0, 0));
+        control_points.push_back(glm::vec3(2, 0, 2));
+        control_points.push_back(glm::vec3(4, 2, 0));
+        BezierCurve curve(control_points);
+        const float tot_time = 10.f;
 
         //tick 60 times per second
         if (time - m_last_time > 1 / 60.0f) {
             m_camera->CalculateMatrix();
             m_last_time = time;
+        }
+        float t = mod(m_last_time, 1.f);
+        cout << "t = " << t << endl;
+        if (0 <= t && t <= 1){
+            glm::vec3 next_pos = curve.getPosition(t);
+            cout << "next_pos = " << next_pos.x << " " << next_pos.y << " " << next_pos.z << endl;
+            m_terrain->m_axis_pos = next_pos;
         }
 
         //draw as often as possible
@@ -352,13 +366,13 @@ private:
                 default:
                     break;
             }
-            cout << "Ampl.  : " << m_amplitude << endl;
+            /*cout << "Ampl.  : " << m_amplitude << endl;
             cout << "H      : " << m_perlinNoise->getProperty(PerlinNoiseProperty::H) << endl;
             cout << "Freq   : " << m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) << endl;
             cout << "Offset : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) << endl;
             cout << "Lac.   : " << m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) << endl;
             cout << "Octave : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) << endl;
-            cout << "Water h: " << m_terrain->water_height << endl;
+            cout << "Water h: " << m_terrain->water_height << endl;*/
         }
     }
 };

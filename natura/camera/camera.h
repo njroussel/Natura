@@ -60,6 +60,10 @@ public:
         return m_position;
     }
 
+    void setPosition(glm::vec3 pos) {
+        m_position = pos;
+    }
+
 private:
     static const size_t m_moving_size = 4;
     bool m_moving[m_moving_size];

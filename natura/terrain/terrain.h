@@ -40,7 +40,7 @@ public:
     void Draw(float amplitude, float time, glm::vec3 cam_pos, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
-        m_axis.Draw(model, view, projection);
+        m_axis.Draw(glm::translate(model, m_axis_pos), view, projection);
         m_skybox->Draw(projection * view * glm::translate(model, -cam_pos/TERRAIN_SCALE));
         glm::mat4 _m = glm::translate(model, glm::vec3(m_offset.x*CHUNK_SIDE_TILE_COUNT, 0, m_offset.y*CHUNK_SIDE_TILE_COUNT));
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
@@ -85,6 +85,7 @@ public:
 
     enum Direction {NORTH, SOUTH, EST, WEST};
     float water_height = WATER_HEIGHT;
+    glm::vec3 m_axis_pos = glm::vec3(0, 0, 0);
 
 private:
     PerlinNoise *m_perlin_noise;
