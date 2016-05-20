@@ -20,6 +20,64 @@ public:
         return res;
     }
 
+    void Draw(const glm::mat4& model = IDENTITY_MATRIX,
+              const glm::mat4& view = IDENTITY_MATRIX,
+              const glm::mat4& projection = IDENTITY_MATRIX){
+        const float step = 0.01;
+        const GLuint vert_count = static_cast<GLuint> (1.f / step);
+        GLfloat curve_vertices[vert_count*3];
+
+        for (int t = 0 ; t < vert_count*3 ; t += 3){
+            float time = t * step / 3.f;
+            glm::vec3 pos = getPosition(time) / TERRAIN_SCALE;
+            curve_vertices[t] = pos.x;
+            curve_vertices[t+1] = pos.y;
+            curve_vertices[t+2] = pos.z;
+        }
+
+        GLuint program_id_ = icg_helper::LoadShaders("bezier_vshader.glsl",
+                                              "bezier_fshader.glsl");
+        if(!program_id_) {
+            exit(EXIT_FAILURE);
+        }
+
+        glUseProgram(program_id_);
+        GLuint vert_array_id;
+        glGenVertexArrays(1, &vert_array_id);
+        glBindVertexArray(vert_array_id);
+        GLuint buffer_id;
+        glGenBuffers(1, &buffer_id);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer_id);
+
+        glBufferData(GL_ARRAY_BUFFER, sizeof(curve_vertices), curve_vertices, GL_STATIC_DRAW);
+
+        GLint posAttrib = glGetAttribLocation(program_id_, "position");
+        glEnableVertexAttribArray(posAttrib);
+        glVertexAttribPointer(posAttrib, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+        glBindVertexArray(0);
+        glUseProgram(0);
+
+
+        // Draw
+        glUseProgram(program_id_);
+
+        glm::mat4 MVP = projection * view * model;
+        GLint MVP_id = glGetUniformLocation(program_id_, "MVP");
+        glUniformMatrix4fv(MVP_id, 1, GL_FALSE, value_ptr(MVP));
+
+        glBindVertexArray(vert_array_id);
+        glDrawArrays(GL_LINE_STRIP, 0, vert_count);
+        glBindVertexArray(0);
+
+        glUseProgram(0);
+
+        glBindVertexArray(0);
+        glUseProgram(0);
+        glDeleteBuffers(1, &buffer_id);
+        glDeleteVertexArrays(1, &vert_array_id);
+    }
+
 private:
     std::vector<glm::vec3> m_control_points;
 

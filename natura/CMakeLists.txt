@@ -26,7 +26,9 @@ file(GLOB SHADERS
         skybox/*.glsl
         water_grid/*.glsl
         axis/axis_fshader.glsl
-        axis/axis_vshader.glsl)
+        axis/axis_vshader.glsl
+        camera/bezier/bezier_fshader.glsl
+        camera/bezier/bezier_vshader.glsl)
 
 deploy_shaders_to_build_dir(${SHADERS})
 

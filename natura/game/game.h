@@ -153,8 +153,9 @@ private:
 
         std::vector<glm::vec3> control_points;
         control_points.push_back(glm::vec3(0, 0, 0));
-        control_points.push_back(glm::vec3(2, 0, 2));
-        control_points.push_back(glm::vec3(4, 2, 0));
+        control_points.push_back(glm::vec3(10, 0, 0));
+        control_points.push_back(glm::vec3(15, 0, 23));
+        control_points.push_back(glm::vec3(4,12, 27));
         BezierCurve curve(control_points);
         const float tot_time = 10.f;
 
@@ -163,7 +164,7 @@ private:
             m_camera->CalculateMatrix();
             m_last_time = time;
         }
-        float t = mod(m_last_time, 1.f);
+        float t = mod(m_last_time/tot_time, 1.f);
         cout << "t = " << t << endl;
         if (0 <= t && t <= 1){
             glm::vec3 next_pos = curve.getPosition(t);
@@ -176,6 +177,7 @@ private:
         //m_terrain->_expand(Terrain::Direction::SOUTH);
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), m_grid_model_matrix, m_camera->GetMatrix(),
                         m_projection->perspective());
+        curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
 
     }
 
