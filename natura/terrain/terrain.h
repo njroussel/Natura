@@ -9,7 +9,7 @@
 #include "../water_grid/water_grid.h"
 
 #define TERRAIN_SCALE 2.0f
-#define WATER_HEIGHT -0.6f
+#define WATER_HEIGHT -0.0f
 
 class Terrain {
 public:
@@ -26,8 +26,8 @@ public:
         m_perlin_noise = perlinNoise;
     }
 
-    void Init(){
-        m_water_grid.Init();
+    void Init(GLuint water_reflection_tex){
+        m_water_grid.Init(water_reflection_tex);
         m_axis.Init();
         m_skybox->Init();
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
@@ -37,20 +37,24 @@ public:
         }
     }
 
-    void Draw(float amplitude, float time, glm::vec3 cam_pos, const glm::mat4 &model = IDENTITY_MATRIX,
+    void Draw(float amplitude, float time, glm::vec3 cam_pos, bool onlyTerrain, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         m_axis.Draw(model, view, projection);
-        m_skybox->Draw(projection * view * glm::translate(model, -cam_pos/TERRAIN_SCALE));
         glm::mat4 _m = glm::translate(model, glm::vec3(m_offset.x*CHUNK_SIDE_TILE_COUNT, 0, m_offset.y*CHUNK_SIDE_TILE_COUNT));
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
             for (size_t j = 0 ; j < m_chunks[i].size() ; j ++) {
                 m_chunks[i][j]->Draw(amplitude, time, glm::translate(_m, glm::vec3(i*CHUNK_SIDE_TILE_COUNT, 0.0, j*CHUNK_SIDE_TILE_COUNT)), view, projection);
             }
         }
-        for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
-            for (size_t j = 0 ; j < m_chunks.size() ; j ++) {
-                m_water_grid.Draw(glm::vec2(i*CHUNK_SIDE_TILE_COUNT, j*CHUNK_SIDE_TILE_COUNT), time/8.f, glm::translate(glm::scale(_m, glm::vec3(CHUNK_SIDE_TILE_COUNT)), glm::vec3(i, water_height, j)), view, projection);
+        if(!onlyTerrain) {
+        m_skybox->Draw(projection * view * glm::translate(model, -cam_pos/TERRAIN_SCALE));
+            for (size_t i = 0; i < m_chunks.size(); i++) {
+                for (size_t j = 0; j < m_chunks.size(); j++) {
+                    m_water_grid.Draw(glm::vec2(i * CHUNK_SIDE_TILE_COUNT, j * CHUNK_SIDE_TILE_COUNT), time / 8.f,
+                                      glm::translate(glm::scale(_m, glm::vec3(CHUNK_SIDE_TILE_COUNT)),
+                                                     glm::vec3(i, water_height, j)), view, projection);
+                }
             }
         }
     }

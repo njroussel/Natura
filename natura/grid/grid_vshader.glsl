@@ -28,6 +28,8 @@ void main() {
 
     gl_Position = projection * vpoint_mv;
 
+    gl_ClipDistance[0] = height;
+
     light_dir = -vec3(vpoint_mv);
     light_dir = normalize(light_dir);
     uv = pos_2d;

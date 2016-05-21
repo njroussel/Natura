@@ -11,11 +11,14 @@ private:
     GLuint vertex_buffer_object_index_;     // memory buffer for indices
     GLuint program_id_;                     // GLSL shader program ID
     GLuint texture_id_;                     // texture ID
+    GLuint reflection_texture_id_;          // texture ID
     GLuint num_indices_;                    // number of vertices to render
     GLuint MV_id;                         // model, view, proj matrix ID
 
 public:
-    void Init() {
+    void Init(GLuint water_reflection_tex) {
+        reflection_texture_id_ = water_reflection_tex;
+
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("water_grid_vshader.glsl",
                                               "water_grid_fshader.glsl");
@@ -93,6 +96,15 @@ public:
             // check_error_gl();
         }
 
+        //texture for relflection
+        {
+            GLuint tex_mirror_id = glGetUniformLocation(program_id_, "tex_reflection");
+            glUniform1i(tex_mirror_id, 1 /*GL_TEXTURE1*/);
+
+            // cleanup
+            glBindTexture(GL_TEXTURE_2D, 0);
+        }
+
         // other uniforms
         MV_id = glGetUniformLocation(program_id_, "MV");
 
@@ -146,6 +158,14 @@ public:
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
+
+        // bind textures
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture_id_);
+
+        // bind textures
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, reflection_texture_id_);
 
         // setup MV
         glm::mat4 MV = view * model;

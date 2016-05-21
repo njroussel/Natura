@@ -26,7 +26,7 @@ public:
     void Init(){
         for (int i = 0 ; i < m_frame_buffers.size() ; i ++){
             for (int j = 0 ; j < m_frame_buffers[i].size() ; j ++){
-                m_frame_buffers[i][j].Init(mWidth, mHeight);
+                m_frame_buffers[i][j].Init(mWidth, mHeight, GL_R32F);
             }
         }
         quad.Init();
@@ -35,9 +35,6 @@ public:
     int generateNoise(glm::vec2 displ) {
         glm::vec2 id = displ - m_terrain_offset;
         FrameBuffer frameBuffer = m_frame_buffers[(int)id.y][(int)id.x];
-        cout << "generateNoise : " << endl;
-        cout << "displ  = " << displ.x << " " << displ.y << endl;
-        cout << "id = " << id.x << " " << id.y << endl;
         int tex = frameBuffer.getTextureId();
 
         frameBuffer.Bind();
