@@ -124,25 +124,33 @@ public:
         {
             glm::vec3 La = glm::vec3(1.0f, 1.0f, 1.0f);
             glm::vec3 Ld = glm::vec3(1.0f, 1.0f, 1.0f);
+            glm::vec3 Ls = glm::vec3(1.0f, 1.0f, 1.0f);
             glm::vec3 light_pos = glm::vec3(0.0f, 100.0f, 0.0f);
 
             GLuint La_id = glGetUniformLocation(program_id_, "La");
             GLuint Ld_id = glGetUniformLocation(program_id_, "Ld");
+            GLuint Ls_id = glGetUniformLocation(program_id_, "Ls");
             GLuint light_pos_id = glGetUniformLocation(program_id_, "light_pos");
 
             glUniform3fv(La_id, ONE, glm::value_ptr(La));
             glUniform3fv(Ld_id, ONE, glm::value_ptr(Ld));
+            glUniform3fv(Ls_id, ONE, glm::value_ptr(Ls));
             glUniform3fv(light_pos_id, ONE, glm::value_ptr(light_pos));
 
-            glm::vec3 ka = glm::vec3(0.5f, 0.5f, 0.5f);
-            glm::vec3 kd = glm::vec3(0.5f, 0.5f, 0.5f);
+            glm::vec3 ka = glm::vec3(0.18f, 0.1f, 0.1f);
+            glm::vec3 kd = glm::vec3(0.9f, 0.5f, 0.5f);
+            glm::vec3 ks = glm::vec3(0.01f, 0.01f, 0.01f);
+            float alpha = 60.0f;
 
             GLuint ka_id = glGetUniformLocation(program_id_, "ka");
             GLuint kd_id = glGetUniformLocation(program_id_, "kd");
+            GLuint ks_id = glGetUniformLocation(program_id_, "ks");
             GLuint alpha_id = glGetUniformLocation(program_id_, "alpha");
 
             glUniform3fv(ka_id, ONE, glm::value_ptr(ka));
             glUniform3fv(kd_id, ONE, glm::value_ptr(kd));
+            glUniform3fv(ks_id, ONE, glm::value_ptr(ks));
+            glUniform1f(alpha_id, alpha);
 
             // other uniforms
             M_id_ = glGetUniformLocation(program_id_, "model");
