@@ -159,24 +159,20 @@ private:
         }
 
 
-
         //draw as often as possible
-        m_terrain->ExpandTerrain(m_camera->getPosition());
-        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false,  m_grid_model_matrix, m_camera->GetMatrix(),
-                        m_projection->perspective());
-
-
-
-
         glEnable(GL_CLIP_PLANE0);
         framebufferFloor.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, m_grid_model_matrix, m_camera->getMirroredMatrix(),
+        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, m_grid_model_matrix,
+                        m_camera->getMirroredMatrix(),
                         m_projection->perspective());
         framebufferFloor.Unbind();
         glDisable(GL_CLIP_PLANE0);
 
-
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        m_terrain->ExpandTerrain(m_camera->getPosition());
+        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix, m_camera->GetMatrix(),
+                        m_projection->perspective());
     }
 
     // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -228,6 +224,9 @@ private:
         m_window_height = height;
         m_projection->reGenerateMatrix((GLfloat) m_window_width / m_window_height);
         glViewport(0, 0, m_window_width, m_window_height);
+        framebufferFloor.Cleanup();
+        GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
+        m_terrain->Init(fb_tex);
     }
 
     void keyCallback(KeyboardHandlerMessage *message) {
