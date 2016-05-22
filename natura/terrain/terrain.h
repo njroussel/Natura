@@ -47,8 +47,8 @@ public:
                 m_chunks[i][j]->Draw(amplitude, time, glm::translate(_m, glm::vec3(i*CHUNK_SIDE_TILE_COUNT, 0.0, j*CHUNK_SIDE_TILE_COUNT)), view, projection);
             }
         }
-        if(!onlyTerrain) {
         m_skybox->Draw(projection * view * glm::translate(model, -cam_pos/TERRAIN_SCALE));
+        if(!onlyTerrain) {
             for (size_t i = 0; i < m_chunks.size(); i++) {
                 for (size_t j = 0; j < m_chunks.size(); j++) {
                     m_water_grid.Draw(glm::vec2(i * CHUNK_SIDE_TILE_COUNT, j * CHUNK_SIDE_TILE_COUNT), time / 8.f,

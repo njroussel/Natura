@@ -158,27 +158,22 @@ private:
             m_last_time = time;
         }
 
-        // TODO: create new VP for mirrored camera
+
 
         //draw as often as possible
         m_terrain->ExpandTerrain(m_camera->getPosition());
-        //m_terrain->_expand(Terrain::Direction::SOUTH);
-
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false,  m_grid_model_matrix, m_camera->GetMatrix(),
                         m_projection->perspective());
 
 
-        // TODO: render the cube using the mirrored camera
-        // HINT: this render will be done in the framebufferFloor texture (remember bind/unbind)
+
 
         glEnable(GL_CLIP_PLANE0);
-
         framebufferFloor.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, m_grid_model_matrix, m_camera->getMirroredMatrix(),
                         m_projection->perspective());
         framebufferFloor.Unbind();
-
         glDisable(GL_CLIP_PLANE0);
 
 
