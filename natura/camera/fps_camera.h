@@ -83,7 +83,7 @@ private:
             m_position += m_movement_factor * -left_direction;
         }
 
-        m_position.y = -1 * TERRAIN_SCALE * m_terrain->getHeight(glm::vec2(-m_position.x/TERRAIN_SCALE, -m_position.z/TERRAIN_SCALE));
+        m_position.y = -1 * TERRAIN_SCALE * m_terrain->getHeight(glm::vec2(-m_position.x/TERRAIN_SCALE, -m_position.z/TERRAIN_SCALE)) - 0.2f;
 
         cout << "Cam pos = " << m_position.x << " " << m_position.y << " " << m_position.z << endl;
     }
