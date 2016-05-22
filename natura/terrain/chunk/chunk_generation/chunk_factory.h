@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../../perlin_noise/perlinnoise.h"
-#include "../../../../../../../../../../../usr/include/stdint.h"
+#include <cstdint>
 #include "../chunk.h"
 
 class ChunkFactory {

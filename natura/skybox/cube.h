@@ -149,42 +149,6 @@ class Cube {
                                       DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
             }
 
-            // load texture
-            {
-                int width;
-                int height;
-                int nb_component;
-                string texture_filename = "stormydays_large.tga";
-                stbi_set_flip_vertically_on_load(1);
-                unsigned char* image = stbi_load(texture_filename.c_str(),
-                                                 &width, &height, &nb_component, 0);
-
-                if(image == nullptr) {
-                    throw(std::string("Failed to load texture"));
-                }
-
-                glGenTextures(1, &texture_id_);
-                glBindTexture(GL_TEXTURE_2D, texture_id_);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-                if(nb_component == 3) {
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
-                                 GL_RGB, GL_UNSIGNED_BYTE, image);
-                } else if(nb_component == 4) {
-                    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
-                                 GL_RGBA, GL_UNSIGNED_BYTE, image);
-                }
-
-                GLuint tex_id = glGetUniformLocation(program_id_, "tex");
-                glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
-
-                // cleanup
-                glBindTexture(GL_TEXTURE_2D, 0);
-                stbi_image_free(image);
-
-            }
-
             {
                 glGenTextures (1, &texture_id_cube);
                 glBindTexture(GL_TEXTURE_CUBE_MAP, texture_id_cube);

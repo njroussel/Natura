@@ -2,7 +2,7 @@
 
 #include <cstdint>
 #include <GL/glew.h>
-#include <bits/stl_deque.h>
+#include <deque>
 #include "../perlin_quad/perlin_quad.h"
 #include "../framebuffer.h"
 #include "../misc/observer_subject/subject.h"

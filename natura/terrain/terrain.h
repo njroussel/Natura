@@ -30,7 +30,7 @@ public:
     void Init(){
         m_water_grid.Init();
         m_axis.Init();
-        //m_skybox->Init();
+        m_skybox->Init();
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
             for (size_t j = 0 ; j < m_chunks[i].size() ; j ++) {
                 m_chunks[i][j]->Init();
