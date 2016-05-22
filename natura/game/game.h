@@ -94,7 +94,6 @@ private:
     Terrain *m_terrain;
     float m_amplitude;
 
-    glm::vec2 m_displ;
 
     /* Input handlers */
     KeyboardHandler m_keyboard_handler;
@@ -102,6 +101,7 @@ private:
     MouseCursorHandler m_mouse_cursor_handler;
     FrameBufferSizeHandler m_frame_buffer_size_handler;
 
+    FrameBuffer framebufferFloor;
 
 
     /* Private function. */
@@ -109,8 +109,7 @@ private:
         const bool top_down_view = true;
         const int TERRAIN_SIZE = 10;
         const int VERT_PER_GRID_SIDE = 8;
-        const float cam_posxy = TERRAIN_SCALE * ((float)(TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
-        cout << "Campos : " << cam_posxy << endl;
+        const float cam_posxy = TERRAIN_SCALE * ((float) (TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
         vec3 starting_camera_position;
         vec2 starting_camera_rotation;
         if (top_down_view) {
@@ -141,7 +140,9 @@ private:
         BASE_TILE = new Grid(VERT_PER_GRID_SIDE, glm::vec2(0, 0));
         BASE_TILE->Init(0);
         m_perlinNoise->Init();
-        m_terrain->Init(/*perlinNoiseTex*/);
+        GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
+        m_terrain->Init(fb_tex);
+
     }
 
     void Display() {
@@ -157,12 +158,21 @@ private:
             m_last_time = time;
         }
 
-        //draw as often as possible
-        m_terrain->ExpandTerrain(m_camera->getPosition());
-        //m_terrain->_expand(Terrain::Direction::SOUTH);
-        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), m_grid_model_matrix, m_camera->GetMatrix(),
-                        m_projection->perspective());
 
+        //draw as often as possible
+        glEnable(GL_CLIP_PLANE0);
+        framebufferFloor.Bind();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, m_grid_model_matrix,
+                        m_camera->getMirroredMatrix(),
+                        m_projection->perspective());
+        framebufferFloor.Unbind();
+        glDisable(GL_CLIP_PLANE0);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        m_terrain->ExpandTerrain(m_camera->getPosition());
+        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix, m_camera->GetMatrix(),
+                        m_projection->perspective());
     }
 
     // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -214,6 +224,9 @@ private:
         m_window_height = height;
         m_projection->reGenerateMatrix((GLfloat) m_window_width / m_window_height);
         glViewport(0, 0, m_window_width, m_window_height);
+        framebufferFloor.Cleanup();
+        GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
+        m_terrain->Init(fb_tex);
     }
 
     void keyCallback(KeyboardHandlerMessage *message) {
@@ -260,21 +273,21 @@ private:
                     m_camera->SetMovement(DIRECTION::Right, false);
                     break;
                 }
-                /*case GLFW_KEY_LEFT:
-                    m_terrain->_expand(Terrain::Direction::WEST);
-                    break;
+                    /*case GLFW_KEY_LEFT:
+                        m_terrain->_expand(Terrain::Direction::WEST);
+                        break;
 
-                case GLFW_KEY_RIGHT:
-                    m_terrain->_expand(Terrain::Direction::EST);
-                    break;
+                    case GLFW_KEY_RIGHT:
+                        m_terrain->_expand(Terrain::Direction::EST);
+                        break;
 
-                case GLFW_KEY_UP:
-                    m_terrain->_expand(Terrain::Direction::NORTH);
-                    break;
+                    case GLFW_KEY_UP:
+                        m_terrain->_expand(Terrain::Direction::NORTH);
+                        break;
 
-                case GLFW_KEY_DOWN:
-                    m_terrain->_expand(Terrain::Direction::SOUTH);
-                    break;*/
+                    case GLFW_KEY_DOWN:
+                        m_terrain->_expand(Terrain::Direction::SOUTH);
+                        break;*/
             }
         }
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
@@ -352,13 +365,6 @@ private:
                 default:
                     break;
             }
-            cout << "Ampl.  : " << m_amplitude << endl;
-            cout << "H      : " << m_perlinNoise->getProperty(PerlinNoiseProperty::H) << endl;
-            cout << "Freq   : " << m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) << endl;
-            cout << "Offset : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) << endl;
-            cout << "Lac.   : " << m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) << endl;
-            cout << "Octave : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) << endl;
-            cout << "Water h: " << m_terrain->water_height << endl;
         }
     }
 };

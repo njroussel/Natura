@@ -43,13 +43,29 @@ public:
         return m_matrix;
     }
 
+    mat4 getMirroredMatrix(){
+        mat4 mirrored = IDENTITY_MATRIX;
+        mirrored = glm::rotate(mirrored, radians(-m_rotation.x), vec3(1.0f, 0.0f, 0.0f));
+        mirrored = glm::rotate(mirrored, radians(m_rotation.y), vec3(0.0f, 1.0f, 0.0f));
+        vec3 pos = vec3(m_position.x, -m_position.y, m_position.z);
+        mirrored = glm::translate(mirrored, pos);
+        return mirrored;
+    }
+
+    vec3 getForwardDirection() {
+        return m_forward_direction;
+    }
+
+    vec3 getLeftDirection() {
+        return m_left_direction;
+    }
+
     void SetRotation(vec2 &new_rotation) {
         m_rotation = new_rotation;
     }
 
     void AddRotation(vec2 &rotation) {
         m_rotation += rotation;
-        cout << m_rotation.x << "   " << m_rotation.y << endl;
     }
 
     void SetMovement(DIRECTION::ENUM direction, bool boolean) {
@@ -65,29 +81,31 @@ private:
     bool m_moving[m_moving_size];
     vec3 m_position;
     vec2 m_rotation;
+    vec3 m_forward_direction;
+    vec3 m_left_direction;
     mat4 m_matrix;
     float m_movement_factor = 0.4f;
 
     void ComputeMovement() {
-        vec3 forward_direction = normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
-                                                sin(radians(m_rotation.x)),
-                                                cos(radians(m_rotation.x)) * cos(radians(m_rotation.y))));
+        m_forward_direction = normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
+                                             sin(radians(m_rotation.x)),
+                                             cos(radians(m_rotation.x)) * cos(radians(m_rotation.y))));
 
-        vec3 left_direction = vec3(cos(radians(m_rotation.y)),
-                                   0,
-                                   sin(radians(m_rotation.y)));;
+        m_left_direction = vec3(cos(radians(m_rotation.y)),
+                                0,
+                                sin(radians(m_rotation.y)));;
 
         if (m_moving[DIRECTION::ENUM::Forward]) {
-            m_position += m_movement_factor * forward_direction;
+            m_position += m_movement_factor * m_forward_direction;
         }
         if (m_moving[DIRECTION::ENUM::Backward]) {
-            m_position += m_movement_factor * -forward_direction;
+            m_position += m_movement_factor * -m_forward_direction;
         }
         if (m_moving[DIRECTION::ENUM::Left]) {
-            m_position += m_movement_factor * left_direction;
+            m_position += m_movement_factor * m_left_direction;
         }
         if (m_moving[DIRECTION::ENUM::Right]) {
-            m_position += m_movement_factor * -left_direction;
+            m_position += m_movement_factor * -m_left_direction;
         }
     }
 };
