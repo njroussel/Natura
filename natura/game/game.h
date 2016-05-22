@@ -12,7 +12,6 @@
 #include "../misc/io/input/handlers/mouse/mouse_button_handler.h"
 #include "../misc/io/input/handlers/mouse/mouse_cursor_handler.h"
 #include "../misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
-#include "../camera/fps_camera.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 
@@ -44,9 +43,7 @@ public:
         // render loop
         while (!glfwWindowShouldClose(m_window)) {
             glm::vec3 pos = m_camera->getPosition();
-            glm::vec2 tmp = glm::vec2(pos.x, pos.z);
-            //float h = m_terrain->getHeight(tmp);
-            //m_camera->snapToHeight(h);
+
             Display();
             glfwSwapBuffers(m_window);
             glfwPollEvents();
@@ -89,7 +86,7 @@ private:
     GLFWwindow *m_window;
 
     /* Camera and view */
-    FPSCamera *m_camera;
+    Camera *m_camera;
     CameraMode m_camera_mode;
     glm::mat4 m_grid_model_matrix;
     Projection *m_projection;
@@ -110,7 +107,6 @@ private:
     MouseButtonHandler m_mouse_button_handler;
     MouseCursorHandler m_mouse_cursor_handler;
     FrameBufferSizeHandler m_frame_buffer_size_handler;
-
 
 
     /* Private function. */
@@ -134,8 +130,8 @@ private:
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
         m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
-        m_camera = new FPSCamera(starting_camera_position, m_terrain);
-
+        m_camera = new Camera(starting_camera_position, starting_camera_rotation, m_terrain);
+        m_camera->enableFPSMode(true);
 
         // sets background color b
         glClearColor(0, 0, 0/*gray*/, 1.0 /*solid*/);
@@ -162,10 +158,11 @@ private:
 
         //tick 60 times per second
         if (time - m_last_time > 1 / 60.0f) {
-            m_camera->CalculateMatrix();
+            m_camera->tick();
             m_last_time = time;
         }
-
+        //glm::vec3 c = m_terrain->getChunkPos(m_camera->getPosition());
+        //cout << "cam : " << m_camera->getPosition().x << " " << m_camera->getPosition().z << " => " << c.x << " " << c.z << endl;
         //draw as often as possible
         m_terrain->ExpandTerrain(m_camera->getPosition());
         //m_terrain->_expand(Terrain::Direction::SOUTH);
@@ -211,7 +208,7 @@ private:
             float yrot =
                     (float) diffx * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
             vec2 tmp = vec2(xrot, yrot);
-            m_camera->AddRotation(tmp);
+            //m_camera->AddRotation(tmp);
         }
     }
 
@@ -230,93 +227,121 @@ private:
         int key = message->getKey();
         int action = message->getAction();
         if (action == GLFW_PRESS) {
-            switch (key) {
-                case GLFW_KEY_W: {
-                    m_camera->SetMovement(DIRECTION::Forward, true);
-                    //m_camera->setAcceleration(Forward);
-                    break;
-                }
-                case GLFW_KEY_S : {
-                    m_camera->SetMovement(DIRECTION::Backward, true);
-                    //m_camera->setAcceleration(Backward);
-                    break;
-                }
-                case GLFW_KEY_A: {
-                    //m_camera->SetMovement(DIRECTION::Left, true);
-                    break;
-                }
-                case GLFW_KEY_D: {
-                    //m_camera->SetMovement(DIRECTION::Right, true);
-                    break;
-                }
+            if (key == GLFW_KEY_W && !m_camera->hasAcceleration(DIRECTION::Forward)) {
+                m_camera->setMovement(DIRECTION::Forward);
+            }
+            if (key == GLFW_KEY_S && !m_camera->hasAcceleration(DIRECTION::Backward)) {
+                m_camera->setMovement(DIRECTION::Backward);
+            }
+            if (key == GLFW_KEY_A && !m_camera->hasAcceleration(DIRECTION::Left)) {
+                m_camera->setMovement(DIRECTION::Left);
+            }
+            if (key == GLFW_KEY_D && !m_camera->hasAcceleration(DIRECTION::Right)) {
+                m_camera->setMovement(DIRECTION::Right);
+            }
+            if (key == GLFW_KEY_Q && !m_camera->hasAcceleration(DIRECTION::Up)) {
+                m_camera->setMovement(DIRECTION::Up);
+            }
+            if (key == GLFW_KEY_E && !m_camera->hasAcceleration(DIRECTION::Down)) {
+                m_camera->setMovement(DIRECTION::Down);
             }
         }
+
         if (action == GLFW_RELEASE) {
-            switch (key) {
-                case GLFW_KEY_W: {
-                    m_camera->SetMovement(DIRECTION::Forward, false);
-                    //m_camera->stopAcceleration(Forward);
-                    break;
-                }
-                case GLFW_KEY_S : {
-                    m_camera->SetMovement(DIRECTION::Backward, false);
-                    //m_camera->stopAcceleration(Backward);
-                    break;
-                }
-                case GLFW_KEY_A: {
-                    //m_camera->SetMovement(DIRECTION::Left, false);
-                    break;
-                }
-                case GLFW_KEY_D: {
-                    //m_camera->SetMovement(DIRECTION::Right, false);
-                    break;
-                }
+            if (key == GLFW_KEY_W && m_camera->hasAcceleration(DIRECTION::Forward)) {
+                m_camera->stopMovement(DIRECTION::Forward);
+            }
+            if (key == GLFW_KEY_S && m_camera->hasAcceleration(DIRECTION::Backward)) {
+                m_camera->stopMovement(DIRECTION::Backward);
+            }
+            if (key == GLFW_KEY_A && m_camera->hasAcceleration(DIRECTION::Left)) {
+                m_camera->stopMovement(DIRECTION::Left);
+            }
+            if (key == GLFW_KEY_D && m_camera->hasAcceleration(DIRECTION::Right)) {
+                m_camera->stopMovement(DIRECTION::Right);
+            }
+            if (key == GLFW_KEY_Q && m_camera->hasAcceleration(DIRECTION::Up)) {
+                m_camera->stopMovement(DIRECTION::Up);
+            }
+            if (key == GLFW_KEY_E && m_camera->hasAcceleration(DIRECTION::Down)) {
+                m_camera->stopMovement(DIRECTION::Down);
             }
         }
+
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
             switch (key) {
                 case GLFW_KEY_ESCAPE:
-                    glfwSetWindowShouldClose(window, GL_TRUE);
+                    glfwSetWindowShouldClose(window,
+                                             GL_TRUE);
                     break;
 
                 case GLFW_KEY_H:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::H,
-                                               m_perlinNoise->getProperty(PerlinNoiseProperty::H) + .05f);
+                    m_perlinNoise->
+                            setProperty(PerlinNoiseProperty::H,
+                                        m_perlinNoise
+                                                ->
+                                                        getProperty(PerlinNoiseProperty::H)
+                                        + .05f);
                     break;
 
                 case GLFW_KEY_N:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::H,
-                                               m_perlinNoise->getProperty(PerlinNoiseProperty::H) - .05f);
+                    m_perlinNoise->
+                            setProperty(PerlinNoiseProperty::H,
+                                        m_perlinNoise
+                                                ->
+                                                        getProperty(PerlinNoiseProperty::H)
+                                        - .05f);
                     break;
 
                 case GLFW_KEY_F:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::FREQUENCY,
-                                               m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) + 0.1f);
+                    m_perlinNoise->
+                            setProperty(PerlinNoiseProperty::FREQUENCY,
+                                        m_perlinNoise
+                                                ->
+                                                        getProperty(PerlinNoiseProperty::FREQUENCY)
+                                        + 0.1f);
                     break;
 
                 case GLFW_KEY_V:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::FREQUENCY,
-                                               m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) - 0.1f);
+                    m_perlinNoise->
+                            setProperty(PerlinNoiseProperty::FREQUENCY,
+                                        m_perlinNoise
+                                                ->
+                                                        getProperty(PerlinNoiseProperty::FREQUENCY)
+                                        - 0.1f);
                     break;
 
                 case GLFW_KEY_O:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::OFFSET,
-                                               m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) + 0.05);
+                    m_perlinNoise->
+                            setProperty(PerlinNoiseProperty::OFFSET,
+                                        m_perlinNoise
+                                                ->
+                                                        getProperty(PerlinNoiseProperty::OFFSET)
+                                        + 0.05);
                     break;
 
                 case GLFW_KEY_L:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::OFFSET,
-                                               m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) - 0.05);
+                    m_perlinNoise->
+                            setProperty(PerlinNoiseProperty::OFFSET,
+                                        m_perlinNoise
+                                                ->
+                                                        getProperty(PerlinNoiseProperty::OFFSET)
+                                        - 0.05);
                     break;
 
                 case GLFW_KEY_I:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::LACUNARITY,
-                                               m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) + 0.05f);
+                    m_perlinNoise->
+                            setProperty(PerlinNoiseProperty::LACUNARITY,
+                                        m_perlinNoise
+                                                ->
+                                                        getProperty(PerlinNoiseProperty::LACUNARITY)
+                                        + 0.05f);
                     break;
 
                 case GLFW_KEY_K:
                     m_perlinNoise->setProperty(PerlinNoiseProperty::LACUNARITY,
-                                               m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) - 0.05f);
+                                               m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY)
+                                               - 0.05f);
                     break;
 
                 case GLFW_KEY_Z:
@@ -328,8 +353,12 @@ private:
                     break;
 
                 case GLFW_KEY_J:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::OCTAVE,
-                                               m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) - 1);
+                    m_perlinNoise->
+                            setProperty(PerlinNoiseProperty::OCTAVE,
+                                        m_perlinNoise
+                                                ->
+                                                        getProperty(PerlinNoiseProperty::OCTAVE)
+                                        - 1);
                     break;
 
                 case GLFW_KEY_U:
@@ -346,42 +375,14 @@ private:
                     break;
 
                 case GLFW_KEY_SPACE:
-                    cout << "KEKED" << endl;
-                    //m_camera->LookAt(glm::vec3(0, 0, 0));
+                    cout << "KEKED" <<
+                    endl;
                     break;
 
-                case GLFW_KEY_A : {
-                    glm::vec2 rot = vec2(0, -1);
-                    m_camera->AddRotation(rot);
-                    break;
-                }
-                case GLFW_KEY_D: {
-                    glm::vec2 rot = vec2(0, 1);
-                    m_camera->AddRotation(rot);
-                    break;
-                }
-
-                case GLFW_KEY_Q : {
-                    glm::vec2 rot = vec2(-1, 0);
-                    m_camera->AddRotation(rot);
-                    break;
-                }
-                case GLFW_KEY_E: {
-                    glm::vec2 rot = vec2(1, 0);
-                    m_camera->AddRotation(rot);
-                    break;
-                }
 
                 default:
                     break;
             }
-            /*cout << "Ampl.  : " << m_amplitude << endl;
-            cout << "H      : " << m_perlinNoise->getProperty(PerlinNoiseProperty::H) << endl;
-            cout << "Freq   : " << m_perlinNoise->getProperty(PerlinNoiseProperty::FREQUENCY) << endl;
-            cout << "Offset : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OFFSET) << endl;
-            cout << "Lac.   : " << m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY) << endl;
-            cout << "Octave : " << m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) << endl;
-            cout << "Water h: " << m_terrain->water_height << endl;*/
         }
     }
 };

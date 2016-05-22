@@ -77,7 +77,7 @@ public:
             std::vector<GLuint> indices;
 
             float sideX = 1 / float(mSideNbPoints);
-            mSideNbPoints ++; // OFF BY ONE BY @Rimbaut
+            //mSideNbPoints ++; // OFF BY ONE BY @Rimbaut
             for (int i = 0; i < mSideNbPoints; i++) {
                 for (int j = 0; j < mSideNbPoints; j++) {
                     vertices.push_back(i * sideX);
