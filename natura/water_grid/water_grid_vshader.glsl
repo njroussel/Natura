@@ -47,32 +47,26 @@ float wave_h(float x, float y) {
 }
 void main() {
     fill_params();
-    float epsilon = 0.005f;
-    uv = (position + vec2(1.0, 1.0) + chunk_pos/4) * 0.5;
-
-    // convert the 2D position into 3D positions that all lay in a horizontal
-    // plane.
-    // TODO 6: animate the height of the grid points as a sine function of the
-    // 'time' and the position ('uv') within the grid.
-    // Water
-    float height = wave_h(uv[0]/* + chunk_pos.x*/, uv[1] /*s+ chunk_pos.y*/);
-    height_ = height;
+    vec2 pos_2d = position;
+    pos_2d.x += chunk_pos.x;
+    pos_2d.y += chunk_pos.y;
+    float height = wave_h(pos_2d.x, pos_2d.y);
     vec3 pos_3d = vec3(position.x, height, position.y);
 
-     float zDiffXAxis = wave_h(uv.x + epsilon, uv.y) - wave_h(uv.x - epsilon, uv.y);
-     float zDiffYAxis = wave_h(uv.x, uv.y + epsilon) - wave_h(uv.x, uv.y - epsilon);
-    normal = normalize(cross(vec3(2 *epsilon, zDiffXAxis, 0.0f), vec3(0.0, zDiffYAxis, 2* epsilon)));
-normal = (inverse(transpose(MV)) * vec4(-normal, 1.0f)).xyz;
+    uv = pos_2d;
 
+    height_ = height;
+
+    float epsilon = 0.01f;
+    float zDiffXaxis = wave_h(pos_2d.x + epsilon, pos_2d.y) - wave_h(pos_2d.x - epsilon, pos_2d.y);
+    float zDiffYaxis = wave_h(pos_2d.x, pos_2d.y + epsilon) - wave_h(pos_2d.x, pos_2d.y - epsilon);
+
+    normal = -normalize((cross(vec3(2 * epsilon, zDiffXaxis, 0.0f), vec3(0.0, zDiffYaxis, 2* epsilon))));
 
     vec4 vpoint_mv = MV * vec4(pos_3d, 1.0);
     gl_Position = projection * vpoint_mv;
 
-    light_dir = light_pos - vpoint_mv.xyz;
-        light_dir = normalize(light_dir);
+    MV_out = MV;
 
-        view_dir = -vpoint_mv.xyz;
-            view_dir  = normalize(view_dir);
-
-        MV_out = MV;
+    light_dir = -vec3(vpoint_mv);
 }

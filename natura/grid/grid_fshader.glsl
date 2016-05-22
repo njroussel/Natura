@@ -13,8 +13,9 @@ uniform sampler2D rock_tex;
 uniform sampler2D snow_tex;
 uniform sampler2D sand_tex;
 uniform sampler2D water_tex;
-uniform vec3 La, Ld;
-uniform vec3 ka, kd;
+uniform vec3 La, Ld, Ls;
+uniform vec3 ka, kd, ks;
+uniform float alpha;
 
 float getPercentage( float value,  float min,  float max ){
     value = clamp( value, min, max );
@@ -64,10 +65,18 @@ void main() {
 
     vec3 normal = normalize(cross(vec3(2 *epsilon, zDiffXaxis, 0.0f), vec3(0.0, zDiffYaxis, 2* epsilon)));
     normal = (inverse(transpose(MV)) * vec4(-normal, 1.0f)).xyz;
+
     vec3 ambient = color * 0.6 * La;
+
     vec3 light = normalize(light_dir);
-    float dotNl = dot(normal, light) < 0.0f ? 0.0f : dot(normal, light);
+    float dotNl = dot(normal, light_dir) < 0.0f ? 0.0f : dot(normal, light_dir);
     vec3 diffuse = color * dotNl * Ld;
 
-    color = ambient +  diffuse;
+    vec3 r = 2 * normal * dotNl + light;
+    r = normalize(r);
+    float dotRv = dot(r, light) < 0.0f ? 0.0f : dot(r, light);
+
+    vec3 specular = ks * pow(dotRv, alpha) * Ls;
+
+    color = ambient + diffuse +specular;
 }
