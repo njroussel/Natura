@@ -115,7 +115,7 @@ public:
 private:
     glm::vec2 m_rotation;
     glm::mat4 m_matrix;
-    bool m_pressed[4];
+    bool m_pressed[6];
     Terrain *m_terrain;
     bool m_fps_mode;
 

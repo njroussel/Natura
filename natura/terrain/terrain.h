@@ -104,7 +104,6 @@ public:
         frameBuffer->Unbind();
 
         height = (height-0.5f)*m_amplitude;
-        water_height = height;
         return height;
     }
 
