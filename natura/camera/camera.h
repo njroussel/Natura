@@ -74,19 +74,19 @@ public:
             glm::vec2 rot = vec2(0, 1);
             addRotation += rot;
         }
-        if (m_pressed[Up] && !m_fps_mode) {
+        if (m_pressed[Up]) {
             m_tmp = true;
             glm::vec2 rot = vec2(-1, 0);
             addRotation += rot;
         }
-        if (m_pressed[Down] && !m_fps_mode) {
+        if (m_pressed[Down]) {
             glm::vec2 rot = vec2(1, 0);
             addRotation += rot;
         }
 
         m_rotation += addRotation;
 
-        if (isMoving() && length(addRotation) != 0) {
+        if (isMoving() && length(addRotation) != 0 && !m_fps_mode) {
             forceDirection(getForwardDirection());
         }
     }
