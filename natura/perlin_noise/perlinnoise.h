@@ -9,7 +9,6 @@
 #include "../misc/observer_subject/messages/perlin_noise_prop_changed_message.h"
 
 enum class PerlinNoiseProperty {H, LACUNARITY, OFFSET, FREQUENCY, OCTAVE};
-
 class PerlinNoise : public Subject{
 public:
     PerlinNoise(uint32_t width, uint32_t height, glm::vec2 cache_size) {
@@ -27,20 +26,21 @@ public:
         for (int i = 0 ; i < m_frame_buffers.size() ; i ++){
             for (int j = 0 ; j < m_frame_buffers[i].size() ; j ++){
                 m_frame_buffers[i][j].Init(mWidth, mHeight, GL_R32F);
+                cout << "FB (" << j << " " << i << ") tex = " << m_frame_buffers[i][j].getTextureId() << endl;
             }
         }
         quad.Init();
     }
 
     int generateNoise(glm::vec2 displ) {
-        glm::vec2 id = displ - m_terrain_offset;
-        FrameBuffer frameBuffer = m_frame_buffers[(int)id.y][(int)id.x];
-        int tex = frameBuffer.getTextureId();
+        glm::vec2 id = displ  - m_terrain_offset;
+        FrameBuffer *frameBuffer = &m_frame_buffers[(int)id.y][(int)id.x];
+        int tex = frameBuffer->getTextureId();
 
-        frameBuffer.Bind();
+        frameBuffer->Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         quad.Draw(IDENTITY_MATRIX, m_H, m_frequency, m_lacunarity, m_offset, m_octaves, displ);
-        frameBuffer.Unbind();
+        frameBuffer->Unbind();
         //frameBuffer.Cleanup();
         return tex;
     }
@@ -126,6 +126,13 @@ public:
         }
     }
 
+    FrameBuffer *getFrameBufferForChunk(glm::vec2 chunkpos){
+        int m = m_frame_buffers.size();
+        chunkpos.x = (int)chunkpos.x % m;
+        chunkpos.y = (int)chunkpos.y % m;
+        return &m_frame_buffers[(int)chunkpos.y][(int)chunkpos.x];
+    }
+
 private:
     std::deque<std::deque<FrameBuffer> > m_frame_buffers;
     glm::vec2 m_terrain_offset;
@@ -139,5 +146,3 @@ private:
     float m_frequency = 0.1f;
     int m_octaves = 6;
 };
-
-
