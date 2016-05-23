@@ -9,7 +9,6 @@
 #include "../misc/observer_subject/messages/perlin_noise_prop_changed_message.h"
 
 enum class PerlinNoiseProperty {H, LACUNARITY, OFFSET, FREQUENCY, OCTAVE};
-bool axis___ = false;
 class PerlinNoise : public Subject{
 public:
     PerlinNoise(uint32_t width, uint32_t height, glm::vec2 cache_size) {
@@ -97,12 +96,10 @@ public:
         glm::vec2 dir = m_terrain_offset - offset;
         m_terrain_offset = offset;
         if (dir.y > 0){
-            cout << "< 0" << endl;
             m_frame_buffers.push_front(m_frame_buffers[m_frame_buffers.size()-1]);
             m_frame_buffers.pop_back();
         }
         else if (dir.y < 0){
-            cout << "> 0" << endl;
             m_frame_buffers.push_back(m_frame_buffers[0]);
             m_frame_buffers.pop_front();
         }
@@ -130,16 +127,9 @@ public:
     }
 
     FrameBuffer *getFrameBufferForChunk(glm::vec2 chunkpos){
-        //chunkpos -= m_terrain_offset;
-        if (axis___)
-            cout << "chunkpos = " << chunkpos.x << " " << chunkpos.y << " |||| ";
-        if (axis___)
-            cout << "m_terrain_offset = " << m_terrain_offset.x << " " << m_terrain_offset.y << " |||| ";
         int m = m_frame_buffers.size();
         chunkpos.x = (int)chunkpos.x % m;
         chunkpos.y = (int)chunkpos.y % m;
-        if (axis___)
-            cout << "id = " << chunkpos.x << " " << chunkpos.y << " |||| ";
         return &m_frame_buffers[(int)chunkpos.y][(int)chunkpos.x];
     }
 

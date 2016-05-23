@@ -41,12 +41,9 @@ public:
         _update_acc();
         CalculateMatrix();
         MaterialPoint::tick();
-        //cout << " pos ===== = " << m_position.x << " " << m_position.y << " " << m_position.z << endl;
         if (m_fps_mode){
             /* We snap the camera to the ground */
-            axis___ = true;
             float h = -1 * TERRAIN_SCALE * m_terrain->getHeight(glm::vec2(-m_position.x/TERRAIN_SCALE, -m_position.z/TERRAIN_SCALE)) - 0.2f;
-            axis___ = false;
             m_position.y = h;
         }
     }
@@ -75,7 +72,6 @@ public:
             addRotation += rot;
         }
         if (m_pressed[Up]) {
-            m_tmp = true;
             glm::vec2 rot = vec2(-1, 0);
             addRotation += rot;
         }
@@ -90,8 +86,6 @@ public:
             forceDirection(getForwardDirection());
         }
     }
-
-    bool m_tmp = false;
 
     bool hasAcceleration(DIRECTION dir) {
         return m_pressed[dir];
