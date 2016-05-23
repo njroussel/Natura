@@ -39,6 +39,7 @@ public:
             int mSideNbPoints = 64;
             float sideX = 1 / float(mSideNbPoints);
             mSideNbPoints++;
+
             for (int i = 0; i < mSideNbPoints; i++) {
                 for (int j = 0; j < mSideNbPoints; j++) {
                     vertices.push_back(i * sideX);
@@ -84,7 +85,7 @@ public:
         // create 1D texture (colormap)
         {
             const int ColormapSize = 2;
-            GLfloat tex[3 * ColormapSize] = {0.0, 0.2, 0.45, 158.0f/255.0f, 181.0f/255.0f, 210.0f/255.0f};
+            GLfloat tex[3 * ColormapSize] = {0.0, 0.2, 0.45, 158.0f / 255.0f, 181.0f / 255.0f, 210.0f / 255.0f};
             glGenTextures(1, &texture_id_);
             glBindTexture(GL_TEXTURE_1D, texture_id_);
             glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, ColormapSize, 0, GL_RGB, GL_FLOAT, tex);
@@ -170,7 +171,8 @@ public:
         // setup MV
         glm::mat4 MV = view * model;
         glUniformMatrix4fv(MV_id, ONE, DONT_TRANSPOSE, glm::value_ptr(MV));
-        glUniformMatrix4fv(glGetUniformLocation(program_id_, "projection"), ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(program_id_, "projection"), ONE, DONT_TRANSPOSE,
+                           glm::value_ptr(projection));
 
         // pass the current time stamp to the shader.
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);

@@ -25,6 +25,7 @@ void main() {
 
     vec3 normal_normalized = normalize(normal);
     vec3 light = normalize(light_dir);
+
     float dotNl = dot(normal_normalized, light) < 0.0f ? 0.0f : dot(normal_normalized, light);
     vec3 diffuse = water_color * dotNl * Ld;
 

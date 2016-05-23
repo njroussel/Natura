@@ -13,6 +13,8 @@
 #include "misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
 #include "water_grid/water_grid.h"
 #include "axis/axis.h"
+#include "physics/material_point.h"
+#include "camera/camera.h"
 
 using namespace glm;
 
@@ -24,8 +26,8 @@ void ErrorCallback(int error, const char *description) {
 }
 
 int main(int argc, char *argv[]) {
-    int window_width = 1000;
-    int window_height = 700;
+    int window_width = 700;
+    int window_height = 500;
     // GLFW Initialization
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW\n");

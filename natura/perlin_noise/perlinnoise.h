@@ -96,12 +96,10 @@ public:
         glm::vec2 dir = m_terrain_offset - offset;
         m_terrain_offset = offset;
         if (dir.y > 0){
-            cout << "< 0" << endl;
             m_frame_buffers.push_front(m_frame_buffers[m_frame_buffers.size()-1]);
             m_frame_buffers.pop_back();
         }
         else if (dir.y < 0){
-            cout << "> 0" << endl;
             m_frame_buffers.push_back(m_frame_buffers[0]);
             m_frame_buffers.pop_front();
         }

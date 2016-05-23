@@ -76,7 +76,6 @@ public:
         cam_pos = abs(cam_pos);
         cam_pos.x = (int) cam_pos.x;
         cam_pos.z = (int) cam_pos.z;
-        //cout << "cam_pos : " << cam_pos.x << " , " << cam_pos.z << endl;
         if (cam_pos.z < edge_threshold)
             _expand(Terrain::Direction::NORTH);
         else if (cam_pos.z > m_chunks[0].size() - 1 - edge_threshold)
