@@ -198,18 +198,16 @@ private:
         GLFWwindow *window = message->getWindow();
         double x = message->getCoordX();
         double y = message->getCoordY();
-        if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-            double diffx = x - m_last_mouse_xpos; //check the difference between the current x and the last x position
-            double diffy = y - m_last_mouse_ypos; //check the difference between the current y and the last y position
-            m_last_mouse_xpos = x; //set lastx to the current x position
-            m_last_mouse_ypos = y; //set lasty to the current y position
-            float xrot =
-                    (float) diffy * 0.1f; //set the xrot to xrot with the addition of the difference in the y position
-            float yrot =
-                    (float) diffx * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
-            vec2 tmp = vec2(xrot, yrot);
-            //m_camera->AddRotation(tmp);
-        }
+        double diffx = x - m_last_mouse_xpos; //check the difference between the current x and the last x position
+        double diffy = y - m_last_mouse_ypos; //check the difference between the current y and the last y position
+        m_last_mouse_xpos = x; //set lastx to the current x position
+        m_last_mouse_ypos = y; //set lasty to the current y position
+        float xrot =
+                (float) diffy * 0.1f; //set the xrot to xrot with the addition of the difference in the y position
+        float yrot =
+                (float) diffx * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
+        vec2 tmp = vec2(xrot, yrot);
+        m_camera->AddRotationFPS(tmp);
     }
 
     // Gets called when the windows/framebuffer is resized.

@@ -103,6 +103,15 @@ public:
         m_fps_mode = enable;
     }
 
+    bool isFPSEnabled() {
+        return m_fps_mode;
+    }
+
+    void AddRotationFPS(glm::vec2 rot) {
+        if (m_fps_mode)
+            m_rotation += rot;
+    }
+
 private:
     glm::vec2 m_rotation;
     glm::mat4 m_matrix;
