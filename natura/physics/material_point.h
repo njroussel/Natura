@@ -37,6 +37,13 @@ public:
                                 m_acceleration.z * curr_speed,
                                 m_acceleration.y * curr_speed);
         }
+
+        cout << "SPEED " << endl;
+        cout << m_speed.x << endl;
+        cout << m_speed.y << endl;
+        cout << m_speed.z << endl;
+
+        cout << " " << endl;
     }
 
     void forceDirection(glm::vec3 acc) {
@@ -113,6 +120,7 @@ private:
             m_speed = glm::vec3(0, 0, 0);
             m_acceleration = glm::vec3(0, 0, 0);
         }
+
         m_position += glm::vec3(m_speed.x,
                                 m_speed.z,
                                 m_speed.y);

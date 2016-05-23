@@ -84,10 +84,21 @@ private:
     bool m_pressed[4];
 
     glm::vec3 getForwardDirection() {
-        vec3 tmp = vec3(0.0f);
+        vec3 tmp = vec3(-sin(radians(m_rotation.y + 90.0f)) * sin(radians(m_rotation.x)),
+                        -cos(radians(m_rotation.y + 90.0f)),
+                        sin(radians(m_rotation.y + 90.0f)) * cos(radians(m_rotation.x)));
+
+        cout << tmp.x << endl;
+        cout << tmp.y << endl;
+        cout << tmp.z << endl;
+
+        cout << " " << endl;
+
         cout << m_rotation.x << endl;
         cout << m_rotation.y << endl;
+
         cout << " " << endl;
+
         return normalize(tmp);
     }
 
