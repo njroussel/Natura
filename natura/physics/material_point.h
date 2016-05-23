@@ -29,13 +29,13 @@ public:
         float theta = dot(m_acceleration, m_speed) / curr_speed;
         if (theta < 0) {
             m_speed = glm::vec3(-m_acceleration.x * curr_speed,
-                                -m_acceleration.z * curr_speed,
-                                -m_acceleration.y * curr_speed);
+                                -m_acceleration.y * curr_speed,
+                                -m_acceleration.z * curr_speed);
         }
         else {
             m_speed = glm::vec3(m_acceleration.x * curr_speed,
-                                m_acceleration.z * curr_speed,
-                                m_acceleration.y * curr_speed);
+                                m_acceleration.y * curr_speed,
+                                m_acceleration.z * curr_speed);
         }
 
         cout << "SPEED " << endl;
@@ -85,7 +85,7 @@ public:
 
     bool isSlowingDown() {
         float d = dot(normalize(m_speed), normalize(m_acceleration));
-        return d < 0;
+        return false;
     }
 
     bool isMoving() {
@@ -111,16 +111,17 @@ private:
 
         float curr_speed = length(m_speed);
 
-
         float epsilon = 0.02f;
-
+        if (curr_speed > m_max_speed) {
+            m_speed = m_speed * m_max_speed / curr_speed;
+        }
         if (curr_speed < epsilon && isSlowingDown()) {
             m_speed = glm::vec3(0, 0, 0);
             m_acceleration = glm::vec3(0, 0, 0);
         }
 
         m_position += glm::vec3(m_speed.x,
-                                m_speed.y,
-                                m_speed.z);
+                                m_speed.z,
+                                m_speed.y);
     }
 };
