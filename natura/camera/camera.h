@@ -81,7 +81,7 @@ public:
 private:
     glm::vec2 m_rotation;
     glm::mat4 m_matrix;
-    bool m_pressed[4];
+    bool m_pressed[6];
 
     glm::vec3 getForwardDirection() {
         vec3 tmp = vec3(-sin(radians(m_rotation.y + 90.0f)) * sin(radians(m_rotation.x)),

@@ -85,7 +85,7 @@ public:
 
     bool isSlowingDown() {
         float d = dot(normalize(m_speed), normalize(m_acceleration));
-        return false;
+        return d <= 0;
     }
 
     bool isMoving() {
