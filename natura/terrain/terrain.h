@@ -114,7 +114,7 @@ public:
         //pos /= TERRAIN_SCALE;
         /*m_axis_pos.x = -pos.x;
         m_axis_pos.z = -pos.y;*/
-        pos = abs(pos);
+        //pos = abs(pos);
         glm::vec2 chunk_idx = glm::vec2(tmp.x, tmp.z);
         FrameBuffer *frameBuffer = m_perlin_noise->getFrameBufferForChunk(chunk_idx);
         if (axis___)

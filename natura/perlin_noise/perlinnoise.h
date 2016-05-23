@@ -136,8 +136,8 @@ public:
         if (axis___)
             cout << "m_terrain_offset = " << m_terrain_offset.x << " " << m_terrain_offset.y << " |||| ";
         int m = m_frame_buffers.size();
-        //chunkpos.x = (int)chunkpos.x % m;
-        //chunkpos.y = (int)chunkpos.y % m;
+        chunkpos.x = (int)chunkpos.x % m;
+        chunkpos.y = (int)chunkpos.y % m;
         if (axis___)
             cout << "id = " << chunkpos.x << " " << chunkpos.y << " |||| ";
         return &m_frame_buffers[(int)chunkpos.y][(int)chunkpos.x];
