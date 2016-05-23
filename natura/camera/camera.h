@@ -28,8 +28,8 @@ public:
 
     void CalculateMatrix() {
         m_matrix = IDENTITY_MATRIX;
-        m_matrix = glm::rotate(m_matrix, radians(m_rotation.x), vec3(1.0f, 0.0f, 0.0f));
-        m_matrix = glm::rotate(m_matrix, radians(m_rotation.y), vec3(0.0f, 1.0f, 0.0f));
+        m_matrix = glm::rotate(m_matrix, radians(m_rotation.y), vec3(1.0f, 0.0f, 0.0f));
+        m_matrix = glm::rotate(m_matrix, radians(m_rotation.x), vec3(0.0f, 1.0f, 0.0f));
         m_matrix = glm::translate(m_matrix, getPosition());
     }
 
@@ -47,27 +47,23 @@ public:
     void AddRotation() {
         vec2 addRotation = vec2(0.0f, 0.0f);
         if (m_pressed[Left]) {
-            glm::vec2 rot = vec2(0, -1);
-            addRotation += rot;
-        }
-        if (m_pressed[Right]) {
-            glm::vec2 rot = vec2(0, 1);
-            addRotation += rot;
-        }
-        if (m_pressed[Up]) {
             glm::vec2 rot = vec2(-1, 0);
             addRotation += rot;
         }
-        if (m_pressed[Down]) {
+        if (m_pressed[Right]) {
             glm::vec2 rot = vec2(1, 0);
+            addRotation += rot;
+        }
+        if (m_pressed[Up]) {
+            glm::vec2 rot = vec2(0, -1);
+            addRotation += rot;
+        }
+        if (m_pressed[Down]) {
+            glm::vec2 rot = vec2(0, 1);
             addRotation += rot;
         }
 
         m_rotation += addRotation;
-
-        if (isMoving() && length(addRotation) != 0) {
-            forceDirection(getForwardDirection());
-        }
     }
 
     bool hasAcceleration(DIRECTION dir) {
@@ -88,12 +84,9 @@ private:
     bool m_pressed[4];
 
     glm::vec3 getForwardDirection() {
-        vec3 tmp = (vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
-                              -sin(radians(m_rotation.x + 180.0f)),
-                              cos(radians(m_rotation.x)) * cos(radians(m_rotation.y))));
-        cout << tmp.x <<endl;
-        cout << tmp.y <<endl;
-        cout << tmp.z<<endl;
+        vec3 tmp = vec3(0.0f);
+        cout << m_rotation.x << endl;
+        cout << m_rotation.y << endl;
         cout << " " << endl;
         return normalize(tmp);
     }
