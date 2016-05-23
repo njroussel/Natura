@@ -11,7 +11,7 @@ public:
         m_speed = vec3(0.0f);
         m_position = initial_pos;
         m_mass = mass;
-        m_max_speed = 0.2f;
+        m_max_speed = 0.4f;
     }
 
     glm::vec3 getPosition() {
@@ -61,13 +61,13 @@ public:
         float alpha = dot(normalize(m_speed), normalize(m_acceleration));
         if (alpha < 0) {
             m_speed = glm::vec3(-m_acceleration.x * curr_speed,
-                                -m_acceleration.z * curr_speed,
-                                -m_acceleration.y * curr_speed);
+                                -m_acceleration.y * curr_speed,
+                                -m_acceleration.z * curr_speed);
         }
         else {
             m_speed = glm::vec3(m_acceleration.x * curr_speed,
-                                m_acceleration.z * curr_speed,
-                                m_acceleration.y * curr_speed);
+                                m_acceleration.y * curr_speed,
+                                m_acceleration.z * curr_speed);
         }
     }
 
@@ -106,13 +106,11 @@ private:
 
     void _update_pos() {
         m_speed += 0.01f * glm::vec3(m_acceleration.x,
-                                     m_acceleration.z,
-                                     m_acceleration.y);
+                                     m_acceleration.y,
+                                     m_acceleration.z);
 
         float curr_speed = length(m_speed);
-        if (curr_speed > m_max_speed) {
-            m_speed = m_speed * m_max_speed / curr_speed;
-        }
+
 
         float epsilon = 0.02f;
 
@@ -122,7 +120,7 @@ private:
         }
 
         m_position += glm::vec3(m_speed.x,
-                                m_speed.z,
-                                m_speed.y);
+                                m_speed.y,
+                                m_speed.z);
     }
 };

@@ -32,7 +32,7 @@ float epsilon = 0.005f;
         vec3 specular = ks * pow(dotRv, alpha) * Ls;
         vec3 apd = diffuse + ambient + specular;
     color = vec4(apd.x, apd.y, apd.z, 0.6);
-   // color = vec4(Ls.x, Ls.y, Ls.z, 1.f);
+    // color = vec4(Ls.x, Ls.y, Ls.z, 1.f);
     //color = vec4(1-dotNl, 1-dotNl, 1-dotNl, 1.f);
     /*if (dotRv == 0)
         color = vec4(1.f, 0, 0, 1.f);

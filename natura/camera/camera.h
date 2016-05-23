@@ -85,10 +85,11 @@ private:
 
     glm::vec3 getForwardDirection() {
         vec3 tmp = vec3(-sin(radians(m_rotation.y + 90.0f)) * sin(radians(m_rotation.x)),
-                        -cos(radians(m_rotation.y + 90.0f)),
-                        sin(radians(m_rotation.y + 90.0f)) * cos(radians(m_rotation.x)));
+                        sin(radians(m_rotation.y + 90.0f)) * cos(radians(m_rotation.x)),
+                        -cos(radians(m_rotation.y + 90.0f)));
 
         cout << tmp.x << endl;
+
         cout << tmp.y << endl;
         cout << tmp.z << endl;
 
