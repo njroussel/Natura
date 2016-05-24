@@ -151,10 +151,12 @@ private:
 
         const float time = glfwGetTime();
 
+        cout << "Frames : " << 1 / (time - m_last_time) << endl;
 
         //tick 60 times per second
         if (time - m_last_time > 1 / 60.0f) {
             m_camera->tick();
+            cout << "Ticks : " << 1 / (time - m_last_time) << endl;
             m_last_time = time;
         }
 
