@@ -54,6 +54,17 @@ public:
         return mirrored;
     }
 
+    /*
+    mat4 lookAtPoint(vec3 point, vec3 up){
+        vec3 previousFwd = getForwardDirection();
+        vec3 position = getPosition();
+        m_matrix = lookAt(position, point, up);
+        vec3 newFwd = point - position;
+
+
+        ;
+    }
+*/
 
     void AddRotation() {
         vec2 addRotation = vec2(0.0f, 0.0f);
