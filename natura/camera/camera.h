@@ -54,17 +54,26 @@ public:
         return mirrored;
     }
 
-    /*
-    mat4 lookAtPoint(vec3 point, vec3 up){
-        vec3 previousFwd = getForwardDirection();
+
+    void lookAtPoint(vec3 point) {
         vec3 position = getPosition();
-        m_matrix = lookAt(position, point, up);
-        vec3 newFwd = point - position;
+        if(position == point){
+            return;
+        }
 
+        vec3 newFwd = normalize(point - position);
+        vec3 up = vec3(0.0f, 1.0f, 0.0f);
+        vec3 right = vec3(0.0f, 0.0f, 1.0f);
 
-        ;
+        float newYRotation = degrees(acos(dot(newFwd, up)));
+
+        vec3 fwdPlaneDirection = normalize(vec3(newFwd.x, 0, newFwd.z));
+        float newXRotation =  degrees(acos(dot(fwdPlaneDirection, right)));
+
+        m_rotation.y = -(newYRotation - 90);
+        m_rotation.x =  position.x < 0 ? -newXRotation : newXRotation;
     }
-*/
+
 
     void AddRotation() {
         vec2 addRotation = vec2(0.0f, 0.0f);
@@ -107,9 +116,8 @@ private:
 
     glm::vec3 getForwardDirection() {
         vec3 tmp = vec3(-sin(radians(m_rotation.y + 90.0f)) * sin(radians(m_rotation.x)),
-                        sin(radians(m_rotation.y + 90.0f)) * cos(radians(m_rotation.x)),
-                        -cos(radians(m_rotation.y + 90.0f)));
-
+                        -cos(radians(m_rotation.y + 90.0f)),
+                        sin(radians(m_rotation.y + 90.0f)) * cos(radians(m_rotation.x)));
         return normalize(tmp);
     }
 

@@ -25,34 +25,9 @@ public:
 
     void setAccelerationVector(glm::vec3 acc) {
         float curr_speed = length(m_speed);
-        m_acceleration = normalize(acc);
+        m_acceleration = normalize(vec3(acc.x, acc.y, acc.z));
         float theta = dot(m_acceleration, m_speed) / curr_speed;
         if (theta < 0) {
-            m_speed = glm::vec3(-m_acceleration.x * curr_speed,
-                                -m_acceleration.y * curr_speed,
-                                -m_acceleration.z * curr_speed);
-        }
-        else {
-            m_speed = glm::vec3(m_acceleration.x * curr_speed,
-                                m_acceleration.y * curr_speed,
-                                m_acceleration.z * curr_speed);
-        }
-    }
-
-    void forceDirection(glm::vec3 acc) {
-        float curr_speed = length(m_speed);
-        float curr_acc = length(m_acceleration);
-        float theta = dot(normalize(acc), normalize(m_acceleration));
-
-        if (theta < 0) {
-            m_acceleration = -acc * curr_acc;
-        }
-        else {
-            m_acceleration = acc * curr_acc;
-        }
-
-        float alpha = dot(normalize(m_speed), normalize(m_acceleration));
-        if (alpha < 0) {
             m_speed = glm::vec3(-m_acceleration.x * curr_speed,
                                 -m_acceleration.y * curr_speed,
                                 -m_acceleration.z * curr_speed);
@@ -114,7 +89,7 @@ private:
         }
 
         m_position += glm::vec3(m_speed.x,
-                                m_speed.z,
-                                m_speed.y);
+                                m_speed.y,
+                                m_speed.z);
     }
 };

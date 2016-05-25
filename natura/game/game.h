@@ -151,7 +151,6 @@ private:
 
         const float time = glfwGetTime();
 
-
         //tick 60 times per second
         if (time - m_last_time > 1 / 60.0f) {
             m_camera->tick();
@@ -382,8 +381,7 @@ private:
                     break;
 
                 case GLFW_KEY_SPACE:
-                    cout << "KEKED" <<
-                    endl;
+                    m_camera->lookAtPoint(vec3(0.0f));
                     break;
 
 
