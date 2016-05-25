@@ -75,10 +75,13 @@ public:
     }
 
 private:
-    enum CameraMode {FLYTHROUGH, FPS};
+    enum CameraMode {
+        FLYTHROUGH, FPS
+    };
 
     double m_last_mouse_xpos, m_last_mouse_ypos;
-    float m_last_time;
+    float m_last_time_tick;
+    float m_last_time_frame;
 
     /* Window size */
     int m_window_width;
@@ -157,24 +160,25 @@ private:
 
         const float time = glfwGetTime();
 
-        cout << "Frames : " << 1 / (time - m_last_time) << endl;
+        cout << "Frames : " << 1 / (time - m_last_time_frame) << endl;
+        m_last_time_frame = time;
 
         //tick 60 times per second
-        if (time - m_last_time > 1 / 60.0f) {
+        if (time - m_last_time_tick >= 1.0 / 60.0) {
+            cout << "Ticks : " << 1 / (time - m_last_time_tick) << endl;
+            m_last_time_tick = time;
             m_camera->tick();
-            cout << "Ticks : " << 1 / (time - m_last_time) << endl;
-            m_last_time = time;
         }
 
         //draw as often as possible
-        glEnable(GL_CLIP_PLANE0);
-        framebufferFloor.Bind();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, m_grid_model_matrix,
-                        m_camera->getMirroredMatrix(),
-                        m_projection->perspective());
-        framebufferFloor.Unbind();
-        glDisable(GL_CLIP_PLANE0);
+        /* glEnable(GL_CLIP_PLANE0);
+         framebufferFloor.Bind();
+         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, m_grid_model_matrix,
+                         m_camera->getMirroredMatrix(),
+                         m_projection->perspective());
+         framebufferFloor.Unbind();
+         glDisable(GL_CLIP_PLANE0);*/
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());

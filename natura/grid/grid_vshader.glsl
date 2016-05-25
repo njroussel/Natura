@@ -8,9 +8,12 @@ uniform vec2 quad_indices;
 uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
-uniform sampler2D perlin_tex;
 uniform float amplitude;
 uniform vec3 light_pos;
+
+uniform sampler2D perlin_tex;
+uniform sampler2D perlin_tex_unde;
+uniform sampler2D perlin_tex_right;
 
 out vec3 light_dir;
 out mat4 MV;

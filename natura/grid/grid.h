@@ -1,4 +1,5 @@
 #pragma once
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "icg_helper.h"
@@ -39,7 +40,7 @@ public:
             Cleanup();
     }
 
-    void setTextureId(int id){
+    void setTextureId(int id) {
         this->texture_perlin_id_ = id;
     }
 
@@ -77,7 +78,7 @@ public:
             std::vector<GLuint> indices;
 
             float sideX = 1 / float(mSideNbPoints);
-            mSideNbPoints ++; // OFF BY ONE BY @Rimbaut
+            mSideNbPoints++; // OFF BY ONE BY @Rimbaut
             for (int i = 0; i < mSideNbPoints; i++) {
                 for (int j = 0; j < mSideNbPoints; j++) {
                     vertices.push_back(i * sideX);
@@ -163,8 +164,7 @@ public:
             //perlin texture
             this->texture_perlin_id_ = texture_;
             //glBindTexture(GL_TEXTURE_2D, texture_id_);
-            glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"),
-                        0 /*GL_TEXTURE0*/);
+            glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"), 0 /*GL_TEXTURE0*/);
         }
 
         loadTexture("grass.tga", &texture_grass_id_, 1, glGetUniformLocation(program_id_, "grass_tex"));
@@ -218,7 +218,7 @@ public:
     }
 
 
-    void loadTexture(string filename, GLuint* texture_id, int tex_index, GLint tex_id_uniform) {
+    void loadTexture(string filename, GLuint *texture_id, int tex_index, GLint tex_id_uniform) {
         // load grass texture
         int width;
         int height;
@@ -234,8 +234,6 @@ public:
 
         glGenTextures(1, texture_id);
         glBindTexture(GL_TEXTURE_2D, *texture_id);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
         if (nb_component == 3) {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
@@ -245,11 +243,17 @@ public:
                          GL_RGBA, GL_UNSIGNED_BYTE, image);
         }
 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
         glUniform1i(tex_id_uniform, tex_index /*GL_TEXTURE*/);
 
         // cleanup
         stbi_image_free(image);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
+
 };
 
 Grid *BASE_TILE;
