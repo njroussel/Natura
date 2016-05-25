@@ -22,6 +22,7 @@ public:
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
         m_amplitude = 9.05f;
+        m_camera_mode = FLYTHROUGH;
         Init();
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
@@ -41,6 +42,8 @@ public:
         m_frame_buffer_size_handler.attach(this);
         // render loop
         while (!glfwWindowShouldClose(m_window)) {
+            glm::vec3 pos = m_camera->getPosition();
+
             Display();
             glfwSwapBuffers(m_window);
             glfwPollEvents();
@@ -72,6 +75,8 @@ public:
     }
 
 private:
+    enum CameraMode {FLYTHROUGH, FPS};
+
     double m_last_mouse_xpos, m_last_mouse_ypos;
     float m_last_time;
 
@@ -82,6 +87,7 @@ private:
 
     /* Camera and view */
     Camera *m_camera;
+    CameraMode m_camera_mode;
     glm::mat4 m_grid_model_matrix;
     Projection *m_projection;
 
@@ -105,7 +111,7 @@ private:
 
     /* Private function. */
     void Init() {
-        const bool top_down_view = true;
+        const bool top_down_view = false;
         const int TERRAIN_SIZE = 10;
         const int VERT_PER_GRID_SIDE = 8;
         const float cam_posxy = TERRAIN_SCALE * ((float) (TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
@@ -120,12 +126,12 @@ private:
             starting_camera_position = vec3(-cam_posxy, -5.0f, -cam_posxy);
             starting_camera_rotation = vec2(0.0f);
         }
-        m_camera = new Camera(starting_camera_position, starting_camera_rotation);
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
         m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
-
+        m_camera = new Camera(starting_camera_position, starting_camera_rotation, m_terrain);
+        m_camera->enableFPSMode(true);
 
         // sets background color b
         glClearColor(0, 0, 0/*gray*/, 1.0 /*solid*/);
@@ -159,7 +165,6 @@ private:
             cout << "Ticks : " << 1 / (time - m_last_time) << endl;
             m_last_time = time;
         }
-
 
         //draw as often as possible
         glEnable(GL_CLIP_PLANE0);
@@ -204,18 +209,16 @@ private:
         GLFWwindow *window = message->getWindow();
         double x = message->getCoordX();
         double y = message->getCoordY();
-        if (glfwGetMouseButton(m_window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-            double diffx = x - m_last_mouse_xpos; //check the difference between the current x and the last x position
-            double diffy = y - m_last_mouse_ypos; //check the difference between the current y and the last y position
-            m_last_mouse_xpos = x; //set lastx to the current x position
-            m_last_mouse_ypos = y; //set lasty to the current y position
-            float xrot =
-                    (float) diffy * 0.1f; //set the xrot to xrot with the addition of the difference in the y position
-            float yrot =
-                    (float) diffx * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
-            vec2 tmp = vec2(xrot, yrot);
-            //m_camera->AddRotation(tmp);
-        }
+        double diffx = x - m_last_mouse_xpos; //check the difference between the current x and the last x position
+        double diffy = y - m_last_mouse_ypos; //check the difference between the current y and the last y position
+        m_last_mouse_xpos = x; //set lastx to the current x position
+        m_last_mouse_ypos = y; //set lasty to the current y position
+        float xrot =
+                (float) diffy * 0.1f; //set the xrot to xrot with the addition of the difference in the y position
+        float yrot =
+                (float) diffx * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
+        vec2 tmp = vec2(xrot, yrot);
+        m_camera->AddRotationFPS(tmp);
     }
 
     // Gets called when the windows/framebuffer is resized.

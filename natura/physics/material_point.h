@@ -90,7 +90,7 @@ public:
         m_speed = glm::vec3(0, 0, 0);
     }
 
-private:
+protected:
     float m_mass;
     float m_max_speed;
     glm::vec3 m_acceleration;

@@ -53,6 +53,10 @@ public:
         return m_position;
     }
 
+    int getTextureId(){
+        return m_chunk_noise_tex_id;
+    }
+
 private:
     glm::vec2 m_position;
     PerlinNoise *m_perlin_noise;

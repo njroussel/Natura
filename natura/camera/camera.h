@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include "icg_helper.h"
 #include "../physics/material_point.h"
+#include "../terrain/terrain.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdint>
 
@@ -15,7 +16,7 @@ typedef enum DIRECTION {
 class Camera : public MaterialPoint {
 public:
 
-    Camera(vec3 &starting_position, vec2 &starting_rotation) : MaterialPoint(1.0, starting_position) {
+    Camera(vec3 &starting_position, vec2 &starting_rotation, Terrain *terrain) : MaterialPoint(1.0, starting_position) {
         m_rotation = vec2(starting_rotation.x, starting_rotation.y);
         m_matrix = IDENTITY_MATRIX;
         m_pressed[Forward] = false;
@@ -24,6 +25,8 @@ public:
         m_pressed[Right] = false;
         m_pressed[Up] = false;
         m_pressed[Down] = false;
+        m_terrain = terrain;
+        m_fps_mode = false;
     }
 
     void CalculateMatrix() {
@@ -38,6 +41,11 @@ public:
         _update_acc();
         CalculateMatrix();
         MaterialPoint::tick();
+        if (m_fps_mode){
+            /* We snap the camera to the ground */
+            float h = -1 * TERRAIN_SCALE * m_terrain->getHeight(glm::vec2(-m_position.x/TERRAIN_SCALE, -m_position.z/TERRAIN_SCALE)) - 0.2f;
+            m_position.y = h;
+        }
     }
 
     mat4 &GetMatrix() {
@@ -53,7 +61,6 @@ public:
         mirrored = glm::translate(mirrored, pos);
         return mirrored;
     }
-
 
     void AddRotation() {
         vec2 addRotation = vec2(0.0f, 0.0f);
@@ -75,6 +82,10 @@ public:
         }
 
         m_rotation += addRotation;
+
+        if (isMoving() && length(addRotation) != 0 && !m_fps_mode) {
+            forceDirection(getForwardDirection());
+        }
     }
 
     bool hasAcceleration(DIRECTION dir) {
@@ -89,16 +100,31 @@ public:
         m_pressed[dir] = false;
     }
 
+    void enableFPSMode(bool enable){
+        m_fps_mode = enable;
+    }
+
+    bool isFPSEnabled() {
+        return m_fps_mode;
+    }
+
+    void AddRotationFPS(glm::vec2 rot) {
+        if (m_fps_mode)
+            m_rotation += rot;
+    }
+
 private:
     glm::vec2 m_rotation;
     glm::mat4 m_matrix;
     bool m_pressed[6];
 
+    Terrain *m_terrain;
+    bool m_fps_mode;
+
     glm::vec3 getForwardDirection() {
         vec3 tmp = vec3(-sin(radians(m_rotation.y + 90.0f)) * sin(radians(m_rotation.x)),
                         sin(radians(m_rotation.y + 90.0f)) * cos(radians(m_rotation.x)),
                         -cos(radians(m_rotation.y + 90.0f)));
-
         return normalize(tmp);
     }
 
