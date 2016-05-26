@@ -7,13 +7,14 @@
 
 class BezierCurve {
 public:
-    BezierCurve(std::vector<glm::vec3> control_points){
+    BezierCurve(std::vector<glm::vec3> control_points, float time_length){
         m_control_points = control_points;
+        m_time_length = time_length;
     }
 
     void Init() {
-        const float step = 0.01;
-        m_vert_count = static_cast<GLuint> (1.f / step);
+        const float step = 0.1;
+        m_vert_count = static_cast<GLuint> (m_time_length / step);
         GLfloat curve_vertices[m_vert_count*3];
 
         for (int t = 0 ; t < m_vert_count*3 ; t += 3){
@@ -47,6 +48,8 @@ public:
     }
 
     glm::vec3 getPosition(float time){
+        time = mod(time / m_time_length, 1.f);
+        cout << "time = " << time << endl;
         size_t n = m_control_points.size()-1;
         glm::vec3 res = glm::vec3(0, 0, 0);
         for (size_t j = 0 ; j <= n ; j ++){
@@ -86,6 +89,7 @@ private:
     GLuint m_ver_array_id;
     GLuint m_vert_count;
     GLuint m_buffer_id;
+    float m_time_length;
 
     float B(float t, int n, int i){
         if (i == 0 && n == 0)

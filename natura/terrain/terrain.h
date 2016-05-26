@@ -42,7 +42,7 @@ public:
     void Draw(float amplitude, float time, glm::vec3 cam_pos, bool onlyTerrain, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
-        m_axis.Draw(IDENTITY_MATRIX, view, projection);
+        m_axis.Draw(glm::translate(model, m_axis_pos), view, projection);
         m_amplitude = amplitude;
         m_skybox->Draw(projection * view * glm::translate(model, -cam_pos/TERRAIN_SCALE));
         glm::mat4 _m = glm::translate(model, glm::vec3(m_offset.x*CHUNK_SIDE_TILE_COUNT, 0, m_offset.y*CHUNK_SIDE_TILE_COUNT));

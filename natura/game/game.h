@@ -12,9 +12,9 @@
 #include "../misc/io/input/handlers/mouse/mouse_button_handler.h"
 #include "../misc/io/input/handlers/mouse/mouse_cursor_handler.h"
 #include "../misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
-#include "../camera/bezier/bezier_curve.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+#define TICK (1.f / 60.f)
 
 class Game : public Observer {
 public:
@@ -23,7 +23,6 @@ public:
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
         m_amplitude = 9.05f;
-        m_camera_mode = FLYTHROUGH;
         Init();
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
@@ -76,8 +75,6 @@ public:
     }
 
 private:
-    enum CameraMode {FLYTHROUGH, FPS};
-
     double m_last_mouse_xpos, m_last_mouse_ypos;
     float m_last_time;
 
@@ -88,7 +85,6 @@ private:
 
     /* Camera and view */
     Camera *m_camera;
-    CameraMode m_camera_mode;
     glm::mat4 m_grid_model_matrix;
     Projection *m_projection;
 
@@ -132,7 +128,7 @@ private:
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
         m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
         m_camera = new Camera(starting_camera_position, starting_camera_rotation, m_terrain);
-        m_camera->enableFPSMode(false);
+        //m_camera->enableFpsMode();
 
         // sets background color b
         glClearColor(0, 0, 0/*gray*/, 1.0 /*solid*/);
@@ -160,28 +156,24 @@ private:
 
         std::vector<glm::vec3> control_points;
         control_points.push_back(glm::vec3(0, 0, 0));
-        control_points.push_back(glm::vec3(10, 0, 0));
-        control_points.push_back(glm::vec3(15, 0, 23));
-        control_points.push_back(glm::vec3(4,12, 27));
-        BezierCurve curve(control_points);
+        control_points.push_back(glm::vec3(1, 0, 0));
+        control_points.push_back(glm::vec3(1, 1, 0));
+        control_points.push_back(glm::vec3(2, 1, 0));
+        BezierCurve curve(control_points, 10.f);
         curve.Init();
         const float tot_time = 10.f;
 
         cout << "Frames : " << 1 / (time - m_last_time) << endl;
 
         //tick 60 times per second
-        if (time - m_last_time > 1 / 60.0f) {
+        if (time - m_last_time > TICK) {
             m_camera->tick();
             cout << "Ticks : " << 1 / (time - m_last_time) << endl;
             m_last_time = time;
         }
-        float t = mod(m_last_time/tot_time, 1.f);
-        cout << "t = " << t << endl;
-        if (0 <= t && t <= 1){
-            glm::vec3 next_pos = curve.getPosition(t);
+            glm::vec3 next_pos = curve.getPosition(m_last_time);
             cout << "next_pos = " << next_pos.x << " " << next_pos.y << " " << next_pos.z << endl;
             m_terrain->m_axis_pos = next_pos;
-        }
 
         //draw as often as possible
         glEnable(GL_CLIP_PLANE0);
