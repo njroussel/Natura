@@ -7,12 +7,36 @@
 
 class BezierCurve {
 public:
-    BezierCurve(std::vector<glm::vec3> control_points, float time_length){
-        m_control_points = control_points;
-        m_time_length = time_length;
+    glm::vec3 getPosition(float time){
+        time = mod(time / m_time_length, 1.f);
+        cout << "time = " << time << endl;
+        size_t n = m_control_points.size()-1;
+        glm::vec3 res = glm::vec3(0, 0, 0);
+        for (size_t j = 0 ; j <= n ; j ++){
+            res += m_control_points[j]*B(time, n, j);
+        }
+        return res;
     }
 
-    void Init() {
+    void addPoint(glm::vec3 point){
+        m_control_points.push_back(point);
+    }
+
+    void Clear(){
+        m_control_points.clear();
+    }
+
+    size_t Size() {
+        return m_control_points.size();
+    }
+
+    void setTimeLength(float time){
+        m_time_length = time;
+    }
+
+    void Draw(const glm::mat4& model = IDENTITY_MATRIX,
+              const glm::mat4& view = IDENTITY_MATRIX,
+              const glm::mat4& projection = IDENTITY_MATRIX){
         const float step = 0.1;
         m_vert_count = static_cast<GLuint> (m_time_length / step);
         GLfloat curve_vertices[m_vert_count*3];
@@ -26,7 +50,7 @@ public:
         }
 
         m_program_id = icg_helper::LoadShaders("bezier_vshader.glsl",
-                                                     "bezier_fshader.glsl");
+                                               "bezier_fshader.glsl");
         if(!m_program_id) {
             exit(EXIT_FAILURE);
         }
@@ -45,22 +69,7 @@ public:
 
         glBindVertexArray(0);
         glUseProgram(0);
-    }
 
-    glm::vec3 getPosition(float time){
-        time = mod(time / m_time_length, 1.f);
-        cout << "time = " << time << endl;
-        size_t n = m_control_points.size()-1;
-        glm::vec3 res = glm::vec3(0, 0, 0);
-        for (size_t j = 0 ; j <= n ; j ++){
-            res += m_control_points[j]*B(time, n, j);
-        }
-        return res;
-    }
-
-    void Draw(const glm::mat4& model = IDENTITY_MATRIX,
-              const glm::mat4& view = IDENTITY_MATRIX,
-              const glm::mat4& projection = IDENTITY_MATRIX){
         // Draw
         glUseProgram(m_program_id);
 
@@ -76,9 +85,7 @@ public:
 
         glBindVertexArray(0);
         glUseProgram(0);
-    }
 
-    void Cleanup(){
         glDeleteBuffers(1, &m_buffer_id);
         glDeleteVertexArrays(1, &m_ver_array_id);
     }
@@ -89,7 +96,7 @@ private:
     GLuint m_ver_array_id;
     GLuint m_vert_count;
     GLuint m_buffer_id;
-    float m_time_length;
+    float m_time_length = 1.f;
 
     float B(float t, int n, int i){
         if (i == 0 && n == 0)
