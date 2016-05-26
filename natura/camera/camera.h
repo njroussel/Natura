@@ -162,6 +162,10 @@ public:
         m_position = pos;
     }
 
+    glm::vec3 getFrontPoint() {
+        return m_position + getForwardDirection();
+    }
+
 private:
     glm::vec2 m_rotation;
     glm::mat4 m_matrix;

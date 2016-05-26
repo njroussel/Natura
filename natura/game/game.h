@@ -101,6 +101,8 @@ private:
     /* Bezier Curve for camera */
     BezierCurve *m_pos_curve;
     BezierCurve *m_look_curve;
+    std::vector<glm::vec3> m_pos_ctrl_points;
+    std::vector<glm::vec3> m_look_ctrl_points;
 
 
     /* Input handlers */
@@ -110,6 +112,7 @@ private:
     FrameBufferSizeHandler m_frame_buffer_size_handler;
 
     FrameBuffer framebufferFloor;
+
 
     /* Private function. */
     void Init() {
@@ -164,13 +167,8 @@ private:
         look_ctrl_pts.push_back(glm::vec3(40, 2, 15));
         look_ctrl_pts.push_back(glm::vec3(0, 0, 0));
 
-        m_look_curve = new BezierCurve(look_ctrl_pts, 10.f);
-        m_pos_curve = new BezierCurve(pos_ctrl_pts, 27.f);
-
-        m_look_curve->Init();
-        m_pos_curve->Init();
-
-        m_camera->enableBezierMode(m_pos_curve, m_look_curve);
+        m_look_curve = NULL;
+        m_pos_curve = NULL;
     }
 
     void Display() {
@@ -204,7 +202,7 @@ private:
         m_terrain->ExpandTerrain(m_camera->getPosition());
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix, m_camera->GetMatrix(),
                         m_projection->perspective());
-        m_look_curve->Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
+        //m_look_curve->Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
         //m_pos_curve->Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
     }
 
@@ -260,6 +258,23 @@ private:
         m_terrain->Init(fb_tex);
     }
 
+    void clearCurves() {
+        if (m_camera->getCameraMode() == CAMERA_MODE::Bezier)
+            m_camera->enableFlyThroughtMode();
+        if (m_look_curve != NULL){
+            m_look_curve->Cleanup();
+            delete m_look_curve;
+            m_look_curve = NULL;
+            m_look_ctrl_points.clear();
+        }
+        if (m_pos_curve != NULL){
+            m_pos_curve->Cleanup();
+            delete m_pos_curve;
+            m_pos_curve = NULL;
+            m_pos_ctrl_points.clear();
+        }
+    }
+
     void keyCallback(KeyboardHandlerMessage *message) {
         GLFWwindow *window = message->getWindow();
         int key = message->getKey();
@@ -282,6 +297,31 @@ private:
             }
             if (key == GLFW_KEY_E && !m_camera->hasAcceleration(DIRECTION::Down)) {
                 m_camera->setMovement(DIRECTION::Down);
+            }
+            if (key == GLFW_KEY_R){
+                clearCurves();
+                glm::vec3 pos_point = m_camera->getPosition()/TERRAIN_SCALE;
+                glm::vec3 look_point = m_camera->getFrontPoint()/TERRAIN_SCALE;
+                m_pos_ctrl_points.push_back(pos_point);
+                m_look_ctrl_points.push_back(look_point);
+                cout << "Point added to bezier curve : (" << pos_point.x << ", " << pos_point.y << ", " << pos_point.z << ") looking at (" << look_point.x << ", " << look_point.y << ", " << look_point.z << ")" << endl;
+            }
+            if (key == GLFW_KEY_T){
+                if (m_look_curve == NULL && m_pos_curve == NULL) {
+                    m_look_curve = new BezierCurve(m_look_ctrl_points, 10.f);
+                    m_pos_curve = new BezierCurve(m_pos_ctrl_points, 10.f);
+                    cout << "Bezier curve creation finished." << endl;
+                }
+            }
+            if (key == GLFW_KEY_C){
+                clearCurves();
+                cout << "Bezier curve cleared" << endl;
+            }
+            if (key == GLFW_KEY_SPACE){
+                if (m_camera->getCameraMode() == CAMERA_MODE::Bezier)
+                    m_camera->enableFlyThroughtMode();
+                else
+                    m_camera->enableBezierMode(m_pos_curve, m_look_curve);
             }
         }
 
@@ -410,10 +450,6 @@ private:
 
                 case GLFW_KEY_B:
                     m_terrain->water_height -= 0.05f;
-                    break;
-
-                case GLFW_KEY_SPACE:
-                    m_camera->lookAtPoint(vec3(15, 15, 15));
                     break;
 
 
