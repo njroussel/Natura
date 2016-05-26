@@ -98,6 +98,11 @@ private:
     float m_amplitude;
 
 
+    /* Bezier Curve for camera */
+    BezierCurve *m_pos_curve;
+    BezierCurve *m_look_curve;
+
+
     /* Input handlers */
     KeyboardHandler m_keyboard_handler;
     MouseButtonHandler m_mouse_button_handler;
@@ -146,6 +151,26 @@ private:
         m_perlinNoise->Init();
         GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
+
+        std::vector<glm::vec3> pos_ctrl_pts;
+        pos_ctrl_pts.push_back(glm::vec3(0, 0, 0));
+        pos_ctrl_pts.push_back(glm::vec3(20, 0, 0));
+        pos_ctrl_pts.push_back(glm::vec3(40, 15, 40));
+        pos_ctrl_pts.push_back(glm::vec3(0, 0, 0));
+
+        std::vector<glm::vec3> look_ctrl_pts;
+        look_ctrl_pts.push_back(glm::vec3(0, 0, 0));
+        look_ctrl_pts.push_back(glm::vec3(0, 5, 15));
+        look_ctrl_pts.push_back(glm::vec3(40, 2, 15));
+        look_ctrl_pts.push_back(glm::vec3(0, 0, 0));
+
+        m_look_curve = new BezierCurve(look_ctrl_pts, 10.f);
+        m_pos_curve = new BezierCurve(pos_ctrl_pts, 27.f);
+
+        m_look_curve->Init();
+        m_pos_curve->Init();
+
+        m_camera->enableBezierMode(m_pos_curve, m_look_curve);
     }
 
     void Display() {
@@ -154,13 +179,6 @@ private:
 
         const float time = glfwGetTime();
 
-        std::vector<glm::vec3> control_points;
-        control_points.push_back(glm::vec3(0, 0, 0));
-        control_points.push_back(glm::vec3(1, 0, 0));
-        control_points.push_back(glm::vec3(1, 1, 0));
-        control_points.push_back(glm::vec3(2, 1, 0));
-        BezierCurve curve(control_points, 10.f);
-        curve.Init();
         const float tot_time = 10.f;
 
         cout << "Frames : " << 1 / (time - m_last_time) << endl;
@@ -171,9 +189,6 @@ private:
             cout << "Ticks : " << 1 / (time - m_last_time) << endl;
             m_last_time = time;
         }
-            glm::vec3 next_pos = curve.getPosition(m_last_time);
-            cout << "next_pos = " << next_pos.x << " " << next_pos.y << " " << next_pos.z << endl;
-            m_terrain->m_axis_pos = next_pos;
 
         //draw as often as possible
         glEnable(GL_CLIP_PLANE0);
@@ -189,7 +204,8 @@ private:
         m_terrain->ExpandTerrain(m_camera->getPosition());
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix, m_camera->GetMatrix(),
                         m_projection->perspective());
-        curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
+        m_look_curve->Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
+        //m_pos_curve->Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
     }
 
     // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -397,7 +413,7 @@ private:
                     break;
 
                 case GLFW_KEY_SPACE:
-                    m_camera->lookAtPoint(vec3(0.0f));
+                    m_camera->lookAtPoint(vec3(15, 15, 15));
                     break;
 
 

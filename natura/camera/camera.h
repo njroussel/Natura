@@ -56,9 +56,14 @@ public:
             float h = -1 * TERRAIN_SCALE * m_terrain->getHeight(glm::vec2(-m_position.x/TERRAIN_SCALE, -m_position.z/TERRAIN_SCALE)) - 0.2f;
             m_position.y = h;
         }
-        else if (m_mode != CAMERA_MODE::Bezier) {
-            // TODO : LookAt
-            // TODO : Update pos
+        else if (m_mode == CAMERA_MODE::Bezier) {
+            cout << "BTIERIEROHQEPOIUQEW " << endl;
+            double time = glfwGetTime();
+            double delta_time = time - m_bezier_time;
+            glm::vec3 look_point = -m_look_curve->getPosition(delta_time);
+            glm::vec3 pos_point = -m_pos_curve->getPosition(delta_time);
+            lookAtPoint(glm::vec3(TERRAIN_SCALE * look_point.x, TERRAIN_SCALE * look_point.y, TERRAIN_SCALE * look_point.z));
+            m_position = pos_point * TERRAIN_SCALE;
         }
     }
 
@@ -92,7 +97,7 @@ public:
         float newXRotation =  degrees(acos(dot(fwdPlaneDirection, right)));
 
         m_rotation.y = -(newYRotation - 90);
-        m_rotation.x =  position.x < 0 ? -newXRotation : newXRotation;
+        m_rotation.x =  position.x < point.x ? -newXRotation : newXRotation;
     }
 
     void AddRotation() {
@@ -141,6 +146,7 @@ public:
         m_mode = CAMERA_MODE::Bezier;
         m_pos_curve = pos_curve;
         m_look_curve = look_curve;
+        m_bezier_time = glfwGetTime();
     }
 
     CAMERA_MODE getCameraMode() {
@@ -162,6 +168,7 @@ private:
     bool m_pressed[6];
     BezierCurve *m_look_curve;
     BezierCurve *m_pos_curve;
+    double m_bezier_time;
 
     Terrain *m_terrain;
     CAMERA_MODE m_mode;
