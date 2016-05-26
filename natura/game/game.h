@@ -14,19 +14,23 @@
 #include "../misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
 #include <glm/gtc/matrix_transform.hpp>
 
+#define TICK (1.f / 60.f)
 
 class Game : public Observer {
 public:
     Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window),
-                               m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window) {
+                               m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window){
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
         m_window = window;
         m_amplitude = 9.05f;
-        m_camera_mode = FLYTHROUGH;
         Init();
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
         resize_callback(&m);
+        m_look_curve.setTimeLength(10.f);
+        m_pos_curve.setTimeLength(10.f);
+        m_draw_curves = false;
+        m_loop_curves = false;
     }
 
     ~Game() {
@@ -75,9 +79,11 @@ public:
     }
 
 private:
+
     enum CameraMode {
         FLYTHROUGH, FPS
     };
+
 
     double m_last_mouse_xpos, m_last_mouse_ypos;
     float m_last_time_tick;
@@ -90,7 +96,6 @@ private:
 
     /* Camera and view */
     Camera *m_camera;
-    CameraMode m_camera_mode;
     glm::mat4 m_grid_model_matrix;
     Projection *m_projection;
 
@@ -104,6 +109,13 @@ private:
     float m_amplitude;
 
 
+    /* Bezier Curve for camera */
+    BezierCurve m_pos_curve;
+    BezierCurve m_look_curve;
+    bool m_draw_curves;
+    bool m_loop_curves;
+
+
     /* Input handlers */
     KeyboardHandler m_keyboard_handler;
     MouseButtonHandler m_mouse_button_handler;
@@ -111,6 +123,7 @@ private:
     FrameBufferSizeHandler m_frame_buffer_size_handler;
 
     FrameBuffer framebufferFloor;
+
 
     /* Private function. */
     void Init() {
@@ -134,7 +147,7 @@ private:
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
         m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
         m_camera = new Camera(starting_camera_position, starting_camera_rotation, m_terrain);
-        m_camera->enableFPSMode(false);
+        //m_camera->enableFpsMode();
 
         // sets background color b
         glClearColor(0, 0, 0/*gray*/, 1.0 /*solid*/);
@@ -164,11 +177,12 @@ private:
         m_last_time_frame = time;
 
         //tick 60 times per second
-        if (time - m_last_time_tick >= 1.0 / 60.0) {
+        if (time - m_last_time_tick >= TICK) {
             cout << "Ticks : " << 1 / (time - m_last_time_tick) << endl;
             m_last_time_tick = time;
             m_camera->tick();
         }
+
 
         //draw as often as possible
         glEnable(GL_CLIP_PLANE0);
@@ -180,10 +194,15 @@ private:
         framebufferFloor.Unbind();
         glDisable(GL_CLIP_PLANE0);
 
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix, m_camera->GetMatrix(),
                         m_projection->perspective());
+        if (m_look_curve.Size() > 1 && m_pos_curve.Size() > 1 && m_draw_curves) {
+            m_look_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
+            m_pos_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
+        }
     }
 
     // transforms glfw screen coordinates into normalized OpenGL coordinates.
@@ -234,8 +253,16 @@ private:
         m_projection->reGenerateMatrix((GLfloat) m_window_width / m_window_height);
         glViewport(0, 0, m_window_width, m_window_height);
         framebufferFloor.Cleanup();
-        GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
+        GLuint fb_tex = (GLuint) framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
+    }
+
+    void clearCurves() {
+        if (m_camera->getCameraMode() == CAMERA_MODE::Bezier){
+            m_camera->enableFlyThroughtMode();
+        }
+        m_look_curve.Clear();
+        m_pos_curve.Clear();
     }
 
     void keyCallback(KeyboardHandlerMessage *message) {
@@ -260,6 +287,32 @@ private:
             }
             if (key == GLFW_KEY_E && !m_camera->hasAcceleration(DIRECTION::Down)) {
                 m_camera->setMovement(DIRECTION::Down);
+            }
+            if (key == GLFW_KEY_R){
+                glm::vec3 pos_point = -m_camera->getPosition()/TERRAIN_SCALE;
+                glm::vec3 look_point = -m_camera->getFrontPoint(2.0f)/TERRAIN_SCALE;
+                cout << "Point added to bezier curve : (" << pos_point.x << ", " << pos_point.y << ", " << pos_point.z << ") looking at (" << look_point.x << ", " << look_point.y << ", " << look_point.z << ")" << endl;
+                m_look_curve.addPoint(look_point);
+                m_pos_curve.addPoint(pos_point);
+            }
+            if (key == GLFW_KEY_T){
+                m_draw_curves = !m_draw_curves;
+                cout << "Bezier curve draw " << (m_draw_curves ? "ON." : "OFF.") << endl;
+            }
+            if (key == GLFW_KEY_C){
+                clearCurves();
+                cout << "Bezier curve cleared" << endl;
+            }
+            if (key == GLFW_KEY_SPACE){
+                if (m_camera->getCameraMode() == CAMERA_MODE::Bezier)
+                    m_camera->enableFlyThroughtMode();
+                else if (m_look_curve.Size() > 1 && m_pos_curve.Size() > 1)
+                    m_camera->enableBezierMode(&m_pos_curve, &m_look_curve);
+            }
+            if (key == GLFW_KEY_L) {
+                m_loop_curves = !m_loop_curves;
+                m_look_curve.enableLoop(m_loop_curves);
+                m_pos_curve.enableLoop(m_loop_curves);
             }
         }
 
@@ -336,7 +389,7 @@ private:
                                         + 0.05);
                     break;
 
-                case GLFW_KEY_L:
+                /*case GLFW_KEY_L:
                     m_perlinNoise->
                             setProperty(PerlinNoiseProperty::OFFSET,
                                         m_perlinNoise
@@ -352,7 +405,7 @@ private:
                                                 ->
                                                         getProperty(PerlinNoiseProperty::LACUNARITY)
                                         + 0.05f);
-                    break;
+                    break;*/
 
                 case GLFW_KEY_K:
                     m_perlinNoise->setProperty(PerlinNoiseProperty::LACUNARITY,
@@ -388,10 +441,6 @@ private:
 
                 case GLFW_KEY_B:
                     m_terrain->water_height -= 0.05f;
-                    break;
-
-                case GLFW_KEY_SPACE:
-                    m_camera->lookAtPoint(vec3(0.0f));
                     break;
 
 

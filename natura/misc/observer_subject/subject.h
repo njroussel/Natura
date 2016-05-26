@@ -12,6 +12,7 @@ public:
 
     virtual void notify(Message *msg){
         for (Observer *obs : m_observers){
+            cout << "notify " << obs << " size = " << m_observers.size() << endl;
             obs->update(msg);
         }
     }
