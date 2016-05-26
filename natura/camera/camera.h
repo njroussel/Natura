@@ -161,8 +161,8 @@ public:
         m_position = pos;
     }
 
-    glm::vec3 getFrontPoint() {
-        return m_position + getForwardDirection();
+    glm::vec3 getFrontPoint(float dist = 1.f) {
+        return m_position +  getForwardDirection();
     }
 
 private:

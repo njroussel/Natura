@@ -158,18 +158,6 @@ private:
         m_perlinNoise->Init();
         GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
-
-        std::vector<glm::vec3> pos_ctrl_pts;
-        pos_ctrl_pts.push_back(glm::vec3(0, 0, 0));
-        pos_ctrl_pts.push_back(glm::vec3(20, 0, 0));
-        pos_ctrl_pts.push_back(glm::vec3(40, 15, 40));
-        pos_ctrl_pts.push_back(glm::vec3(0, 0, 0));
-
-        std::vector<glm::vec3> look_ctrl_pts;
-        look_ctrl_pts.push_back(glm::vec3(0, 0, 0));
-        look_ctrl_pts.push_back(glm::vec3(0, 5, 15));
-        look_ctrl_pts.push_back(glm::vec3(40, 2, 15));
-        look_ctrl_pts.push_back(glm::vec3(0, 0, 0));
     }
 
     void Display() {
@@ -189,7 +177,7 @@ private:
             m_last_time = time;
         }
 
-        /*
+
         //draw as often as possible
         glEnable(GL_CLIP_PLANE0);
         framebufferFloor.Bind();
@@ -199,7 +187,7 @@ private:
                         m_projection->perspective());
         framebufferFloor.Unbind();
         glDisable(GL_CLIP_PLANE0);
-         */
+
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());
@@ -259,7 +247,7 @@ private:
         m_projection->reGenerateMatrix((GLfloat) m_window_width / m_window_height);
         glViewport(0, 0, m_window_width, m_window_height);
         framebufferFloor.Cleanup();
-        GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
+        GLuint fb_tex = (GLuint) framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
     }
 
@@ -296,7 +284,7 @@ private:
             }
             if (key == GLFW_KEY_R){
                 glm::vec3 pos_point = -m_camera->getPosition()/TERRAIN_SCALE;
-                glm::vec3 look_point = -m_camera->getFrontPoint()/TERRAIN_SCALE;
+                glm::vec3 look_point = -m_camera->getFrontPoint(2.0f)/TERRAIN_SCALE;
                 cout << "Point added to bezier curve : (" << pos_point.x << ", " << pos_point.y << ", " << pos_point.z << ") looking at (" << look_point.x << ", " << look_point.y << ", " << look_point.z << ")" << endl;
                 m_look_curve.addPoint(look_point);
                 m_pos_curve.addPoint(pos_point);

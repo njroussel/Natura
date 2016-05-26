@@ -24,6 +24,9 @@ public:
             CleanUp();
             Init();
         }
+        else {
+            Init();
+        }
     }
 
     void enableLoop(bool enable){
@@ -58,6 +61,8 @@ public:
     }
 
     void Init() {
+        if (m_control_points.size() < 2)
+            return;
         m_init_done = true;
         const float step = 0.1;
         m_vert_count = static_cast<GLuint> (m_time_length / step);
@@ -96,6 +101,8 @@ public:
     void Draw(const glm::mat4& model = IDENTITY_MATRIX,
               const glm::mat4& view = IDENTITY_MATRIX,
               const glm::mat4& projection = IDENTITY_MATRIX){
+        if (!m_init_done)
+            return;
         glUseProgram(m_program_id);
 
         glm::mat4 MVP = projection * view * model;
