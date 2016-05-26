@@ -5,11 +5,16 @@
 #include "icg_helper.h"
 #include "../physics/material_point.h"
 #include "../terrain/terrain.h"
+#include "bezier/bezier_curve.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdint>
 
 typedef enum DIRECTION {
     Forward = 0, Backward = 1, Left = 2, Right = 3, Up = 4, Down = 5
+};
+
+typedef enum CAMERA_MODE {
+    Flythrough = 0, Fps = 1, Bezier = 2
 };
 
 
@@ -26,7 +31,9 @@ public:
         m_pressed[Up] = false;
         m_pressed[Down] = false;
         m_terrain = terrain;
-        m_fps_mode = false;
+        m_mode = CAMERA_MODE::Flythrough;
+        m_pos_curve = NULL;
+        m_look_curve = NULL;
     }
 
     void CalculateMatrix() {
@@ -37,14 +44,21 @@ public:
     }
 
     void tick() {
-        AddRotation();
-        _update_acc();
+        if (m_mode != CAMERA_MODE::Bezier){
+            AddRotation();
+            _update_acc();
+        }
         CalculateMatrix();
-        MaterialPoint::tick();
-        if (m_fps_mode){
+        if (m_mode != CAMERA_MODE::Bezier)
+            MaterialPoint::tick();
+        if (m_mode == CAMERA_MODE::Fps){
             /* We snap the camera to the ground */
             float h = -1 * TERRAIN_SCALE * m_terrain->getHeight(glm::vec2(-m_position.x/TERRAIN_SCALE, -m_position.z/TERRAIN_SCALE)) - 0.2f;
             m_position.y = h;
+        }
+        else if (m_mode != CAMERA_MODE::Bezier) {
+            // TODO : LookAt
+            // TODO : Update pos
         }
     }
 
@@ -115,16 +129,26 @@ public:
         m_pressed[dir] = false;
     }
 
-    void enableFPSMode(bool enable){
-        m_fps_mode = enable;
+    void enableFpsMode(){
+        m_mode = CAMERA_MODE::Fps;
     }
 
-    bool isFPSEnabled() {
-        return m_fps_mode;
+    void enableFlyThroughtMode(){
+        m_mode = CAMERA_MODE::Flythrough;
+    }
+
+    void enableBezierMode(BezierCurve *pos_curve, BezierCurve *look_curve){
+        m_mode = CAMERA_MODE::Bezier;
+        m_pos_curve = pos_curve;
+        m_look_curve = look_curve;
+    }
+
+    CAMERA_MODE getCameraMode() {
+        return m_mode;
     }
 
     void AddRotationFPS(glm::vec2 rot) {
-        if (m_fps_mode)
+        if (m_mode == CAMERA_MODE::Fps)
             m_rotation += rot;
     }
 
@@ -136,9 +160,11 @@ private:
     glm::vec2 m_rotation;
     glm::mat4 m_matrix;
     bool m_pressed[6];
+    BezierCurve *m_look_curve;
+    BezierCurve *m_pos_curve;
 
     Terrain *m_terrain;
-    bool m_fps_mode;
+    CAMERA_MODE m_mode;
 
     glm::vec3 getForwardDirection() {
         vec3 tmp = vec3(-sin(radians(m_rotation.y + 90.0f)) * sin(radians(m_rotation.x)),
