@@ -8,10 +8,10 @@ uniform vec2 quad_indices;
 uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
-uniform sampler2D perlin_tex;
 uniform float amplitude;
 uniform vec3 light_pos;
 
+uniform sampler2D perlin_tex;
 uniform sampler2D left_tex;
 uniform sampler2D low_tex;
 
@@ -20,13 +20,11 @@ out mat4 MV;
 
 /* Sampler2D are opaque types so this function is handy to avoid duplication. */
 float getTextureVal(vec2 pos){
-    if (pos.x >= 1.0f){
-        pos.x = 0.0f;
-        return texture(left_tex, pos).r;
+    if(pos.x >= 1.0f){
+        return texture(low_tex, vec2(0.0f, pos.y)).r;
     }
     else if (pos.y >= 1.0f){
-        pos.y = 0.0f;
-        return texture(low_tex, pos).r;
+        return texture(left_tex, vec2(pos.x, 0.0f)).r;
     }
     else{
         return texture(perlin_tex, pos).r;
