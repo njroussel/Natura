@@ -30,6 +30,7 @@ public:
         m_look_curve.setTimeLength(10.f);
         m_pos_curve.setTimeLength(10.f);
         m_draw_curves = false;
+        m_loop_curves = false;
     }
 
     ~Game() {
@@ -105,6 +106,7 @@ private:
     BezierCurve m_pos_curve;
     BezierCurve m_look_curve;
     bool m_draw_curves;
+    bool m_loop_curves;
 
 
     /* Input handlers */
@@ -313,6 +315,11 @@ private:
                 else if (m_look_curve.Size() > 1 && m_pos_curve.Size() > 1)
                     m_camera->enableBezierMode(&m_pos_curve, &m_look_curve);
             }
+            if (key == GLFW_KEY_L) {
+                m_loop_curves = !m_loop_curves;
+                m_look_curve.enableLoop(m_loop_curves);
+                m_pos_curve.enableLoop(m_loop_curves);
+            }
         }
 
         if (action == GLFW_RELEASE) {
@@ -388,7 +395,7 @@ private:
                                         + 0.05);
                     break;
 
-                case GLFW_KEY_L:
+                /*case GLFW_KEY_L:
                     m_perlinNoise->
                             setProperty(PerlinNoiseProperty::OFFSET,
                                         m_perlinNoise
@@ -404,7 +411,7 @@ private:
                                                 ->
                                                         getProperty(PerlinNoiseProperty::LACUNARITY)
                                         + 0.05f);
-                    break;
+                    break;*/
 
                 case GLFW_KEY_K:
                     m_perlinNoise->setProperty(PerlinNoiseProperty::LACUNARITY,

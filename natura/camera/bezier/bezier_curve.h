@@ -26,6 +26,25 @@ public:
         }
     }
 
+    void enableLoop(bool enable){
+        size_t ctrl_points_count = m_control_points.size();
+        if (ctrl_points_count > 2) {
+            if (enable){
+                if (m_control_points[0] != m_control_points[ctrl_points_count-1])
+                    addPoint(m_control_points[0]);
+            }
+            else{
+                if (m_control_points[0] == m_control_points[ctrl_points_count-1]){
+                    m_control_points.pop_back();
+                    if (m_init_done){
+                        CleanUp();
+                        Init();
+                    }
+                }
+            }
+        }
+    }
+
     void Clear(){
         m_control_points.clear();
     }
