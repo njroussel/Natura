@@ -174,7 +174,8 @@ public:
             this->texture_perlin_id_ = texture_;
             //glBindTexture(GL_TEXTURE_2D, texture_id_);
             glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"), 0 /*GL_TEXTURE0*/);
-
+            glUniform1i(glGetUniformLocation(program_id_, "left_tex"), 6/*GL_TEXTURE0*/);
+            glUniform1i(glGetUniformLocation(program_id_, "low_tex"), 7 /*GL_TEXTURE0*/);
         }
 
         loadTexture("grass.tga", &texture_grass_id_, 1, glGetUniformLocation(program_id_, "grass_tex"));
@@ -200,10 +201,6 @@ public:
         glUniformMatrix4fv(V_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(view));
         glUniformMatrix4fv(P_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
         glUniform2fv(glGetUniformLocation(program_id_, "quad_indices"), ONE, glm::value_ptr(indices));
-
-
-        glUniform1i(glGetUniformLocation(program_id_, "left_tex"), 6 /*GL_TEXTURE6*/);
-        glUniform1i(glGetUniformLocation(program_id_, "low_tex"), 7 /*GL_TEXTURE7*/);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_perlin_id_);
