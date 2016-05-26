@@ -24,7 +24,7 @@ public:
         m_chunk_noise_tex_id = m_perlin_noise->generateNoise(glm::vec2(m_position.x, m_position.y));
     }
 
-    void Draw(float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
+    void Draw(float amplitude, float time, vec3 cam_pos, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         for (int i = 0 ; i < CHUNK_SIDE_TILE_COUNT ; i ++){

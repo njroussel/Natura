@@ -11,8 +11,10 @@ uniform mat4 view;
 uniform sampler2D perlin_tex;
 uniform float amplitude;
 uniform vec3 light_pos;
+uniform vec3 cam_pos;
 
 out vec3 light_dir;
+out float distance_camera;
 out mat4 MV;
 
 void main() {
@@ -25,6 +27,7 @@ void main() {
 
     MV = view * model;
     vec4 vpoint_mv = MV * vec4(pos_3d, 1.0);
+    distance_camera = length(vpoint_mv);
 
     gl_Position = projection * vpoint_mv;
 
