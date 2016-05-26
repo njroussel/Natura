@@ -13,6 +13,8 @@ private:
     GLuint vertex_buffer_object_index_;     // memory buffer for indices
     GLuint program_id_;                     // GLSL shader program ID
     GLuint texture_perlin_id_;              // texture ID
+    GLuint texture_left_id_;              // texture ID
+    GLuint texture_low_id_;              // texture ID
     GLuint texture_grass_id_;               // texture ID
     GLuint texture_rock_id_;                // texture ID
     GLuint texture_snow_id_;                // texture ID
@@ -41,6 +43,14 @@ public:
 
     void setTextureId(int id){
         this->texture_perlin_id_ = id;
+    }
+
+    void setTextureLeft(GLuint id){
+        texture_left_id_ = id;
+    }
+
+    void setTextureLow(GLuint id){
+        texture_low_id_ = id;
     }
 
     void Cleanup() {
@@ -163,8 +173,7 @@ public:
             //perlin texture
             this->texture_perlin_id_ = texture_;
             //glBindTexture(GL_TEXTURE_2D, texture_id_);
-            glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"),
-                        0 /*GL_TEXTURE0*/);
+            glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"), 0 /*GL_TEXTURE0*/);
         }
 
         loadTexture("grass.tga", &texture_grass_id_, 1, glGetUniformLocation(program_id_, "grass_tex"));
@@ -208,6 +217,12 @@ public:
 
         glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_2D, texture_deep_water_id_);
+
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, texture_left_id_);
+
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, texture_low_id_);
 
         // draw
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

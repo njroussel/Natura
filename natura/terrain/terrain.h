@@ -48,7 +48,9 @@ public:
         glm::mat4 _m = glm::translate(model, glm::vec3(m_offset.x*CHUNK_SIDE_TILE_COUNT, 0, m_offset.y*CHUNK_SIDE_TILE_COUNT));
         for (size_t i = 0 ; i < m_chunks.size() ; i ++) {
             for (size_t j = 0 ; j < m_chunks[i].size() ; j ++) {
-                m_chunks[i][j]->Draw(amplitude, time, glm::translate(_m, glm::vec3(i*CHUNK_SIDE_TILE_COUNT, 0.0, j*CHUNK_SIDE_TILE_COUNT)), view, projection);
+                GLuint left = j < m_chunks[i].size() - 1 ? m_chunks[i][j+1]->getTextureId() : 0;
+                GLuint low = i < m_chunks.size() - 1 ? m_chunks[i+1][j]->getTextureId() : 0;
+                m_chunks[i][j]->Draw(amplitude, time, left, low, glm::translate(_m, glm::vec3(i*CHUNK_SIDE_TILE_COUNT, 0.0, j*CHUNK_SIDE_TILE_COUNT)), view, projection);
             }
         }
         m_skybox->Draw(projection * view * glm::translate(model, -cam_pos/TERRAIN_SCALE));

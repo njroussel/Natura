@@ -13,9 +13,13 @@ uniform sampler2D rock_tex;
 uniform sampler2D snow_tex;
 uniform sampler2D sand_tex;
 uniform sampler2D water_tex;
+
 uniform vec3 La, Ld, Ls;
 uniform vec3 ka, kd, ks;
 uniform float alpha;
+
+uniform sampler2D left_tex;
+uniform sampler2D low_tex;
 
 float getPercentage( float value,  float min,  float max ){
     value = clamp( value, min, max );
