@@ -1,9 +1,13 @@
 #version 330
 #define noise_size 4.0f
+#define min_fog_distance 30.0f
+#define max_fog_distance 40.0f
+#define fog_colour vec3(0.4, 0.4, 0.4)
 
 in vec2 uv;
 in vec3 light_dir;
 in mat4 MV;
+in float distance_camera;
 
 out vec3 color;
 uniform vec2 quad_indices;
@@ -27,7 +31,6 @@ float getPercentage( float value,  float min,  float max ){
 void main() {
 
     vec2 pos_2d = uv;
-
 
     float height = ((texture(perlin_tex, pos_2d).r) + 1.0f) / 2.0f;
     vec3 grassColor = texture(grass_tex, pos_2d* 10.f).rgb;
@@ -76,5 +79,8 @@ void main() {
 
     vec3 specular = ks * pow(dotRv, alpha) * Ls;
 
-    color = ambient + diffuse +specular;
+    float fog_factor = (max_fog_distance - distance_camera) / (max_fog_distance - min_fog_distance);
+    fog_factor = clamp(fog_factor, 0.0f, 1.0f);
+
+    color = mix(fog_colour, ambient + diffuse +specular, fog_factor);
 }

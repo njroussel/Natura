@@ -10,6 +10,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform float amplitude;
 uniform vec3 light_pos;
+uniform vec3 cam_pos;
 
 uniform sampler2D perlin_tex;
 uniform sampler2D left_tex;
@@ -17,6 +18,7 @@ uniform sampler2D low_tex;
 
 
 out vec3 light_dir;
+out float distance_camera;
 out mat4 MV;
 
 /* Sampler2D are opaque types so this function is handy to avoid duplication. */
@@ -42,6 +44,7 @@ void main() {
 
     MV = view * model;
     vec4 vpoint_mv = MV * vec4(pos_3d, 1.0);
+    distance_camera = length(vpoint_mv);
 
     gl_Position = projection * vpoint_mv;
 
