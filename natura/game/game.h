@@ -168,12 +168,13 @@ private:
 
         //draw as often as possible
         glEnable(GL_CLIP_PLANE0);
-        framebufferFloor.Bind();
+        /*framebufferFloor.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, m_grid_model_matrix,
                         m_camera->getMirroredMatrix(),
                         m_projection->perspective());
         framebufferFloor.Unbind();
+        */
         glDisable(GL_CLIP_PLANE0);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

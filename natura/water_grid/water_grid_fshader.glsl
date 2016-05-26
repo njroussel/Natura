@@ -47,5 +47,6 @@ void main() {
     vec3 color_from_mirror = texture(tex_reflection, new_uv).rgb;
 
     vec3 original_color = specular + diffuse + ambient;
-    color = vec4(mix(color_from_mirror, original_color, vec3(0.65f)), 0.6f);
+    //color = vec4(mix(color_from_mirror, original_color, vec3(0.65f)), 0.6f);
+    color = vec4(original_color, 0.6f);
 }
