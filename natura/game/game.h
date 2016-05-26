@@ -166,8 +166,6 @@ private:
 
         const float time = glfwGetTime();
 
-        const float tot_time = 10.f;
-
         cout << "Frames : " << 1 / (time - m_last_time) << endl;
 
         //tick 60 times per second
