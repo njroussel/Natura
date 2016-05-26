@@ -29,6 +29,7 @@ public:
         resize_callback(&m);
         m_look_curve.setTimeLength(10.f);
         m_pos_curve.setTimeLength(10.f);
+        m_draw_curves = false;
     }
 
     ~Game() {
@@ -103,6 +104,7 @@ private:
     /* Bezier Curve for camera */
     BezierCurve m_pos_curve;
     BezierCurve m_look_curve;
+    bool m_draw_curves;
 
 
     /* Input handlers */
@@ -201,7 +203,7 @@ private:
         m_terrain->ExpandTerrain(m_camera->getPosition());
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix, m_camera->GetMatrix(),
                         m_projection->perspective());
-        if (m_look_curve.Size() > 1 && m_pos_curve.Size() > 1) {
+        if (m_look_curve.Size() > 1 && m_pos_curve.Size() > 1 && m_draw_curves) {
             m_look_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
             m_pos_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
         }
@@ -298,7 +300,8 @@ private:
                 m_pos_curve.addPoint(pos_point);
             }
             if (key == GLFW_KEY_T){
-                cout << "Bezier curve creation finished." << endl;
+                m_draw_curves = !m_draw_curves;
+                cout << "Bezier curve draw " << (m_draw_curves ? "ON." : "OFF.") << endl;
             }
             if (key == GLFW_KEY_C){
                 clearCurves();

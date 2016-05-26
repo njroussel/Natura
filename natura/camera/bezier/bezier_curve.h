@@ -20,6 +20,10 @@ public:
 
     void addPoint(glm::vec3 point){
         m_control_points.push_back(point);
+        if (m_init_done){
+            CleanUp();
+            Init();
+        }
     }
 
     void Clear(){
@@ -34,9 +38,8 @@ public:
         m_time_length = time;
     }
 
-    void Draw(const glm::mat4& model = IDENTITY_MATRIX,
-              const glm::mat4& view = IDENTITY_MATRIX,
-              const glm::mat4& projection = IDENTITY_MATRIX){
+    void Init() {
+        m_init_done = true;
         const float step = 0.1;
         m_vert_count = static_cast<GLuint> (m_time_length / step);
         GLfloat curve_vertices[m_vert_count*3];
@@ -69,8 +72,11 @@ public:
 
         glBindVertexArray(0);
         glUseProgram(0);
+    }
 
-        // Draw
+    void Draw(const glm::mat4& model = IDENTITY_MATRIX,
+              const glm::mat4& view = IDENTITY_MATRIX,
+              const glm::mat4& projection = IDENTITY_MATRIX){
         glUseProgram(m_program_id);
 
         glm::mat4 MVP = projection * view * model;
@@ -85,7 +91,9 @@ public:
 
         glBindVertexArray(0);
         glUseProgram(0);
+    }
 
+    void CleanUp(){
         glDeleteBuffers(1, &m_buffer_id);
         glDeleteVertexArrays(1, &m_ver_array_id);
     }
@@ -97,6 +105,7 @@ private:
     GLuint m_vert_count;
     GLuint m_buffer_id;
     float m_time_length = 1.f;
+    bool m_init_done = false;
 
     float B(float t, int n, int i){
         if (i == 0 && n == 0)

@@ -57,11 +57,9 @@ public:
             m_position.y = h;
         }
         else if (m_mode == CAMERA_MODE::Bezier) {
-            cout << "BTIERIEROHQEPOIUQEW " << endl;
             double time = glfwGetTime();
             double delta_time = time - m_bezier_time;
-            //glm::vec3 look_point = -m_look_curve->getPosition(delta_time);
-            glm::vec3 look_point = glm::vec3(0);
+            glm::vec3 look_point = -m_look_curve->getPosition(delta_time);
             glm::vec3 pos_point = -m_pos_curve->getPosition(delta_time);
             m_position = pos_point * TERRAIN_SCALE;
             lookAtPoint(glm::vec3(TERRAIN_SCALE * look_point.x, TERRAIN_SCALE * look_point.y, TERRAIN_SCALE * look_point.z));
