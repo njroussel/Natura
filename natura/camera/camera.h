@@ -3,61 +3,129 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "icg_helper.h"
+#include "../physics/material_point.h"
+#include "../terrain/terrain.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdint>
 
-struct DIRECTION {
-    enum ENUM {
-        Forward = 0, Backward = 1, Left = 2, Right = 3
-    };
+typedef enum DIRECTION {
+    Forward = 0, Backward = 1, Left = 2, Right = 3, Up = 4, Down = 5
 };
 
 
-class Camera {
-
+class Camera : public MaterialPoint {
 public:
 
-    Camera(vec3 &starting_position, vec2 &starting_rotation) {
-        m_position = vec3(starting_position.x, starting_position.y, starting_position.z);
+    Camera(vec3 &starting_position, vec2 &starting_rotation, Terrain *terrain) : MaterialPoint(1.0, starting_position) {
         m_rotation = vec2(starting_rotation.x, starting_rotation.y);
         m_matrix = IDENTITY_MATRIX;
-
-        for (int i = 0; i < m_moving_size; i++) {
-            m_moving[i] = false;
-        }
-    }
-
-    ~Camera() {
+        m_pressed[Forward] = false;
+        m_pressed[Backward] = false;
+        m_pressed[Left] = false;
+        m_pressed[Right] = false;
+        m_pressed[Up] = false;
+        m_pressed[Down] = false;
+        m_terrain = terrain;
+        m_fps_mode = false;
     }
 
     void CalculateMatrix() {
-        ComputeMovement();
-
         m_matrix = IDENTITY_MATRIX;
-        m_matrix = glm::rotate(m_matrix, radians(m_rotation.x), vec3(1.0f, 0.0f, 0.0f));
-        m_matrix = glm::rotate(m_matrix, radians(m_rotation.y), vec3(0.0f, 1.0f, 0.0f));
-        m_matrix = glm::translate(m_matrix, m_position);
+        m_matrix = glm::rotate(m_matrix, radians(m_rotation.y), vec3(1.0f, 0.0f, 0.0f));
+        m_matrix = glm::rotate(m_matrix, radians(m_rotation.x), vec3(0.0f, 1.0f, 0.0f));
+        m_matrix = glm::translate(m_matrix, getPosition());
+    }
+
+    void tick() {
+        AddRotation();
+        _update_acc();
+        CalculateMatrix();
+        MaterialPoint::tick();
+        if (m_fps_mode){
+            /* We snap the camera to the ground */
+            float h = -1 * TERRAIN_SCALE * m_terrain->getHeight(glm::vec2(-m_position.x/TERRAIN_SCALE, -m_position.z/TERRAIN_SCALE)) - 0.2f;
+            m_position.y = h;
+        }
     }
 
     mat4 &GetMatrix() {
         return m_matrix;
     }
 
-    void SetRotation(vec2 &new_rotation) {
-        m_rotation = new_rotation;
+    mat4 getMirroredMatrix() {
+        mat4 mirrored = IDENTITY_MATRIX;
+        vec3 pos = getPosition();
+        mirrored = glm::rotate(mirrored, radians(-m_rotation.y), vec3(1.0f, 0.0f, 0.0f));
+        mirrored = glm::rotate(mirrored, radians(m_rotation.x), vec3(0.0f, 1.0f, 0.0f));
+        pos = vec3(pos.x, -pos.y, pos.z);
+        mirrored = glm::translate(mirrored, pos);
+        return mirrored;
     }
 
-    void AddRotation(vec2 &rotation) {
-        m_rotation += rotation;
-        cout << m_rotation.x << "   " << m_rotation.y << endl;
+    void lookAtPoint(vec3 point) {
+        vec3 position = getPosition();
+        if(position == point){
+            return;
+        }
+
+        vec3 newFwd = normalize(point - position);
+        vec3 up = vec3(0.0f, 1.0f, 0.0f);
+        vec3 right = vec3(0.0f, 0.0f, 1.0f);
+
+        float newYRotation = degrees(acos(dot(newFwd, up)));
+
+        vec3 fwdPlaneDirection = normalize(vec3(newFwd.x, 0, newFwd.z));
+        float newXRotation =  degrees(acos(dot(fwdPlaneDirection, right)));
+
+        m_rotation.y = -(newYRotation - 90);
+        m_rotation.x =  position.x < 0 ? -newXRotation : newXRotation;
     }
 
-    void SetMovement(DIRECTION::ENUM direction, bool boolean) {
-        m_moving[direction] = boolean;
+    void AddRotation() {
+        vec2 addRotation = vec2(0.0f, 0.0f);
+        if (m_pressed[Left]) {
+            glm::vec2 rot = vec2(-1, 0);
+            addRotation += rot;
+        }
+        if (m_pressed[Right]) {
+            glm::vec2 rot = vec2(1, 0);
+            addRotation += rot;
+        }
+        if (m_pressed[Up]) {
+            glm::vec2 rot = vec2(0, -1);
+            addRotation += rot;
+        }
+        if (m_pressed[Down]) {
+            glm::vec2 rot = vec2(0, 1);
+            addRotation += rot;
+        }
+
+        m_rotation += addRotation;
     }
 
-    glm::vec3 getPosition() {
-        return m_position;
+    bool hasAcceleration(DIRECTION dir) {
+        return m_pressed[dir];
+    }
+
+    void setMovement(DIRECTION dir) {
+        m_pressed[dir] = true;
+    }
+
+    void stopMovement(DIRECTION dir) {
+        m_pressed[dir] = false;
+    }
+
+    void enableFPSMode(bool enable){
+        m_fps_mode = enable;
+    }
+
+    bool isFPSEnabled() {
+        return m_fps_mode;
+    }
+
+    void AddRotationFPS(glm::vec2 rot) {
+        if (m_fps_mode)
+            m_rotation += rot;
     }
 
     void setPosition(glm::vec3 pos) {
@@ -65,34 +133,40 @@ public:
     }
 
 private:
-    static const size_t m_moving_size = 4;
-    bool m_moving[m_moving_size];
-    vec3 m_position;
-    vec2 m_rotation;
-    mat4 m_matrix;
-    float m_movement_factor = 0.4f;
+    glm::vec2 m_rotation;
+    glm::mat4 m_matrix;
+    bool m_pressed[6];
 
-    void ComputeMovement() {
-        vec3 forward_direction = normalize(vec3(-cos(radians(m_rotation.x)) * sin(radians(m_rotation.y)),
-                                                sin(radians(m_rotation.x)),
-                                                cos(radians(m_rotation.x)) * cos(radians(m_rotation.y))));
+    Terrain *m_terrain;
+    bool m_fps_mode;
 
-        vec3 left_direction = vec3(cos(radians(m_rotation.y)),
-                                   0,
-                                   sin(radians(m_rotation.y)));;
+    glm::vec3 getForwardDirection() {
+        vec3 tmp = vec3(-sin(radians(m_rotation.y + 90.0f)) * sin(radians(m_rotation.x)),
 
-        if (m_moving[DIRECTION::ENUM::Forward]) {
-            m_position += m_movement_factor * forward_direction;
+                        -cos(radians(m_rotation.y + 90.0f)),
+                        sin(radians(m_rotation.y + 90.0f)) * cos(radians(m_rotation.x)));
+        return normalize(tmp);
+    }
+
+    void _update_acc() {
+        vec3 fwdDirection = getForwardDirection();
+        if (m_pressed[Forward] && !m_pressed[Backward]) {
+            setAccelerationVector(fwdDirection);
         }
-        if (m_moving[DIRECTION::ENUM::Backward]) {
-            m_position += m_movement_factor * -forward_direction;
+        else if (!m_pressed[Forward] && m_pressed[Backward]) {
+            setAccelerationVector(-fwdDirection);
         }
-        if (m_moving[DIRECTION::ENUM::Left]) {
-            m_position += m_movement_factor * left_direction;
-        }
-        if (m_moving[DIRECTION::ENUM::Right]) {
-            m_position += m_movement_factor * -left_direction;
+        else {
+            if (isMoving()) {
+                vec3 currentSpeed = getSpeedVector();
+                float direction = dot(currentSpeed, fwdDirection);
+                if (direction < 0) {
+                    setAccelerationVector(fwdDirection);
+                }
+                else {
+                    setAccelerationVector(-fwdDirection);
+                }
+            }
         }
     }
 };
-

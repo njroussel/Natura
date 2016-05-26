@@ -11,11 +11,14 @@ private:
     GLuint vertex_buffer_object_index_;     // memory buffer for indices
     GLuint program_id_;                     // GLSL shader program ID
     GLuint texture_id_;                     // texture ID
+    GLuint reflection_texture_id_;          // texture ID
     GLuint num_indices_;                    // number of vertices to render
     GLuint MV_id;                         // model, view, proj matrix ID
 
 public:
-    void Init() {
+    void Init(GLuint water_reflection_tex) {
+        reflection_texture_id_ = water_reflection_tex;
+
         // compile the shaders.
         program_id_ = icg_helper::LoadShaders("water_grid_vshader.glsl",
                                               "water_grid_fshader.glsl");
@@ -35,7 +38,8 @@ public:
             std::vector<GLuint> indices;
             int mSideNbPoints = 64;
             float sideX = 1 / float(mSideNbPoints);
-            mSideNbPoints ++; // OFF BY ONE BY @Rimbaut
+            mSideNbPoints++;
+
             for (int i = 0; i < mSideNbPoints; i++) {
                 for (int j = 0; j < mSideNbPoints; j++) {
                     vertices.push_back(i * sideX);
@@ -81,7 +85,7 @@ public:
         // create 1D texture (colormap)
         {
             const int ColormapSize = 2;
-            GLfloat tex[3 * ColormapSize] = {0.0, 0.2, 0.45, 158.0f/255.0f, 181.0f/255.0f, 210.0f/255.0f};
+            GLfloat tex[3 * ColormapSize] = {0.0, 0.2, 0.45, 158.0f / 255.0f, 181.0f / 255.0f, 210.0f / 255.0f};
             glGenTextures(1, &texture_id_);
             glBindTexture(GL_TEXTURE_1D, texture_id_);
             glTexImage1D(GL_TEXTURE_1D, 0, GL_RGB, ColormapSize, 0, GL_RGB, GL_FLOAT, tex);
@@ -91,6 +95,15 @@ public:
             GLuint tex_id = glGetUniformLocation(program_id_, "colormap");
             glUniform1i(tex_id, 0 /*GL_TEXTURE0*/);
             // check_error_gl();
+        }
+
+        //texture for relflection
+        {
+            GLuint tex_mirror_id = glGetUniformLocation(program_id_, "tex_reflection");
+            glUniform1i(tex_mirror_id, 1 /*GL_TEXTURE1*/);
+
+            // cleanup
+            glBindTexture(GL_TEXTURE_2D, 0);
         }
 
         // other uniforms
@@ -111,10 +124,10 @@ public:
         glUniform3fv(Ls_id, ONE, glm::value_ptr(Ls));
         glUniform3fv(light_pos_id, ONE, glm::value_ptr(light_pos));
 
-        glm::vec3 ka = glm::vec3(0.5f, 0.5f, 0.5f);
-        glm::vec3 kd = glm::vec3(0.5f, 0.5f, 0.5f);
-        glm::vec3 ks = glm::vec3(0.8f, 0.8f, 0.8f);
-        float alpha = 60.0f;
+        glm::vec3 ka = glm::vec3(0.18f, 0.1f, 0.1f);
+        glm::vec3 kd = glm::vec3(0.9f, 0.5f, 0.5f);
+        glm::vec3 ks = glm::vec3(0.3f, 0.3f, 0.3f);
+        float alpha = 30.0f;
 
         GLuint ka_id = glGetUniformLocation(program_id_, "ka");
         GLuint kd_id = glGetUniformLocation(program_id_, "kd");
@@ -147,26 +160,30 @@ public:
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
 
+        // bind textures
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture_id_);
+
+        // bind textures
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, reflection_texture_id_);
+
         // setup MV
         glm::mat4 MV = view * model;
         glUniformMatrix4fv(MV_id, ONE, DONT_TRANSPOSE, glm::value_ptr(MV));
-        glUniformMatrix4fv(glGetUniformLocation(program_id_, "projection"), ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
+        glUniformMatrix4fv(glGetUniformLocation(program_id_, "projection"), ONE, DONT_TRANSPOSE,
+                           glm::value_ptr(projection));
 
         // pass the current time stamp to the shader.
         glUniform1f(glGetUniformLocation(program_id_, "time"), time);
         glUniform2fv(glGetUniformLocation(program_id_, "chunk_pos"), ONE, glm::value_ptr(pos));
 
-        // draw
-        // TODO 5: for debugging it can be helpful to draw only the wireframe.
-        // You can do that by uncommenting the next line.
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        // TODO 5: depending on how you set up your vertex index buffer, you
-        // might have to change GL_TRIANGLE_STRIP to GL_TRIANGLES.
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        //glDisable(GL_CULL_FACE);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
         glDrawElements(GL_TRIANGLE_STRIP, num_indices_, GL_UNSIGNED_INT, 0);
-        //glEnable(GL_CULL_FACE);
         glDisable(GL_BLEND);
         glBindVertexArray(0);
         glUseProgram(0);

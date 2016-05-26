@@ -6,11 +6,11 @@
 
 GLfloat lineVertices[] = {
         0.0f,  0.0f, 0.0f,
-        1.0f, 0.0f, 0.0f,
+        10.0f, 0.0f, 0.0f,
         0.0f,  0.0f, 0.0f,
-        0.0f, 1.0f, 0.0f,
+        0.0f, 10.0f, 0.0f,
         0.0f,  0.0f, 0.0f,
-        0.0f, 0.0f, 1.0f
+        0.0f, 0.0f, 10.0f
 };
 
 class Axis {
@@ -57,7 +57,7 @@ public:
               const glm::mat4& projection = IDENTITY_MATRIX){
         glUseProgram(program_id_);
 
-        glm::mat4 MVP = projection * view * model;
+        glm::mat4 MVP = projection * view;
         GLint MVP_id = glGetUniformLocation(program_id_, "MVP");
         glUniformMatrix4fv(MVP_id, 1, GL_FALSE, value_ptr(MVP));
 
