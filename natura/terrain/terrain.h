@@ -137,6 +137,7 @@ private:
         pos.z = floor(pos.z);
         return pos;
     }
+
     void _expand(Direction dir){
         switch (dir) {
             case SOUTH: {

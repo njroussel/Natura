@@ -18,9 +18,6 @@ uniform vec3 La, Ld, Ls;
 uniform vec3 ka, kd, ks;
 uniform float alpha;
 
-uniform sampler2D left_tex;
-uniform sampler2D low_tex;
-
 float getPercentage( float value,  float min,  float max ){
     value = clamp( value, min, max );
     return (value - min) / (max - min);
@@ -30,9 +27,6 @@ float getPercentage( float value,  float min,  float max ){
 void main() {
 
     vec2 pos_2d = uv;
-    //pos_2d.x += quad_indices.x;
-    //pos_2d.y += quad_indices.y;
-    //spos_2d = pos_2d / noise_size;
 
 
     float height = ((texture(perlin_tex, pos_2d).r) + 1.0f) / 2.0f;
