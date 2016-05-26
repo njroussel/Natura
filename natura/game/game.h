@@ -157,6 +157,7 @@ private:
         control_points.push_back(glm::vec3(15, 0, 23));
         control_points.push_back(glm::vec3(4,12, 27));
         BezierCurve curve(control_points);
+        curve.Init();
         const float tot_time = 10.f;
 
         //tick 60 times per second
