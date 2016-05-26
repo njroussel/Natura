@@ -7,7 +7,7 @@
 #include "chunk/chunk.h"
 #include "chunk/chunk_generation/chunk_factory.h"
 #include "../water_grid/water_grid.h"
-#include "../skybox/cube.h"
+#include "../skybox/skybox.h"
 
 #define TERRAIN_SCALE 2.0f
 #define WATER_HEIGHT -0.0f
@@ -22,7 +22,7 @@ public:
             }
             m_chunks.push_back(row);
         }
-        m_skybox = new Cube();
+        m_skybox = new SkyBox();
         m_offset = glm::vec2(0, 0);
         m_perlin_noise = perlinNoise;
         m_axis_pos = glm::vec3(0, 0, 0);
@@ -122,7 +122,7 @@ private:
     WaterGrid m_water_grid;
     ChunkFactory m_chunk_factory;
     std::deque<std::deque<Chunk *>> m_chunks;
-    Cube* m_skybox;
+    SkyBox* m_skybox;
     Axis m_axis;
     glm::vec2 m_offset;
     float m_amplitude;

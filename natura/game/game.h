@@ -5,7 +5,7 @@
 #include "../perlin_noise/perlinnoise.h"
 #include "../trackball.h"
 #include "../../external/glm/detail/type_mat.hpp"
-#include "../skybox/cube.h"
+#include "../skybox/skybox.h"
 #include "../terrain/terrain.h"
 #include "../misc/observer_subject/messages/keyboard_handler_message.h"
 #include "../misc/io/input/handlers/keyboard/keyboard_handler.h"

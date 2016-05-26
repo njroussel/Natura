@@ -93,7 +93,7 @@ static const glm::vec2 CubeUVs[] =
     glm::vec2(1.0, 0.75)
 };
 
-class Cube {
+class SkyBox {
 
     private:
         GLuint vertex_array_id_;        // vertex array object
@@ -234,7 +234,7 @@ class Cube {
 
 
             // setup MVP
-            mat4 model = scale(model_matrix_, vec3(40.0f));
+            mat4 model = scale(model_matrix_, vec3(60.0f));
             glm::mat4 MVP = view_projection * model;
             GLuint MVP_id = glGetUniformLocation(program_id_, "MVP");
             glUniformMatrix4fv(MVP_id, 1, GL_FALSE, value_ptr(MVP));
