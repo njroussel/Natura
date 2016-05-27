@@ -10,7 +10,7 @@
 #include "../skybox/skybox.h"
 
 #define TERRAIN_SCALE 2.0f
-#define WATER_HEIGHT -0.0f
+#define WATER_HEIGHT -0.75f
 
 class Terrain {
 public:

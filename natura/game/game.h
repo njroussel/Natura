@@ -449,6 +449,7 @@ private:
 
                 case GLFW_KEY_B:
                     m_terrain->m_water_height -= 0.05f;
+                    cout << "Water height = " << m_terrain->m_water_height << endl;
                     break;
 
 
