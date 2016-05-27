@@ -196,13 +196,15 @@ public:
         glUseProgram(0);
     }
 
-    void Draw(glm::vec2 indices, float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
+    void Draw(glm::vec2 indices, float amplitude, float water_height, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
 
         glUniform1f(glGetUniformLocation(program_id_, "amplitude"), amplitude);
+
+        glUniform1f(glGetUniformLocation(program_id_, "water_height"), water_height);
 
         glUniformMatrix4fv(M_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(model));
         glUniformMatrix4fv(V_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(view));
