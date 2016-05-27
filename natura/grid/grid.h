@@ -16,6 +16,7 @@ private:
     GLuint texture_perlin_id_;              // texture ID
     GLuint texture_left_id_;              // texture ID
     GLuint texture_low_id_;              // texture ID
+    GLuint texture_low_left_id_;
     GLuint texture_grass_id_;               // texture ID
     GLuint texture_rock_id_;                // texture ID
     GLuint texture_snow_id_;                // texture ID
@@ -52,6 +53,10 @@ public:
 
     void setTextureLow(GLuint id){
         texture_low_id_ = id;
+    }
+
+    void setTextureLowLeft(GLuint id){
+        texture_low_left_id_ = id;
     }
 
     void Cleanup() {
@@ -177,6 +182,7 @@ public:
             glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"), 0 /*GL_TEXTURE0*/);
             glUniform1i(glGetUniformLocation(program_id_, "left_tex"), 6/*GL_TEXTURE0*/);
             glUniform1i(glGetUniformLocation(program_id_, "low_tex"), 7 /*GL_TEXTURE0*/);
+            glUniform1i(glGetUniformLocation(program_id_, "low_left_tex"), 8 /*GL_TEXTURE0*/);
         }
 
         loadTexture("grass.tga", &texture_grass_id_, 1, glGetUniformLocation(program_id_, "grass_tex"));
@@ -229,6 +235,10 @@ public:
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, texture_low_id_);
         glUniform1i(glGetUniformLocation(program_id_, "low_present"), texture_low_id_ != 0);
+
+        glActiveTexture(GL_TEXTURE8);
+        glBindTexture(GL_TEXTURE_2D, texture_low_left_id_);
+        glUniform1i(glGetUniformLocation(program_id_, "low_left_present"), texture_low_left_id_ != 0);
 
         // draw
         glEnable(GL_BLEND);

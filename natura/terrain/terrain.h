@@ -54,7 +54,8 @@ public:
             for (size_t j = 0; j < m_chunks[i].size(); j++) {
                 GLuint left = j < m_chunks[i].size() - 1 ? m_chunks[i][j + 1]->getTextureId() : 0;
                 GLuint low = i < m_chunks.size() - 1 ? m_chunks[i + 1][j]->getTextureId() : 0;
-                m_chunks[i][j]->Draw(amplitude, time, left, low, glm::translate(_m, glm::vec3(i * CHUNK_SIDE_TILE_COUNT,
+                GLuint low_left = i < m_chunks.size() - 1 && j < m_chunks[i].size() - 1 ? m_chunks[i+1][j+1]->getTextureId() : 0;
+                m_chunks[i][j]->Draw(amplitude, time, left, low, low_left, glm::translate(_m, glm::vec3(i * CHUNK_SIDE_TILE_COUNT,
                                                                                               0.0, j *
                                                                                                    CHUNK_SIDE_TILE_COUNT)),
                                      view, projection);
