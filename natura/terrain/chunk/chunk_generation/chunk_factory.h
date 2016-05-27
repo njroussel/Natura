@@ -3,6 +3,7 @@
 #include "../../../perlin_noise/perlinnoise.h"
 #include <cstdint>
 #include "../chunk.h"
+#include "../../terrain.h"
 
 class ChunkFactory {
 public:
@@ -11,7 +12,7 @@ public:
         m_perlin_noise = perlin_noise;
     }
 
-    Chunk *createChunk(glm::vec2 indices){
+    Chunk *createChunk(glm::vec2 indices, Terrain* terrain){
         return new Chunk(indices, m_tile_side_size, m_perlin_noise);
     }
 

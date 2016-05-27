@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "icg_helper.h"
+#include "../terrain/terrain.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdint>
 
