@@ -10,6 +10,7 @@ out vec3 light_dir;
 out mat4 MV_out;
 out vec3 view_dir;
 out vec3 normal;
+out float distance_camera;
 
 uniform mat4 MV;
 uniform mat4 projection;
@@ -64,6 +65,7 @@ void main() {
     normal = -normalize((cross(vec3(2 * epsilon, zDiffXaxis, 0.0f), vec3(0.0, zDiffYaxis, 2* epsilon))));
 
     vec4 vpoint_mv = MV * vec4(pos_3d, 1.0);
+    distance_camera = length(vpoint_mv);
     gl_Position = projection * vpoint_mv;
 
     MV_out = MV;
