@@ -231,8 +231,11 @@ public:
         glUniform1i(glGetUniformLocation(program_id_, "low_present"), texture_low_id_ != 0);
 
         // draw
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawElements(GL_TRIANGLE_STRIP, num_indices_, GL_UNSIGNED_INT, 0);
+        glDisable(GL_BLEND);
 
         glBindVertexArray(0);
         glUseProgram(0);
