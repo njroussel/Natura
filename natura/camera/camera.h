@@ -186,10 +186,14 @@ private:
     CAMERA_MODE m_mode;
 
     glm::vec3 getForwardDirection() {
-        vec3 tmp = vec3(-sin(radians(m_rotation.y + 90.0f)) * sin(radians(m_rotation.x)),
-
-                        -cos(radians(m_rotation.y + 90.0f)),
-                        sin(radians(m_rotation.y + 90.0f)) * cos(radians(m_rotation.x)));
+        float rot_y = m_rotation.y;
+        if (m_mode == CAMERA_MODE::Fps){
+            /* We need to do this in order to be able to walk when looking up. */
+            rot_y = 0.0;
+        }
+        vec3 tmp = vec3(-sin(radians(rot_y + 90.0f)) * sin(radians(m_rotation.x)),
+                        -cos(radians(rot_y + 90.0f)),
+                        sin(radians(rot_y + 90.0f)) * cos(radians(m_rotation.x)));
         return normalize(tmp);
     }
 
