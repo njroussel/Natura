@@ -7,6 +7,7 @@
 #include "../../external/glm/detail/type_mat.hpp"
 #include "../skybox/skybox.h"
 #include "../terrain/terrain.h"
+#include "../physics/ball.h"
 #include "../misc/observer_subject/messages/keyboard_handler_message.h"
 #include "../misc/io/input/handlers/keyboard/keyboard_handler.h"
 #include "../misc/io/input/handlers/mouse/mouse_button_handler.h"
@@ -187,6 +188,7 @@ private:
 
 
         //draw as often as possible
+        /*
         glEnable(GL_CLIP_PLANE0);
         framebufferFloor.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -195,6 +197,7 @@ private:
                         m_projection->perspective());
         framebufferFloor.Unbind();
         glDisable(GL_CLIP_PLANE0);
+         */
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());

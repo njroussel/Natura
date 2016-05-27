@@ -50,10 +50,10 @@ void main() {
     vec2 new_uv = vec2(width_normed, 1 - height_normed);
     vec3 color_from_mirror = texture(tex_reflection, new_uv).rgb;
 
-float fog_factor = (max_fog_distance - distance_camera) / (max_fog_distance - min_fog_distance);
+    float fog_factor = (max_fog_distance - distance_camera) / (max_fog_distance - min_fog_distance);
     fog_factor = clamp(fog_factor, 0.0f, 1.0f);
 
     vec3 original_color = specular + diffuse + ambient;
-    color = vec4(mix(color_from_mirror, original_color, vec3(0.65f)), min(0.6, fog_factor));
-    //color = vec4(original_color, 0.6f);
+    //color = vec4(mix(color_from_mirror, original_color, vec3(0.65f)), min(0.6, fog_factor));
+    color = vec4(original_color, 0.6f);
 }
