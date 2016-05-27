@@ -42,7 +42,8 @@ void main() {
     float window_width = window.x;
     vec4 window_coord = gl_FragCoord;
     float width_normed = window_coord.x / window_width;
-    float height_normed = window_coord.y / window_height;
+    float height_normed = (window_coord.y)/ window_height;
+
     vec2 new_uv = vec2(width_normed, 1 - height_normed);
     vec3 color_from_mirror = texture(tex_reflection, new_uv).rgb;
 

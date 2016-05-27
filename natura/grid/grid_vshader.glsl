@@ -9,6 +9,7 @@ uniform mat4 projection;
 uniform mat4 model;
 uniform mat4 view;
 uniform float amplitude;
+uniform float water_height;
 uniform vec3 light_pos;
 uniform vec3 cam_pos;
 
@@ -50,7 +51,7 @@ void main() {
 
     gl_Position = projection * vpoint_mv;
 
-    gl_ClipDistance[0] = height;
+    gl_ClipDistance[0] = height - water_height;
 
     light_dir = -vec3(vpoint_mv);
     light_dir = normalize(light_dir);

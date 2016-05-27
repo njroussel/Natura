@@ -25,7 +25,7 @@ public:
         m_chunk_noise_tex_id = m_perlin_noise->generateNoise(glm::vec2(m_position.x, m_position.y));
     }
 
-    void Draw(float amplitude, float time, GLuint left_tex, GLuint low_tex,
+    void Draw(float amplitude, float time, float water_height, GLuint left_tex, GLuint low_tex,
               const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
@@ -34,7 +34,7 @@ public:
                 BASE_TILE->setTextureId(m_chunk_noise_tex_id);
                 BASE_TILE->setTextureLeft(left_tex);
                 BASE_TILE->setTextureLow(low_tex);
-                BASE_TILE->Draw(glm::vec2(i, j), amplitude, time, glm::translate(model, glm::vec3(i, 0, j)), view,
+                BASE_TILE->Draw(glm::vec2(i, j), amplitude, water_height, time, glm::translate(model, glm::vec3(i, 0, j)), view,
                                 projection);
             }
         }

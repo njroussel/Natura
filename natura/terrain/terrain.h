@@ -54,9 +54,10 @@ public:
             for (size_t j = 0; j < m_chunks[i].size(); j++) {
                 GLuint left = j < m_chunks[i].size() - 1 ? m_chunks[i][j + 1]->getTextureId() : 0;
                 GLuint low = i < m_chunks.size() - 1 ? m_chunks[i + 1][j]->getTextureId() : 0;
-                m_chunks[i][j]->Draw(amplitude, time, left, low, glm::translate(_m, glm::vec3(i * CHUNK_SIDE_TILE_COUNT,
-                                                                                              0.0, j *
-                                                                                                   CHUNK_SIDE_TILE_COUNT)),
+                m_chunks[i][j]->Draw(amplitude, time, m_water_height * CHUNK_SIDE_TILE_COUNT, left, low,
+                                     glm::translate(_m, glm::vec3(i * CHUNK_SIDE_TILE_COUNT,
+                                                                  0.0, j *
+                                                                       CHUNK_SIDE_TILE_COUNT)),
                                      view, projection);
             }
         }
@@ -65,7 +66,7 @@ public:
                 for (size_t j = 0; j < m_chunks.size(); j++) {
                     m_water_grid.Draw(glm::vec2(i * CHUNK_SIDE_TILE_COUNT, j * CHUNK_SIDE_TILE_COUNT), time / 4.0f,
                                       glm::translate(glm::scale(_m, glm::vec3(CHUNK_SIDE_TILE_COUNT)),
-                                                     glm::vec3(i, water_height, j)), view, projection);
+                                                     glm::vec3(i, m_water_height, j)), view, projection);
                 }
             }
         }
@@ -125,7 +126,7 @@ public:
     enum Direction {
         NORTH, SOUTH, EST, WEST
     };
-    float water_height = WATER_HEIGHT;
+    float m_water_height = WATER_HEIGHT;
     glm::vec3 m_axis_pos = glm::vec3(0, 0, 0);
 
 private:

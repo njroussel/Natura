@@ -70,13 +70,16 @@ public:
         return m_matrix;
     }
 
-    mat4 getMirroredMatrix() {
+    mat4 getMirroredMatrix(float axisHeight) {
         mat4 mirrored = IDENTITY_MATRIX;
         vec3 pos = getPosition();
         mirrored = glm::rotate(mirrored, radians(-m_rotation.y), vec3(1.0f, 0.0f, 0.0f));
         mirrored = glm::rotate(mirrored, radians(m_rotation.x), vec3(0.0f, 1.0f, 0.0f));
-        pos = vec3(pos.x, -pos.y, pos.z);
-        mirrored = glm::translate(mirrored, pos);
+        cout << pos.y << endl;
+        cout << axisHeight << endl;
+        vec3 new_pos = vec3(pos.x, (axisHeight - (pos.y - axisHeight)), pos.z);
+        cout << new_pos.y << endl;
+        mirrored = glm::translate(mirrored, new_pos);
         return mirrored;
     }
 
@@ -172,7 +175,7 @@ private:
     BezierCurve *m_look_curve;
     BezierCurve *m_pos_curve;
     double m_bezier_time;
-    float m_rotation_speed = 5.f;
+    float m_rotation_speed = 2.f;
 
     Terrain *m_terrain;
     CAMERA_MODE m_mode;
