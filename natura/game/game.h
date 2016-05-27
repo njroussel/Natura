@@ -98,6 +98,7 @@ private:
     Camera *m_camera;
     glm::mat4 m_grid_model_matrix;
     Projection *m_projection;
+    float m_fps_sensitivity = 0.1;
 
     Trackball *m_trackball;
 
@@ -242,9 +243,7 @@ private:
                 (float) diffx * 0.1f; //set the xrot to xrot with the addition of the difference in the y position
         float yrot =
                 (float) diffy * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
-        cout << "diffx = " << diffx << endl;
-        cout << "diffy = " << diffy << endl;
-        vec2 tmp = vec2(xrot, yrot);
+        vec2 tmp = vec2(xrot * m_fps_sensitivity, yrot * m_fps_sensitivity);
         m_camera->AddRotationFPS(tmp);
         glfwSetCursorPos(window, m_window_width / 2, m_window_height / 2);
     }
