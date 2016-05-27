@@ -234,16 +234,19 @@ private:
         GLFWwindow *window = message->getWindow();
         double x = message->getCoordX();
         double y = message->getCoordY();
-        double diffx = x - m_last_mouse_xpos; //check the difference between the current x and the last x position
-        double diffy = y - m_last_mouse_ypos; //check the difference between the current y and the last y position
+        double diffx = x - m_window_width / 2; //check the difference between the current x and the last x position
+        double diffy = y - m_window_height / 2; //check the difference between the current y and the last y position
         m_last_mouse_xpos = x; //set lastx to the current x position
         m_last_mouse_ypos = y; //set lasty to the current y position
         float xrot =
-                (float) diffy * 0.1f; //set the xrot to xrot with the addition of the difference in the y position
+                (float) diffx * 0.1f; //set the xrot to xrot with the addition of the difference in the y position
         float yrot =
-                (float) diffx * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
+                (float) diffy * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
+        cout << "diffx = " << diffx << endl;
+        cout << "diffy = " << diffy << endl;
         vec2 tmp = vec2(xrot, yrot);
         m_camera->AddRotationFPS(tmp);
+        glfwSetCursorPos(window, m_window_width / 2, m_window_height / 2);
     }
 
     // Gets called when the windows/framebuffer is resized.
@@ -318,9 +321,14 @@ private:
                 m_look_curve.enableLoop(m_loop_curves);
                 m_pos_curve.enableLoop(m_loop_curves);
             }
-
             if (key == GLFW_KEY_P) {
                 m_reverse = !m_reverse;
+            }
+            if (key == GLFW_KEY_F){
+                if (m_camera->getCameraMode() == CAMERA_MODE::Fps)
+                    m_camera->enableFlyThroughtMode();
+                else
+                    m_camera->enableFpsMode();
             }
         }
 
@@ -370,7 +378,7 @@ private:
                                         - .05f);
                     break;
 
-                case GLFW_KEY_F:
+              /*  case GLFW_KEY_F:
                     m_perlinNoise->
                             setProperty(PerlinNoiseProperty::FREQUENCY,
                                         m_perlinNoise
@@ -386,7 +394,7 @@ private:
                                                 ->
                                                         getProperty(PerlinNoiseProperty::FREQUENCY)
                                         - 0.1f);
-                    break;
+                    break;*/
 
                 case GLFW_KEY_O:
                     m_perlinNoise->
