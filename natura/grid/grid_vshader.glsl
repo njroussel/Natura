@@ -14,7 +14,9 @@ uniform vec3 cam_pos;
 
 uniform sampler2D perlin_tex;
 uniform sampler2D left_tex;
+uniform bool left_present;
 uniform sampler2D low_tex;
+uniform bool low_present;
 
 
 out vec3 light_dir;
@@ -23,10 +25,10 @@ out mat4 MV;
 
 /* Sampler2D are opaque types so this function is handy to avoid duplication. */
 float getTextureVal(vec2 pos){
-    if(pos.x >= 1.0f){
+    if(pos.x >= 1.0f && low_present){
         return texture(low_tex, vec2(0.0f, pos.y)).r;
     }
-    else if (pos.y >= 1.0f){
+    else if (pos.y >= 1.0f && left_present){
         return texture(left_tex, vec2(pos.x, 0.0f)).r;
     }
     else{

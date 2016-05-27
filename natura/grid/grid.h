@@ -224,8 +224,11 @@ public:
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, texture_left_id_);
 
+        glUniform1i(glGetUniformLocation(program_id_, "left_present"), texture_left_id_ != 0);
+
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, texture_low_id_);
+        glUniform1i(glGetUniformLocation(program_id_, "low_present"), texture_low_id_ != 0);
 
         // draw
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
