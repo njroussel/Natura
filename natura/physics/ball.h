@@ -120,13 +120,14 @@ public:
             vec3 m = m_speed - dot(m_speed, normal) * normal;
             vec3 endpoint = m_position + m + m;
             vec3 new_speed = endpoint - (m_position + m_speed);
+            new_speed.y = -m_speed.y;
             float curr_speed = length(m_speed);
             if (curr_speed < 0.01f) {
                 m_speed = vec3(0.0f);
             }
             else {
                 m_position = vec3(m_position.x, terrainHeight, m_position.z);
-                m_speed = normalize(vec3(new_speed.x, -m_speed.y, new_speed.z)) * curr_speed * 0.8f;
+                m_speed = normalize(new_speed) * curr_speed * 0.7f;
             }
         }
     }
@@ -145,7 +146,7 @@ public:
 
         glm::mat4 M = model;
         M = glm::translate(model, m_position);
-        M = glm::scale(M, vec3(0.25f));
+        M = glm::scale(M, vec3(0.1f));
 
         glUseProgram(m_program_id);
         glBindVertexArray(m_vertex_array_id);
