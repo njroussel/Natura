@@ -104,24 +104,29 @@ public:
 
     void AddRotation() {
         vec2 addRotation = vec2(0.0f, 0.0f);
+        float speed = m_mode == CAMERA_MODE::Fps ? 1.f : m_rotation_speed;
         if (m_pressed[Left]) {
-            glm::vec2 rot = vec2(-m_rotation_speed, 0);
+            glm::vec2 rot = vec2(-speed, 0);
             addRotation += rot;
         }
         if (m_pressed[Right]) {
-            glm::vec2 rot = vec2(m_rotation_speed, 0);
+            glm::vec2 rot = vec2(speed, 0);
             addRotation += rot;
         }
         if (m_pressed[Up]) {
-            glm::vec2 rot = vec2(0, -m_rotation_speed);
+            glm::vec2 rot = vec2(0, -speed);
             addRotation += rot;
         }
         if (m_pressed[Down]) {
-            glm::vec2 rot = vec2(0, m_rotation_speed);
+            glm::vec2 rot = vec2(0, speed);
             addRotation += rot;
         }
 
         m_rotation += addRotation;
+        if (m_mode == CAMERA_MODE::Fps){
+            if (m_rotation.y > 90) m_rotation.y = 90;
+            else if (m_rotation.y < -90) m_rotation.y = -90;
+        }
     }
 
     bool hasAcceleration(DIRECTION dir) {
@@ -181,10 +186,14 @@ private:
     CAMERA_MODE m_mode;
 
     glm::vec3 getForwardDirection() {
-        vec3 tmp = vec3(-sin(radians(m_rotation.y + 90.0f)) * sin(radians(m_rotation.x)),
-
-                        -cos(radians(m_rotation.y + 90.0f)),
-                        sin(radians(m_rotation.y + 90.0f)) * cos(radians(m_rotation.x)));
+        float rot_y = m_rotation.y;
+        if (m_mode == CAMERA_MODE::Fps){
+            /* We need to do this in order to be able to walk when looking up. */
+            rot_y = 0.0;
+        }
+        vec3 tmp = vec3(-sin(radians(rot_y + 90.0f)) * sin(radians(m_rotation.x)),
+                        -cos(radians(rot_y + 90.0f)),
+                        sin(radians(rot_y + 90.0f)) * cos(radians(m_rotation.x)));
         return normalize(tmp);
     }
 

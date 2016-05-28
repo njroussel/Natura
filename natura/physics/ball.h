@@ -11,7 +11,7 @@ public:
     Ball(vec3 starting_position, vec3 starting_vector, Terrain *terrain) : MaterialPoint(1.0, 2.3f, starting_position) {
         m_terrain = terrain;
         m_max_distance = 3.0f;
-        m_speed = starting_vector;
+        m_speed = 0.5f * starting_vector;
         this->setAccelerationVector(vec3(0, -2.0f, 0));
 
         string error;
@@ -100,7 +100,7 @@ public:
 
     void tick(vec3 referencePoint) {
         _update_pos();
-        if(m_position.y < -1 * TERRAIN_SCALE * m_terrain->getHeight(glm::vec2(m_position.x/TERRAIN_SCALE, m_position.z/TERRAIN_SCALE))){
+        if(m_position.y / TERRAIN_SCALE < m_terrain->getHeight(glm::vec2(m_position.x/TERRAIN_SCALE, m_position.z/TERRAIN_SCALE))){
             m_speed = vec3(0.0f);
             setAccelerationVector(vec3(0.0f));
         }
