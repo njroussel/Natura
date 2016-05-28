@@ -81,24 +81,37 @@ public:
         }
     }
 
-    void ExpandTerrain(glm::vec3 cam_pos) {
+    void ExpandTerrain(glm::vec3 camera_position) {
         const uint32_t edge_threshold = 4;
-        cam_pos = -cam_pos;
-        glm::vec3 old = cam_pos;
-        cam_pos /= TERRAIN_SCALE;
-        cam_pos = getChunkPos(cam_pos);
-        if (cam_pos.z < edge_threshold) {
-            _expand(Terrain::Direction::NORTH);
-        }
-        else if (cam_pos.z > m_chunks[0].size() - 1 - edge_threshold) {
-            _expand(Terrain::Direction::SOUTH);
-        }
-        else if (cam_pos.x < edge_threshold) {
-            _expand(Terrain::Direction::WEST);
-        }
-        else if (cam_pos.x > m_chunks.size() - 1 - edge_threshold) {
-            _expand(Terrain::Direction::EST);
-        }
+        /* Redo: Used if the camera is too far away from the terrain so that we need to expand multiple time. */
+        bool redo = false;
+        //do {
+            glm::vec3 cam_pos = camera_position;
+            cam_pos = -cam_pos;
+            glm::vec3 old = cam_pos;
+            cam_pos /= TERRAIN_SCALE;
+            cam_pos = getChunkPos(cam_pos);
+            redo = true;
+            if (cam_pos.z < edge_threshold) {
+                _expand(Terrain::Direction::NORTH);
+                cout << "EXPANSINO" << endl;
+            }
+            else if (cam_pos.z > m_chunks[0].size() - 1 - edge_threshold) {
+                _expand(Terrain::Direction::SOUTH);
+                cout << "EXPANSINO" << endl;
+            }
+            else if (cam_pos.x < edge_threshold) {
+                _expand(Terrain::Direction::WEST);
+                cout << "EXPANSINO" << endl;
+            }
+            else if (cam_pos.x > m_chunks.size() - 1 - edge_threshold) {
+                _expand(Terrain::Direction::EST);
+                cout << "EXPANSINO" << endl;
+            }
+            else{
+                redo = false;
+            }
+        //}while (redo);
     }
 
     float getHeight(glm::vec2 pos) {
@@ -142,7 +155,6 @@ private:
     glm::vec3 getChunkPos(glm::vec3 pos) {
         pos /= CHUNK_SIDE_TILE_COUNT;
         pos -= glm::vec3(m_offset.x, 0, m_offset.y);
-        pos = abs(pos);
         pos.x = floor(pos.x);
         pos.z = floor(pos.z);
         return pos;
