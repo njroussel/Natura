@@ -1,7 +1,7 @@
 #version 330
 #define noise_size 4.0f
-#define min_fog_distance 30.0f
-#define max_fog_distance 40.0f
+#define min_fog_distance 45.0f
+#define max_fog_distance 60.0f
 
 in vec2 uv;
 in vec3 light_dir;
