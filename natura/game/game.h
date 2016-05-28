@@ -77,18 +77,9 @@ public:
                 BallOutOfBoundsMessage *message = reinterpret_cast<BallOutOfBoundsMessage *> (msg);
                 Ball *ball = message->getBallInstance();
                 ball->CleanUp();
-                size_t before = m_balls.size();
                 std::vector<Ball *>::iterator position = std::find(m_balls.begin(), m_balls.end(), ball);
                 if (position != m_balls.end()) // == myVector.end() means the element was not found
                     m_balls.erase(position);
-                size_t after = m_balls.size();
-                if (after == before-1){
-                    cout << "Ball REMOVED" << endl;
-                }
-                else {
-                    cout << "Ball NONNONONONONONT REMOVED." << endl;
-                }
-
                 break;
             }
 
