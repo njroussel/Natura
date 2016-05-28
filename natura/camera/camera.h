@@ -53,8 +53,15 @@ public:
             MaterialPoint::tick();
         if (m_mode == CAMERA_MODE::Fps){
             /* We snap the camera to the ground */
-            float h = -1 * TERRAIN_SCALE * m_terrain->getHeight(glm::vec2(-m_position.x/TERRAIN_SCALE, -m_position.z/TERRAIN_SCALE)) - 0.2f;
-            m_position.y = h;
+            try {
+                float h = -1 * TERRAIN_SCALE * m_terrain->getHeight(
+                        glm::vec2(-m_position.x / TERRAIN_SCALE, -m_position.z / TERRAIN_SCALE)) - 0.2f;
+                m_position.y = h;
+            }
+            catch (std::runtime_error e){
+                /* Fall back mode : FlyThrough */
+                m_mode = CAMERA_MODE::Flythrough;
+            }
         }
         else if (m_mode == CAMERA_MODE::Bezier) {
             double time = glfwGetTime();
