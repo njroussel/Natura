@@ -16,7 +16,7 @@ void main() {
     //>>>>>>>>>> TODO >>>>>>>>>>>
     // TODO 1.2: Phong shading.
     // 1) compute ambient term.
-    /*vec3 ambient = ka * La;
+    vec3 ambient = ka * La;
 
     // 2) compute diffuse term.
     float dotNl = dot(normal_mv, light_dir) < 0.0f ? 0.0f : dot(normal_mv, light_dir);
@@ -27,7 +27,7 @@ void main() {
     r = normalize(r);
     float dotRv = dot(r, view_dir) < 0.0f ? 0.0f : dot(r, view_dir);
 
-    vec3 specular = ks * pow(dotRv, alpha) * Ls;*/
-    color = vec3(0.0f);// ambient + diffuse + specular;
+    vec3 specular = ks * pow(dotRv, alpha) * Ls;
+    color = ambient + diffuse + specular;
     //<<<<<<<<<< TODO <<<<<<<<<<<
 }

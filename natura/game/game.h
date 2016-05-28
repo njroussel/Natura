@@ -186,6 +186,9 @@ private:
             cout << "Ticks : " << 1 / (time - m_last_time_tick) << endl;
             m_last_time_tick = time;
             m_camera->tick();
+            for(int i = 0; i < m_balls.size(); i++){
+                m_balls[i]->tick(-m_camera->getPosition());
+            }
         }
 
 
@@ -330,7 +333,7 @@ private:
             }
 
             if (key == GLFW_KEY_P) {
-                m_balls.push_back(new Ball(m_camera->getPosition(), vec3(0.0f)));
+                m_balls.push_back(new Ball(-m_camera->getFrontPoint(), -(m_camera->getFrontPoint() - m_camera->getPosition()), m_terrain));
             }
         }
 

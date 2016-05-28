@@ -21,7 +21,7 @@ typedef enum CAMERA_MODE {
 class Camera : public MaterialPoint {
 public:
 
-    Camera(vec3 &starting_position, vec2 &starting_rotation, Terrain *terrain) : MaterialPoint(1.0, starting_position) {
+    Camera(vec3 &starting_position, vec2 &starting_rotation, Terrain *terrain) : MaterialPoint(1.0, 0.4f, starting_position) {
         m_rotation = vec2(starting_rotation.x, starting_rotation.y);
         m_matrix = IDENTITY_MATRIX;
         m_pressed[Forward] = false;
@@ -191,20 +191,20 @@ private:
     void _update_acc() {
         vec3 fwdDirection = getForwardDirection();
         if (m_pressed[Forward] && !m_pressed[Backward]) {
-            setAccelerationVector(fwdDirection);
+            forceSpeedDirectionAlongAcceleration(fwdDirection);
         }
         else if (!m_pressed[Forward] && m_pressed[Backward]) {
-            setAccelerationVector(-fwdDirection);
+            forceSpeedDirectionAlongAcceleration(-fwdDirection);
         }
         else {
             if (isMoving()) {
                 vec3 currentSpeed = getSpeedVector();
                 float direction = dot(currentSpeed, fwdDirection);
                 if (direction < 0) {
-                    setAccelerationVector(fwdDirection);
+                    forceSpeedDirectionAlongAcceleration(fwdDirection);
                 }
                 else {
-                    setAccelerationVector(-fwdDirection);
+                    forceSpeedDirectionAlongAcceleration(-fwdDirection);
                 }
             }
         }
