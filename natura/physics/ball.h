@@ -7,12 +7,13 @@
 
 class Ball : public MaterialPoint {
 
-    Ball(vec3 &starting_position, vec3 starting_vector) : MaterialPoint(1.0, starting_position) {
+public:
+    Ball(vec3 starting_position, vec3 starting_vector) : MaterialPoint(1.0, starting_position) {
         m_position = starting_position;
         string error;
         // obj files can contains material informations
         vector<tinyobj::material_t> materials;
-        string filename = "shpere.obj";
+        string filename = "sphere.obj";
 
         bool objLoadReturn = tinyobj::LoadObj(m_shapes, materials, error, filename.c_str());
 
@@ -57,10 +58,63 @@ class Ball : public MaterialPoint {
                      number_of_indices * sizeof(unsigned int),
                      &m_shapes[0].mesh.indices[0], GL_STATIC_DRAW);
 
+        glBindVertexArray(0);
+
+        m_program_id = icg_helper::LoadShaders("ball_vshader.glsl",
+                                               "ball_fshader.glsl");
     }
 
     void tick() {
 
+    }
+
+    void Draw(const glm::mat4 &model = IDENTITY_MATRIX,
+              const glm::mat4 &view = IDENTITY_MATRIX,
+              const glm::mat4 &projection = IDENTITY_MATRIX) {
+
+        glm::mat4 M = model;
+        M = glm::translate(model, m_position);
+
+        glUseProgram(m_program_id);
+        glBindVertexArray(m_vertex_array_id);
+
+        GLint vertex_point_id = glGetAttribLocation(m_program_id, "vpoint");
+        if (vertex_point_id >= 0) {
+            glEnableVertexAttribArray(vertex_point_id);
+
+            glBindBuffer(GL_ARRAY_BUFFER, m_vertex_buffer_object);
+            glVertexAttribPointer(vertex_point_id, 3 /*vec3*/, GL_FLOAT,
+                                  DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
+        }
+
+        // vertex attribute id for normals
+        GLint vertex_normal_id = glGetAttribLocation(m_program_id, "vnormal");
+        if (vertex_normal_id >= 0) {
+            glEnableVertexAttribArray(vertex_normal_id);
+            glBindBuffer(GL_ARRAY_BUFFER, m_vertex_normal_buffer_object);
+            glVertexAttribPointer(vertex_normal_id, 3 /*vec3*/, GL_FLOAT,
+                                  DONT_NORMALIZE, ZERO_STRIDE, ZERO_BUFFER_OFFSET);
+        }
+
+        GLint model_id = glGetUniformLocation(m_program_id, "model");
+        glUniformMatrix4fv(model_id, ONE, DONT_TRANSPOSE, glm::value_ptr(M));
+
+        GLint view_id = glGetUniformLocation(m_program_id, "view");
+        glUniformMatrix4fv(view_id, ONE, DONT_TRANSPOSE, glm::value_ptr(view));
+
+        GLint projection_id = glGetUniformLocation(m_program_id, "projection");
+        glUniformMatrix4fv(projection_id, ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
+
+        glDrawElements(GL_TRIANGLES, /*#vertices*/ m_shapes[0].mesh.indices.size(),
+                       GL_UNSIGNED_INT, ZERO_BUFFER_OFFSET);
+
+        vertex_point_id = glGetAttribLocation(m_program_id, "vpoint");
+        if (vertex_point_id >= 0) {
+            glDisableVertexAttribArray(vertex_point_id);
+        }
+
+        glUseProgram(0);
+        glBindVertexArray(0);
     }
 
 private:

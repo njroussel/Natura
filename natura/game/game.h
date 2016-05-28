@@ -127,6 +127,8 @@ private:
 
     bool m_reverse = false;
 
+    vector<Ball*> m_balls;
+
 
     /* Private function. */
     void Init() {
@@ -204,6 +206,11 @@ private:
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix,
                         m_camera->GetMatrix(),
                         m_projection->perspective());
+
+        for(int i = 0; i < m_balls.size(); i++){
+            m_balls[i]->Draw(IDENTITY_MATRIX, m_camera->GetMatrix(), m_projection->perspective());
+        }
+
         if (m_look_curve.Size() > 1 && m_pos_curve.Size() > 1 && m_draw_curves) {
             m_look_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
             m_pos_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
@@ -323,7 +330,7 @@ private:
             }
 
             if (key == GLFW_KEY_P) {
-                m_reverse = !m_reverse;
+                m_balls.push_back(new Ball(m_camera->getPosition(), vec3(0.0f)));
             }
         }
 
