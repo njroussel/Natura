@@ -52,10 +52,13 @@ public:
             for (size_t j = 0; j < m_chunks[i].size(); j++) {
                 GLuint left = j < m_chunks[i].size() - 1 ? m_chunks[i][j + 1]->getTextureId() : 0;
                 GLuint low = i < m_chunks.size() - 1 ? m_chunks[i + 1][j]->getTextureId() : 0;
-                GLuint low_left = i < m_chunks.size() - 1 && j < m_chunks[i].size() - 1 ? m_chunks[i+1][j+1]->getTextureId() : 0;
-                m_chunks[i][j]->Draw(amplitude, time, m_water_height * CHUNK_SIDE_TILE_COUNT, left, low, low_left, glm::translate(_m, glm::vec3(i * CHUNK_SIDE_TILE_COUNT,
-                                                                                              0.0, j *
-                                                                                                   CHUNK_SIDE_TILE_COUNT)),
+                GLuint low_left =
+                        i < m_chunks.size() - 1 && j < m_chunks[i].size() - 1 ? m_chunks[i + 1][j + 1]->getTextureId()
+                                                                              : 0;
+                m_chunks[i][j]->Draw(amplitude, time, m_water_height * CHUNK_SIDE_TILE_COUNT, left, low, low_left,
+                                     glm::translate(_m, glm::vec3(i * CHUNK_SIDE_TILE_COUNT,
+                                                                  0.0, j *
+                                                                       CHUNK_SIDE_TILE_COUNT)),
                                      view, projection);
             }
         }
@@ -84,37 +87,43 @@ public:
         /* Redo: Used if the camera is too far away from the terrain so that we need to expand multiple time. */
         bool redo = false;
         //do {
-            glm::vec3 cam_pos = camera_position;
-            cam_pos = -cam_pos;
-            glm::vec3 old = cam_pos;
-            cam_pos /= TERRAIN_SCALE;
-            cam_pos = getChunkPos(cam_pos);
-            redo = true;
-            if (cam_pos.z < edge_threshold) {
-                _expand(Terrain::Direction::NORTH);
-                cout << "EXPANSINO" << endl;
-            }
-            else if (cam_pos.z > m_chunks[0].size() - 1 - edge_threshold) {
-                _expand(Terrain::Direction::SOUTH);
-                cout << "EXPANSINO" << endl;
-            }
-            else if (cam_pos.x < edge_threshold) {
-                _expand(Terrain::Direction::WEST);
-                cout << "EXPANSINO" << endl;
-            }
-            else if (cam_pos.x > m_chunks.size() - 1 - edge_threshold) {
-                _expand(Terrain::Direction::EST);
-                cout << "EXPANSINO" << endl;
-            }
-            else{
-                redo = false;
-            }
+        glm::vec3 cam_pos = camera_position;
+        cam_pos = -cam_pos;
+        glm::vec3 old = cam_pos;
+        cam_pos /= TERRAIN_SCALE;
+        cam_pos = getChunkPos(cam_pos);
+        redo = true;
+        if (cam_pos.z < edge_threshold) {
+            _expand(Terrain::Direction::NORTH);
+            cout << "EXPANSINO" << endl;
+        }
+        else if (cam_pos.z > m_chunks[0].size() - 1 - edge_threshold) {
+            _expand(Terrain::Direction::SOUTH);
+            cout << "EXPANSINO" << endl;
+        }
+        else if (cam_pos.x < edge_threshold) {
+            _expand(Terrain::Direction::WEST);
+            cout << "EXPANSINO" << endl;
+        }
+        else if (cam_pos.x > m_chunks.size() - 1 - edge_threshold) {
+            _expand(Terrain::Direction::EST);
+            cout << "EXPANSINO" << endl;
+        }
+        else {
+            redo = false;
+        }
         //}while (redo);
     }
 
     float getHeight(glm::vec2 pos) {
         glm::vec3 tmp = glm::vec3(pos.x, 0, pos.y);
         tmp = getChunkPos(tmp);
+        vec2 minPos = m_chunks[0][0]->getPosition();
+        vec2 maxPos = m_chunks[m_chunks.size() - 1][m_chunks[m_chunks.size() - 1].size() - 1]->getPosition();
+
+        if (tmp.x < minPos.x || tmp.z < minPos.y || tmp.x > maxPos.x || tmp.z > maxPos.y){
+            return  NULL;
+        }
         glm::vec2 chunk_idx = glm::vec2(tmp.x, tmp.z);
         FrameBuffer *frameBuffer = m_perlin_noise->getFrameBufferForChunk(chunk_idx);
         glm::vec2 pos_on_tex = pos - glm::vec2((chunk_idx.x + m_offset.x) * CHUNK_SIDE_TILE_COUNT,

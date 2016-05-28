@@ -211,7 +211,7 @@ private:
                         m_projection->perspective());
 
         for(int i = 0; i < m_balls.size(); i++){
-            m_balls[i]->Draw(IDENTITY_MATRIX, m_camera->GetMatrix(), m_projection->perspective());
+            m_balls[i]->Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
         }
 
         if (m_look_curve.Size() > 1 && m_pos_curve.Size() > 1 && m_draw_curves) {
@@ -333,7 +333,7 @@ private:
                 m_pos_curve.enableLoop(m_loop_curves);
             }
             if (key == GLFW_KEY_P) {
-                m_balls.push_back(new Ball(-m_camera->getFrontPoint(), -(m_camera->getFrontPoint() - m_camera->getPosition()), m_terrain));
+                m_balls.push_back(new Ball(-m_camera->getFrontPoint() / TERRAIN_SCALE, -(m_camera->getFrontPoint() - m_camera->getPosition()), m_terrain));
             }
             if (key == GLFW_KEY_F){
                 if (m_camera->getCameraMode() == CAMERA_MODE::Fps)
