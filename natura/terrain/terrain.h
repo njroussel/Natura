@@ -8,9 +8,7 @@
 #include "chunk/chunk_generation/chunk_factory.h"
 #include "../water_grid/water_grid.h"
 #include "../skybox/skybox.h"
-
-#define TERRAIN_SCALE 2.0f
-#define WATER_HEIGHT -0.75f
+#include "../config.h"
 
 class Terrain {
 public:

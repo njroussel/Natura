@@ -7,8 +7,7 @@
 #include "../../../common/icg_helper.h"
 #include "../../../external/glm/detail/type_mat.hpp"
 #include "../../../external/glm/gtc/matrix_transform.hpp"
-
-#define CHUNK_SIDE_TILE_COUNT 4
+#include "../../config.h"
 
 
 class Chunk : public Observer {
