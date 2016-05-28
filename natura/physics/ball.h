@@ -125,6 +125,7 @@ public:
                 m_speed = vec3(0.0f);
             }
             else {
+                m_position = vec3(m_position.x, terrainHeight, m_position.z);
                 m_speed = normalize(vec3(new_speed.x, -m_speed.y, new_speed.z)) * curr_speed * 0.8f;
             }
         }

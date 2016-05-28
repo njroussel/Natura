@@ -118,14 +118,12 @@ public:
     float getHeight(glm::vec2 pos) {
         glm::vec3 tmp = glm::vec3(pos.x, 0, pos.y);
         tmp = getChunkPos(tmp);
-        vec2 minPos = m_chunks[0][0]->getPosition();
-        vec2 maxPos = m_chunks[m_chunks.size() - 1][m_chunks[m_chunks.size() - 1].size() - 1]->getPosition();
 
-        if (tmp.x < minPos.x || tmp.z < minPos.y || tmp.x > maxPos.x || tmp.z > maxPos.y){
-            return  NULL;
-        }
         glm::vec2 chunk_idx = glm::vec2(tmp.x, tmp.z);
         FrameBuffer *frameBuffer = m_perlin_noise->getFrameBufferForChunk(chunk_idx);
+        if(frameBuffer == NULL){
+            return NULL;
+        }
         glm::vec2 pos_on_tex = pos - glm::vec2((chunk_idx.x + m_offset.x) * CHUNK_SIDE_TILE_COUNT,
                                                (chunk_idx.y + m_offset.y) * CHUNK_SIDE_TILE_COUNT);
 

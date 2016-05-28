@@ -130,6 +130,9 @@ public:
         int m = m_frame_buffers.size();
         chunkpos.x = (int)chunkpos.x % m;
         chunkpos.y = (int)chunkpos.y % m;
+        if(chunkpos.x < 0 || chunkpos.y < 0){
+            return NULL;
+        }
         return &m_frame_buffers[(int)chunkpos.y][(int)chunkpos.x];
     }
 
