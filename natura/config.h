@@ -12,4 +12,5 @@
 #define WATER_HEIGHT -0.75f
 /* Number of sub-tiles per chunk. */
 #define CHUNK_SIDE_TILE_COUNT 4
-
+/* Maximum time a ball can stay in a frozen state. */
+#define BALL_MAX_FROZEN_TIME 30.f

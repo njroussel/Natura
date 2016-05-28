@@ -13,6 +13,7 @@ public:
         m_terrain = terrain;
         m_max_distance = 3.0f;
         m_speed = 0.4f * starting_vector;
+        m_frozen = false;
         this->setAccelerationVector(vec3(0, -1.0f, 0));
 
         string error;
@@ -100,43 +101,54 @@ public:
     }
 
     void tick(vec3 referencePoint) {
-        if (length(m_speed) < 0.01f) {
-            return;
-        }
-        _update_pos();
-        try {
-            float terrainHeight = m_terrain->getHeight(glm::vec2(m_position.x, m_position.z));
-            if (terrainHeight == NULL) {
-                m_speed = vec3(0.0f);
-                setAccelerationVector(vec3(0.0f));
+        if (length(m_speed) < 0.01f || m_frozen) {
+            if (!m_frozen){
+                m_frozen = true;
+                m_froze_time = glfwGetTime();
             }
-            else if (m_position.y < terrainHeight) {
-                float epsilon = 0.005f;
-                float zDiffXaxis = m_terrain->getHeight(vec2(m_position.x + epsilon, m_position.z)) -
-                                   m_terrain->getHeight(vec2(m_position.x - epsilon, m_position.z));
-
-                float zDiffYaxis = m_terrain->getHeight(vec2(m_position.x, m_position.z + epsilon)) -
-                                   m_terrain->getHeight(vec2(m_position.x, m_position.z - epsilon));
-
-                vec3 normal = -normalize(
-                        cross(vec3(2 * epsilon, zDiffXaxis, 0.0f), vec3(0.0, zDiffYaxis, 2 * epsilon)));
-                vec3 m = m_speed - dot(m_speed, normal) * normal;
-                vec3 endpoint = m_position + m + m;
-                vec3 new_speed = endpoint - (m_position + m_speed);
-                new_speed.y = -m_speed.y;
-                float curr_speed = length(m_speed);
-                if (curr_speed < 0.01f) {
+            else{
+                double time = glfwGetTime();
+                if (time - m_froze_time > BALL_MAX_FROZEN_TIME){
+                    notify(new BallOutOfBoundsMessage(this));
+                }
+            }
+        }
+        else{
+            _update_pos();
+            try {
+                float terrainHeight = m_terrain->getHeight(glm::vec2(m_position.x, m_position.z));
+                if (terrainHeight == NULL) {
                     m_speed = vec3(0.0f);
+                    setAccelerationVector(vec3(0.0f));
                 }
-                else {
-                    m_position = vec3(m_position.x, terrainHeight, m_position.z);
-                    m_speed = normalize(new_speed) * curr_speed * 0.7f;
+                else if (m_position.y < terrainHeight) {
+                    float epsilon = 0.005f;
+                    float zDiffXaxis = m_terrain->getHeight(vec2(m_position.x + epsilon, m_position.z)) -
+                                       m_terrain->getHeight(vec2(m_position.x - epsilon, m_position.z));
+
+                    float zDiffYaxis = m_terrain->getHeight(vec2(m_position.x, m_position.z + epsilon)) -
+                                       m_terrain->getHeight(vec2(m_position.x, m_position.z - epsilon));
+
+                    vec3 normal = -normalize(
+                            cross(vec3(2 * epsilon, zDiffXaxis, 0.0f), vec3(0.0, zDiffYaxis, 2 * epsilon)));
+                    vec3 m = m_speed - dot(m_speed, normal) * normal;
+                    vec3 endpoint = m_position + m + m;
+                    vec3 new_speed = endpoint - (m_position + m_speed);
+                    new_speed.y = -m_speed.y;
+                    float curr_speed = length(m_speed);
+                    if (curr_speed < 0.01f) {
+                        m_speed = vec3(0.0f);
+                    }
+                    else {
+                        m_position = vec3(m_position.x, terrainHeight, m_position.z);
+                        m_speed = normalize(new_speed) * curr_speed * 0.7f;
+                    }
                 }
             }
-        }
-        catch (std::runtime_error e){
-            /* Need to destroy the ball. */
-            notify(new BallOutOfBoundsMessage(this));
+            catch (std::runtime_error e){
+                /* Need to destroy the ball. */
+                notify(new BallOutOfBoundsMessage(this));
+            }
         }
     }
 
@@ -206,6 +218,8 @@ private:
     GLuint m_vertex_array_id;                // vertex array object
     GLuint m_program_id;
     float m_max_distance;
+    bool m_frozen;
+    float m_froze_time;
     Terrain *m_terrain;
 };
 
