@@ -16,7 +16,7 @@
 #include "../config.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-class Game : public Observer {
+class Game : public Observer{
 public:
     Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window),
                                m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window) {
@@ -72,6 +72,25 @@ public:
             case Message::Type::FRAMEBUFFER_SIZE_CHANGE :
                 resize_callback(reinterpret_cast<FrameBufferSizeHandlerMessage *>(msg));
                 break;
+
+            case Message::Type::BALL_OUT_OF_BOUNDS : {
+                BallOutOfBoundsMessage *message = reinterpret_cast<BallOutOfBoundsMessage *> (msg);
+                Ball *ball = message->getBallInstance();
+                ball->CleanUp();
+                size_t before = m_balls.size();
+                std::vector<Ball *>::iterator position = std::find(m_balls.begin(), m_balls.end(), ball);
+                if (position != m_balls.end()) // == myVector.end() means the element was not found
+                    m_balls.erase(position);
+                size_t after = m_balls.size();
+                if (after == before-1){
+                    cout << "Ball REMOVED" << endl;
+                }
+                else {
+                    cout << "Ball NONNONONONONONT REMOVED." << endl;
+                }
+
+                break;
+            }
 
             default:
                 throw std::string("Error : Unexpected message in class Game");
@@ -133,7 +152,7 @@ private:
     /* Private function. */
     void Init() {
         const bool top_down_view = false;
-        const int TERRAIN_SIZE = 10;
+        const int TERRAIN_SIZE = TERRAIN_CHUNK_SIZE;
         const int VERT_PER_GRID_SIDE = 8;
         const float cam_posxy = TERRAIN_SCALE * ((float) (TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
 
@@ -333,7 +352,9 @@ private:
                 m_pos_curve.enableLoop(m_loop_curves);
             }
             if (key == GLFW_KEY_P) {
-                m_balls.push_back(new Ball(-m_camera->getFrontPoint() / TERRAIN_SCALE, -(m_camera->getFrontPoint() - m_camera->getPosition()), m_terrain));
+                Ball *new_ball = new Ball(-m_camera->getFrontPoint() / TERRAIN_SCALE, -(m_camera->getFrontPoint() - m_camera->getPosition()), m_terrain);
+                m_balls.push_back(new_ball);
+                new_ball->attach(this);
             }
             if (key == GLFW_KEY_F){
                 if (m_camera->getCameraMode() == CAMERA_MODE::Fps)

@@ -4,8 +4,9 @@
 #include <GLFW/glfw3.h>
 #include "icg_helper.h"
 #include "../physics/material_point.h"
+#include "../misc/observer_subject/messages/ball_out_of_bound_message.h"
 
-class Ball : public MaterialPoint {
+class Ball : public MaterialPoint, public Subject{
 
 public:
     Ball(vec3 starting_position, vec3 starting_vector, Terrain *terrain) : MaterialPoint(1.0, 2.3f, starting_position) {
@@ -103,32 +104,39 @@ public:
             return;
         }
         _update_pos();
-        float terrainHeight = m_terrain->getHeight(glm::vec2(m_position.x, m_position.z));
-        if (terrainHeight == NULL) {
-            m_speed = vec3(0.0f);
-            setAccelerationVector(vec3(0.0f));
-        }
-        else if (m_position.y < terrainHeight) {
-            float epsilon = 0.005f;
-            float zDiffXaxis = m_terrain->getHeight(vec2(m_position.x + epsilon, m_position.z)) -
-                               m_terrain->getHeight(vec2(m_position.x - epsilon, m_position.z));
-
-            float zDiffYaxis = m_terrain->getHeight(vec2(m_position.x, m_position.z + epsilon)) -
-                               m_terrain->getHeight(vec2(m_position.x, m_position.z - epsilon));
-
-            vec3 normal = -normalize(cross(vec3(2 * epsilon, zDiffXaxis, 0.0f), vec3(0.0, zDiffYaxis, 2 * epsilon)));
-            vec3 m = m_speed - dot(m_speed, normal) * normal;
-            vec3 endpoint = m_position + m + m;
-            vec3 new_speed = endpoint - (m_position + m_speed);
-            new_speed.y = -m_speed.y;
-            float curr_speed = length(m_speed);
-            if (curr_speed < 0.01f) {
+        try {
+            float terrainHeight = m_terrain->getHeight(glm::vec2(m_position.x, m_position.z));
+            if (terrainHeight == NULL) {
                 m_speed = vec3(0.0f);
+                setAccelerationVector(vec3(0.0f));
             }
-            else {
-                m_position = vec3(m_position.x, terrainHeight, m_position.z);
-                m_speed = normalize(new_speed) * curr_speed * 0.7f;
+            else if (m_position.y < terrainHeight) {
+                float epsilon = 0.005f;
+                float zDiffXaxis = m_terrain->getHeight(vec2(m_position.x + epsilon, m_position.z)) -
+                                   m_terrain->getHeight(vec2(m_position.x - epsilon, m_position.z));
+
+                float zDiffYaxis = m_terrain->getHeight(vec2(m_position.x, m_position.z + epsilon)) -
+                                   m_terrain->getHeight(vec2(m_position.x, m_position.z - epsilon));
+
+                vec3 normal = -normalize(
+                        cross(vec3(2 * epsilon, zDiffXaxis, 0.0f), vec3(0.0, zDiffYaxis, 2 * epsilon)));
+                vec3 m = m_speed - dot(m_speed, normal) * normal;
+                vec3 endpoint = m_position + m + m;
+                vec3 new_speed = endpoint - (m_position + m_speed);
+                new_speed.y = -m_speed.y;
+                float curr_speed = length(m_speed);
+                if (curr_speed < 0.01f) {
+                    m_speed = vec3(0.0f);
+                }
+                else {
+                    m_position = vec3(m_position.x, terrainHeight, m_position.z);
+                    m_speed = normalize(new_speed) * curr_speed * 0.7f;
+                }
             }
+        }
+        catch (std::runtime_error e){
+            /* Need to destroy the ball. */
+            notify(new BallOutOfBoundsMessage(this));
         }
     }
 

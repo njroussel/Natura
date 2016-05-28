@@ -6,6 +6,8 @@
 #define TICK (1.f / 60.f)
 /* Scale of the terrain. */
 #define TERRAIN_SCALE 2.0f
+/* Size of the terrain in chunks. */
+#define TERRAIN_CHUNK_SIZE 10
 /* Height of the water grid. */
 #define WATER_HEIGHT -0.75f
 /* Number of sub-tiles per chunk. */
