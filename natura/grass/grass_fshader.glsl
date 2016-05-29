@@ -10,15 +10,14 @@ uniform float fAlphaMultiplier;
 
 void main()
 {
-   vec4 vTexColor = texture2D(gSampler, vTexCoord);
-   float fNewAlpha = vTexColor.a*fAlphaMultiplier;
+    vec4 vTexColor = texture2D(gSampler, vec2(vTexCoord.x, -vTexCoord.y));
+    float fNewAlpha = vTexColor.a;
 
 
-   if(fNewAlpha > 1.0f)
-      fNewAlpha = 1.0f;
+      if(fNewAlpha > 1.0f)
+         fNewAlpha = 1.0f;
 
-   vec4 vMixedColor = vTexColor*vColor;
+    vec4 vMixedColor = vTexColor;
 
-   //outputColor = vec4(vMixedColor.zyx, fNewAlpha);
-  color = vec4(1.0f);
+    color = vec4(vMixedColor.rgb, fNewAlpha);
 }

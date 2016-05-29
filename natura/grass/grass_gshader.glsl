@@ -42,7 +42,7 @@ float randZeroOne()
 int randomInt(int min, int max)
 {
 	float fRandomFloat = randZeroOne();
-	return int(float(min)+fRandomFloat*float(max-min));
+	return 2;
 }
 
 void main()

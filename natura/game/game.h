@@ -173,9 +173,6 @@ private:
         m_camera = new Camera(starting_camera_position, starting_camera_rotation, m_terrain);
         //m_camera->enableFpsMode();
 
-        m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
-        m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
-
         // sets background color b
         glClearColor(0, 0, 0/*gray*/, 1.0 /*solid*/);
 
@@ -192,7 +189,7 @@ private:
         m_perlinNoise->Init();
         GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
-        m_grass = new Grass(0.1f,0.2f,4.0f,0.5f,0.7f,0.5f,0.7f,m_terrain);
+        m_grass = new Grass(0.1f,0.2f,0.2f,0.5f,0.6f,0.5f,0.6f,m_terrain);
         m_grass->Init();
 
     }

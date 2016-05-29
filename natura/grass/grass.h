@@ -61,8 +61,8 @@ public :
             while (vCurPatchPos.x < m_maxXpos) {
                 vCurPatchPos.z = m_minZpos;
                 while (vCurPatchPos.z < m_maxZpos) {
-                    vCurPatchPos.z += m_fGrassPatchOffsetMin ; //+
-                                      //(m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
+                    vCurPatchPos.z += m_fGrassPatchOffsetMin; //+
+                    //(m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
                     vCurPatchPos.y = m_terrain->getHeight(vec2(vCurPatchPos.x, vCurPatchPos.z));
                     m_grass_triangles_count += 1;
                     vertex_point.push_back(vCurPatchPos.x);
@@ -70,8 +70,8 @@ public :
                     vertex_point.push_back(vCurPatchPos.z);
                 }
 
-                vCurPatchPos.x += m_fGrassPatchOffsetMin ;//+
-                                 // (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
+                vCurPatchPos.x += m_fGrassPatchOffsetMin;//+
+                // (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
             }
 
             // buffer
@@ -87,8 +87,10 @@ public :
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
 
+
         m_texture_id = loadDDS("grassPack.dds");
         glUniform1i(glGetUniformLocation(program_id_, "gSampler"), 0 /*GL_TEXTURE*/);
+
 
         glBindVertexArray(0);
         glUseProgram(0);
@@ -106,12 +108,12 @@ public :
         glUniformMatrix4fv(glGetUniformLocation(program_id_, "projection"), ONE, DONT_TRANSPOSE,
                            glm::value_ptr(projection));
 
+        glUniform1f(glGetUniformLocation(program_id_, "time"), time);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, m_texture_id);
 
 
-        glUniform1f(glGetUniformLocation(program_id_, "time"), time);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
@@ -125,15 +127,15 @@ public :
     }
 
     GLuint loadDDS(const char *imagepath) {
-
         unsigned char header[124];
 
         FILE *fp;
 
         /* try to open the file */
         fp = fopen(imagepath, "rb");
-        if (fp == NULL)
+        if (fp == NULL) {
             return 0;
+        }
 
         /* verify the type of file */
         char filecode[4];
@@ -152,41 +154,56 @@ public :
         unsigned int mipMapCount = *(unsigned int *) &(header[24]);
         unsigned int fourCC = *(unsigned int *) &(header[80]);
 
-        unsigned char * buffer;
+        unsigned char *buffer;
         unsigned int bufsize;
+
         /* how big is it going to be including all mipmaps? */
         bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize;
-        buffer = (unsigned char*)malloc(bufsize * sizeof(unsigned char));
+        buffer = (unsigned char *) malloc(bufsize * sizeof(unsigned char));
         fread(buffer, 1, bufsize, fp);
+
         /* close the file pointer */
         fclose(fp);
 
-        unsigned int format;
-        format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+        unsigned int format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+
+        // Create one OpenGL texture
         GLuint textureID;
         glGenTextures(1, &textureID);
 
         // "Bind" the newly created texture : all future texture functions will modify this texture
         glBindTexture(GL_TEXTURE_2D, textureID);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
-        unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
+        unsigned int blockSize = 8;
         unsigned int offset = 0;
 
         /* load the mipmaps */
-        for (unsigned int level = 0; level < mipMapCount && (width || height); ++level)
-        {
-            unsigned int size = ((width+3)/4)*((height+3)/4)*blockSize;
+        for (unsigned int level = 0; level < 1 && (width || height); ++level) {
+            unsigned int size = ((width + 3) / 4) * ((height + 3) / 4) * blockSize;
             glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height,
                                    0, size, buffer + offset);
 
             offset += size;
-            width  /= 2;
-            height /= 2;
+            width = width/2 > 1 ? width/2 : 1;
+            height = height/2 > 1 ? height/2 : 1;
         }
+
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
         free(buffer);
+
+        //Unbind the texture
+        glBindTexture(GL_TEXTURE_2D, 0);
+
 
         return textureID;
     }
+
+
 };
 
 
