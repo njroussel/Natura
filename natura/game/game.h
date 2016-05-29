@@ -169,7 +169,7 @@ private:
 
         // enable depth test.
         glEnable(GL_DEPTH_TEST);
-        glEnable(GL_MULTISAMPLE);
+        //glEnable(GL_MULTISAMPLE);
         m_grid_model_matrix = IDENTITY_MATRIX;
         //m_grid_model_matrix = translate(m_grid_model_matrix, vec3(-4.0f, -0.25f, -4.0f));
         m_grid_model_matrix = scale(m_grid_model_matrix, vec3(TERRAIN_SCALE, TERRAIN_SCALE, TERRAIN_SCALE));
@@ -215,7 +215,7 @@ private:
                              0.5f, 0.5f, 0.5f, 1.0f);
 
         check_error_gl();
-        m_depth_tex = m_shadow_buffer.Init();
+        m_depth_tex = 0;// m_shadow_buffer.Init();
         BASE_TILE->setDepthTex(m_depth_tex);
     }
 

@@ -198,7 +198,7 @@ public:
             glUniform1i(glGetUniformLocation(program_id_, "left_tex"), 6/*GL_TEXTURE0*/);
             glUniform1i(glGetUniformLocation(program_id_, "low_tex"), 7 /*GL_TEXTURE0*/);
             glUniform1i(glGetUniformLocation(program_id_, "low_left_tex"), 8 /*GL_TEXTURE0*/);
-            glUniform1i(glGetUniformLocation(program_id_, "shadow_map"), 9 /*GL_TEXTURE0*/);
+            //glUniform1i(glGetUniformLocation(program_id_, "shadow_map"), 9 /*GL_TEXTURE0*/);
         }
 
         loadTexture("grass.tga", &texture_grass_id_, 1, glGetUniformLocation(program_id_, "grass_tex"));
@@ -258,8 +258,8 @@ public:
         glBindTexture(GL_TEXTURE_2D, texture_low_left_id_);
         glUniform1i(glGetUniformLocation(program_id_, "low_left_present"), texture_low_left_id_ != 0);
 
-        glActiveTexture(GL_TEXTURE9);
-        glBindTexture(GL_TEXTURE_2D, m_depth_tex);
+        //glActiveTexture(GL_TEXTURE9);
+        //glBindTexture(GL_TEXTURE_2D, m_depth_tex);
 
         // draw
         glEnable(GL_BLEND);

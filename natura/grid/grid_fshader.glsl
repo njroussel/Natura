@@ -21,7 +21,7 @@ uniform sampler2D water_tex;
 
 /* Shadows */
 uniform float bias;
-uniform sampler2D shadow_map;
+//uniform sampler2D shadow_map;
 uniform bool show_shadow;
 uniform bool do_pcf;
 uniform vec3 sun_light_dir;
@@ -115,7 +115,7 @@ void main() {
     //color = mix(fog_colour, ambient + diffuse +specular, fog_factor);
     color = ambient + diffuse +specular;
 
-    float ambient_light = 0.0;
+    /*float ambient_light = 0.0;
         float shade = ambient_light + max(dot(normalize(normal),
                                               normalize(sun_light_dir)), 0.0);
 
@@ -139,7 +139,7 @@ void main() {
                   }
                 }
             }
-        }
+        }*/
 
             //color = shadow * shade * color.rgb;
             //color = vec3(shadow * shade);
