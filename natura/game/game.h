@@ -2,6 +2,7 @@
 
 #include "../projection.h"
 #include "../camera/camera.h"
+#include "../grass/grass.h"
 #include "../perlin_noise/perlinnoise.h"
 #include "../trackball.h"
 #include "../../external/glm/detail/type_mat.hpp"

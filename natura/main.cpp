@@ -13,10 +13,9 @@
 #include "misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
 #include "water_grid/water_grid.h"
 #include "axis/axis.h"
-#include "terrain/terrain.h"
-#include "grass/grass.h"
 #include "physics/material_point.h"
 #include "camera/camera.h"
+#include "grass/grass.h"
 
 using namespace glm;
 

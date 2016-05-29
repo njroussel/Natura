@@ -24,6 +24,7 @@ copy_files_once(${TEXTURES})
 file(GLOB SHADERS
         grid/*.glsl
         perlin_quad/*.glsl
+        grass/*.glsl
         skybox/*.glsl
         water_grid/*.glsl
         axis/axis_fshader.glsl
