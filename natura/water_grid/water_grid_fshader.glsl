@@ -1,4 +1,6 @@
 #version 330
+#define min_fog_distance 30.0f
+#define max_fog_distance 40.0f
 
 in vec2 uv;
 in vec3 light_dir;
@@ -6,6 +8,7 @@ in float height_;
 in mat4 MV_out;
 in vec3 view_dir;
 in vec3 normal;
+in float distance_camera;
 
 uniform vec3 La, Ld, Ls;
 uniform vec3 ka, kd, ks;
@@ -42,10 +45,15 @@ void main() {
     float window_width = window.x;
     vec4 window_coord = gl_FragCoord;
     float width_normed = window_coord.x / window_width;
-    float height_normed = window_coord.y / window_height;
+    float height_normed = (window_coord.y)/ window_height;
+
     vec2 new_uv = vec2(width_normed, 1 - height_normed);
     vec3 color_from_mirror = texture(tex_reflection, new_uv).rgb;
 
+float fog_factor = (max_fog_distance - distance_camera) / (max_fog_distance - min_fog_distance);
+    fog_factor = clamp(fog_factor, 0.0f, 1.0f);
+
     vec3 original_color = specular + diffuse + ambient;
-    color = vec4(mix(color_from_mirror, original_color, vec3(0.65f)), 0.6f);
+    color = vec4(mix(color_from_mirror, original_color, vec3(0.65f)), min(0.6, fog_factor));
+    //color = vec4(original_color, 0.6f);
 }

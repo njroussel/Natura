@@ -56,6 +56,7 @@ int main(int argc, char *argv[]) {
 
     // makes the OpenGL context of window current on the calling thread
     glfwMakeContextCurrent(window);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     // GLEW Initialization (must have a context)
     // https://www.opengl.org/wiki/OpenGL_Loading_Library

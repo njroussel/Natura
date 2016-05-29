@@ -1,4 +1,5 @@
 #pragma once
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "icg_helper.h"
@@ -13,6 +14,9 @@ private:
     GLuint vertex_buffer_object_index_;     // memory buffer for indices
     GLuint program_id_;                     // GLSL shader program ID
     GLuint texture_perlin_id_;              // texture ID
+    GLuint texture_left_id_;              // texture ID
+    GLuint texture_low_id_;              // texture ID
+    GLuint texture_low_left_id_;
     GLuint texture_grass_id_;               // texture ID
     GLuint texture_rock_id_;                // texture ID
     GLuint texture_snow_id_;                // texture ID
@@ -39,8 +43,20 @@ public:
             Cleanup();
     }
 
-    void setTextureId(int id){
+    void setTextureId(int id) {
         this->texture_perlin_id_ = id;
+    }
+
+    void setTextureLeft(GLuint id){
+        texture_left_id_ = id;
+    }
+
+    void setTextureLow(GLuint id){
+        texture_low_id_ = id;
+    }
+
+    void setTextureLowLeft(GLuint id){
+        texture_low_left_id_ = id;
     }
 
     void Cleanup() {
@@ -77,7 +93,7 @@ public:
             std::vector<GLuint> indices;
 
             float sideX = 1 / float(mSideNbPoints);
-            mSideNbPoints ++; // OFF BY ONE BY @Rimbaut
+            mSideNbPoints++; // OFF BY ONE BY @Rimbaut
             for (int i = 0; i < mSideNbPoints; i++) {
                 for (int j = 0; j < mSideNbPoints; j++) {
                     vertices.push_back(i * sideX);
@@ -163,8 +179,10 @@ public:
             //perlin texture
             this->texture_perlin_id_ = texture_;
             //glBindTexture(GL_TEXTURE_2D, texture_id_);
-            glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"),
-                        0 /*GL_TEXTURE0*/);
+            glUniform1i(glGetUniformLocation(program_id_, "perlin_tex"), 0 /*GL_TEXTURE0*/);
+            glUniform1i(glGetUniformLocation(program_id_, "left_tex"), 6/*GL_TEXTURE0*/);
+            glUniform1i(glGetUniformLocation(program_id_, "low_tex"), 7 /*GL_TEXTURE0*/);
+            glUniform1i(glGetUniformLocation(program_id_, "low_left_tex"), 8 /*GL_TEXTURE0*/);
         }
 
         loadTexture("grass.tga", &texture_grass_id_, 1, glGetUniformLocation(program_id_, "grass_tex"));
@@ -178,13 +196,15 @@ public:
         glUseProgram(0);
     }
 
-    void Draw(glm::vec2 indices, float amplitude, float time, const glm::mat4 &model = IDENTITY_MATRIX,
+    void Draw(glm::vec2 indices, float amplitude, float water_height, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
 
         glUniform1f(glGetUniformLocation(program_id_, "amplitude"), amplitude);
+
+        glUniform1f(glGetUniformLocation(program_id_, "water_height"), water_height);
 
         glUniformMatrix4fv(M_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(model));
         glUniformMatrix4fv(V_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(view));
@@ -209,16 +229,32 @@ public:
         glActiveTexture(GL_TEXTURE5);
         glBindTexture(GL_TEXTURE_2D, texture_deep_water_id_);
 
+        glActiveTexture(GL_TEXTURE6);
+        glBindTexture(GL_TEXTURE_2D, texture_left_id_);
+
+        glUniform1i(glGetUniformLocation(program_id_, "left_present"), texture_left_id_ != 0);
+
+        glActiveTexture(GL_TEXTURE7);
+        glBindTexture(GL_TEXTURE_2D, texture_low_id_);
+        glUniform1i(glGetUniformLocation(program_id_, "low_present"), texture_low_id_ != 0);
+
+        glActiveTexture(GL_TEXTURE8);
+        glBindTexture(GL_TEXTURE_2D, texture_low_left_id_);
+        glUniform1i(glGetUniformLocation(program_id_, "low_left_present"), texture_low_left_id_ != 0);
+
         // draw
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawElements(GL_TRIANGLE_STRIP, num_indices_, GL_UNSIGNED_INT, 0);
+        glDisable(GL_BLEND);
 
         glBindVertexArray(0);
         glUseProgram(0);
     }
 
 
-    void loadTexture(string filename, GLuint* texture_id, int tex_index, GLint tex_id_uniform) {
+    void loadTexture(string filename, GLuint *texture_id, int tex_index, GLint tex_id_uniform) {
         // load grass texture
         int width;
         int height;
@@ -234,8 +270,6 @@ public:
 
         glGenTextures(1, texture_id);
         glBindTexture(GL_TEXTURE_2D, *texture_id);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
         if (nb_component == 3) {
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
@@ -245,11 +279,17 @@ public:
                          GL_RGBA, GL_UNSIGNED_BYTE, image);
         }
 
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
         glUniform1i(tex_id_uniform, tex_index /*GL_TEXTURE*/);
 
         // cleanup
         stbi_image_free(image);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
+
 };
 
 Grid *BASE_TILE;

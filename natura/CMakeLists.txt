@@ -29,9 +29,11 @@ file(GLOB SHADERS
         skybox/*.glsl
         water_grid/*.glsl
         axis/axis_fshader.glsl
-        axis/axis_vshader.glsl)
+        axis/axis_vshader.glsl
+        camera/bezier/bezier_fshader.glsl
+        camera/bezier/bezier_vshader.glsl)
 
 deploy_shaders_to_build_dir(${SHADERS})
 
-add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS} terrain/chunk/chunk.h game/game.h misc/observer_subject/observer.h misc/observer_subject/subject.h misc/observer_subject/messages/message.h misc/io/input/handlers/keyboard/keyboard_handler.h misc/observer_subject/messages/keyboard_handler_message.h misc/observer_subject/messages/perlin_noise_prop_changed_message.h misc/io/input/handlers/mouse/mouse_button_handler.h misc/io/input/handlers/handler.h misc/observer_subject/messages/mouse_button_handler_message.h misc/io/input/handlers/mouse/mouse_cursor_handler.h misc/observer_subject/messages/mouse_cursor_handler_message.h misc/io/input/handlers/framebuffer/framebuffer_size_handler.h misc/observer_subject/messages/framebuffer_size_handler_message.h terrain/chunk/chunk_generation/chunk_factory.h axis/axis.h physics/material_point.h)
+add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS} terrain/chunk/chunk.h game/game.h misc/observer_subject/observer.h misc/observer_subject/subject.h misc/observer_subject/messages/message.h misc/io/input/handlers/keyboard/keyboard_handler.h misc/observer_subject/messages/keyboard_handler_message.h misc/observer_subject/messages/perlin_noise_prop_changed_message.h misc/io/input/handlers/mouse/mouse_button_handler.h misc/observer_subject/messages/mouse_button_handler_message.h misc/io/input/handlers/mouse/mouse_cursor_handler.h misc/observer_subject/messages/mouse_cursor_handler_message.h misc/io/input/handlers/framebuffer/framebuffer_size_handler.h misc/observer_subject/messages/framebuffer_size_handler_message.h terrain/chunk/chunk_generation/chunk_factory.h axis/axis.h physics/material_point.h config.h)
 target_link_libraries(${EXERCISENAME} ${COMMON_LIBS})
