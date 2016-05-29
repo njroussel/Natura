@@ -12,10 +12,13 @@ void main()
 {
     vec4 vTexColor = texture2D(gSampler, vec2(vTexCoord.x, -vTexCoord.y));
     float fNewAlpha = vTexColor.a;
+    if(fNewAlpha < 0.1f) {
+        discard;
+    }
 
-
-      if(fNewAlpha > 1.0f)
-         fNewAlpha = 1.0f;
+    if(fNewAlpha > 1.0f){
+        fNewAlpha = 1.0f;
+    }
 
     vec4 vMixedColor = vTexColor;
 
