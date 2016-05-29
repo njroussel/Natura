@@ -97,7 +97,7 @@ public :
         glBindVertexArray(vertex_array_id_);
 
        // draw
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawArrays(GL_POINTS, 0, m_grass_triangles_count);
 
         glBindVertexArray(0);
