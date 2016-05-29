@@ -59,12 +59,10 @@ void main()
 	vec3 vGrassFieldPos = gl_in[0].gl_Position.xyz;
 
 	float PIover180 = 3.1415/180.0;
-	vec3 vBaseDir[] =
-	{
+	vec3 vBaseDir[] = vec3[](
 		vec3(1.0, 0.0, 0.0),
 		vec3(float(cos(45.0*PIover180)), 0.0f, float(sin(45.0*PIover180))),
-		vec3(float(cos(-45.0*PIover180)), 0.0f, float(sin(-45.0*PIover180)))
-	};
+		vec3(float(cos(-45.0*PIover180)), 0.0f, float(sin(-45.0*PIover180))));
 
 	float fGrassPatchSize = 5.0;
 	float fWindStrength = 4.0;

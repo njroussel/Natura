@@ -18,7 +18,7 @@ public:
         for (int i = 0 ; i < chunk_per_side; i ++) {
             std::deque<Chunk *> row;
             for (int j = 0 ; j < chunk_per_side; j ++) {
-                row.push_back(m_chunk_factory.createChunk(glm::vec2(i, j), this));
+                row.push_back(m_chunk_factory.createChunk(glm::vec2(i, j)));
             }
             m_chunks.push_back(row);
         }

@@ -17,8 +17,7 @@ void main()
 {
    vec4 vTexColor = texture2D(gSampler, vTexCoord);
    float fNewAlpha = vTexColor.a*fAlphaMultiplier;
-   if(fNewAlpha < fAlphaTest)
-      discard;
+
 
    if(fNewAlpha > 1.0f)
       fNewAlpha = 1.0f;

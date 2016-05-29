@@ -14,6 +14,7 @@ private :
     GLuint program_id_;
     GLuint vertex_array_id_;   // memory buffer
     GLuint vertex_buffer_object_;   // memory buffer
+    GLuint m_grass_triangles_count;
     float m_fGrassPatchOffsetMin;
     float m_fGrassPatchOffsetMax;
     float m_fGrassPatchHeight;
@@ -38,10 +39,9 @@ public :
     }
 
     void Init() {
-
         program_id_ = icg_helper::LoadShaders("grass_vshader.glsl",
-                                              "grass_gshader.glsl",
-                                              "grass_fshader.glsl");
+                                              "grass_fshader.glsl",
+                                              "grass_gshader.glsl");
         glUseProgram(program_id_);
 
         // vertex one vertex Array
@@ -52,7 +52,7 @@ public :
         {
             vector<GLfloat> vertex_point;
 
-
+            m_grass_triangles_count = 0;
             glm::vec3 vCurPatchPos(m_minXpos, 0.0f, m_minZpos);
 
 
@@ -62,7 +62,7 @@ public :
                     vCurPatchPos.z += m_fGrassPatchOffsetMin +
                                       (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
                     vCurPatchPos.y = m_terrain->getHeight(vec2(vCurPatchPos.x, vCurPatchPos.z));
-
+                    m_grass_triangles_count += 1;
                     vertex_point.push_back(vCurPatchPos.x);
                     vertex_point.push_back(vCurPatchPos.y);
                     vertex_point.push_back(vCurPatchPos.z);
@@ -84,6 +84,21 @@ public :
             glVertexAttribPointer(vertex_point_id, 3, GL_FLOAT, DONT_NORMALIZE,
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
+
+
+        glBindVertexArray(0);
+        glUseProgram(0);
+    }
+
+    void Draw(const glm::mat4 &model = IDENTITY_MATRIX,
+              const glm::mat4 &view = IDENTITY_MATRIX,
+              const glm::mat4 &projection = IDENTITY_MATRIX) {
+        glUseProgram(program_id_);
+        glBindVertexArray(vertex_array_id_);
+
+       // draw
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glDrawArrays(GL_POINTS, 0, m_grass_triangles_count);
 
         glBindVertexArray(0);
         glUseProgram(0);

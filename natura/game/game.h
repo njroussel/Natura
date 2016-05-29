@@ -24,6 +24,12 @@ public:
         m_window = window;
         m_amplitude = 9.05f;
         m_camera_mode = FLYTHROUGH;
+        const int TERRAIN_SIZE = 10;
+        const int VERT_PER_GRID_SIDE = 8;
+        m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
+        m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
+
+        m_grass = new Grass(0.1f,0.3f,4.0f,0.0f,2.0f,0.0f,2.0f,m_terrain);
         Init();
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
@@ -81,6 +87,8 @@ private:
     double m_last_mouse_xpos, m_last_mouse_ypos;
     float m_last_time;
 
+    Grass *m_grass;
+
     /* Window size */
     int m_window_width;
     int m_window_height;
@@ -129,10 +137,9 @@ private:
         }
         m_trackball = new Trackball();
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
-        m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
-        m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
         m_camera = new Camera(starting_camera_position, starting_camera_rotation, m_terrain);
         m_camera->enableFPSMode(false);
+        m_grass->Init();
 
         // sets background color b
         glClearColor(0, 0, 0/*gray*/, 1.0 /*solid*/);
@@ -176,6 +183,7 @@ private:
                         m_projection->perspective());
         framebufferFloor.Unbind();
         glDisable(GL_CLIP_PLANE0);
+        m_grass->Draw(IDENTITY_MATRIX, m_camera->GetMatrix(), m_projection->perspective());
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());

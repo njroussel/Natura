@@ -12,7 +12,7 @@ public:
         m_perlin_noise = perlin_noise;
     }
 
-    Chunk *createChunk(glm::vec2 indices, Terrain* terrain){
+    Chunk *createChunk(glm::vec2 indices){
         return new Chunk(indices, m_tile_side_size, m_perlin_noise);
     }
 
