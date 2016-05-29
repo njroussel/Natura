@@ -117,11 +117,7 @@ public:
             _update_pos();
             try {
                 float terrainHeight = m_terrain->getHeight(glm::vec2(m_position.x, m_position.z));
-                if (terrainHeight == NULL) {
-                    m_speed = vec3(0.0f);
-                    setAccelerationVector(vec3(0.0f));
-                }
-                else if (m_position.y < terrainHeight) {
+                if (m_position.y < terrainHeight) {
                     float epsilon = 0.005f;
                     float zDiffXaxis = m_terrain->getHeight(vec2(m_position.x + epsilon, m_position.z)) -
                                        m_terrain->getHeight(vec2(m_position.x - epsilon, m_position.z));
