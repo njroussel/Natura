@@ -12,7 +12,7 @@ class ShadowBuffer {
         GLint previous_viewport_[4];
 
     public:
-        ShadowBuffer(int image_width = 512, int image_height = 512){
+        ShadowBuffer(int image_width = 1024, int image_height = 1024){
             this->width_ = image_width;
             this->height_ = image_height;
         }

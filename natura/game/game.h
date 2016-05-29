@@ -140,6 +140,8 @@ private:
     float m_bias = 0.0f;
     glm::mat4 m_offset_matrix;
     bool m_draw_from_light_pov = false;
+    float m_near = -10.f;
+    float m_light_height = 1.f;
 
     /* Private function. */
     void Init() {
@@ -183,7 +185,7 @@ private:
         GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
 
-        m_light_dir = vec3(0.0, 4.0, 0.0);
+        m_light_dir = vec3(0.0, m_light_height, 0.0);
         m_light_dir = normalize(m_light_dir);
         m_default_pid = BASE_TILE->getPID();
         if(!m_default_pid) {
@@ -204,8 +206,8 @@ private:
         float ratio = m_window_width / (float) m_window_height;
 
         // Orthographic projection, assuming directional light.
-        float ext = 1.5f;
-        m_light_projection = ortho(-ext, ext, -ext, ext, 1.0f-ext, 1.0f+ext);
+        //float ext = 1500.0f;
+        //m_light_projection = ortho(-ext, ext, -ext, ext, -10.f, ext);
 
         // Matrix that can be used to move a point's components from [-1, 1] to [0, 1].
         m_offset_matrix = mat4(0.5f, 0.0f, 0.0f, 0.0f,
@@ -234,7 +236,10 @@ private:
             m_camera->tick();
         }
 
-
+        m_light_dir = vec3(1.0, 0.1, 1.0);
+        m_light_dir = normalize(m_light_dir);
+        float ext = 50.0f;
+        m_light_projection = ortho(-ext, ext, -ext, ext, -ext, ext);
         //draw as often as possible
         /* First the shadow map.*/
         glUseProgram(m_shadow_pid);
@@ -245,7 +250,7 @@ private:
             up = vec3(0.0f, 0.0f, 1.0f);
         }
         //glm::vec3 eye = -glm::vec3(4*m_light_dir.x, 4*m_light_dir.y, 4*m_light_dir.z);
-        mat4 light_view = lookAt(m_light_dir, vec3(0.0f, 1.0f, 0.0f), up);
+        mat4 light_view = lookAt(m_light_dir, vec3(0.0f, 0.0f, 0.0f), up);
         mat4 depth_vp = m_light_projection * light_view;
         glUniformMatrix4fv(glGetUniformLocation(m_shadow_pid, "depth_vp"), 1,
                            GL_FALSE, value_ptr(depth_vp));
@@ -454,13 +459,18 @@ private:
 
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
             if (key == GLFW_KEY_UP) {
-                mat4 M = translate(IDENTITY_MATRIX, vec3(0, 1.0, 0));
-                m_light_dir = normalize(vec3(M*vec4(m_light_dir, 1.0f)));
+                m_near += 0.5;
             }
 
             if (key == GLFW_KEY_DOWN) {
-                mat4 M = translate(IDENTITY_MATRIX, vec3(-0, -1.0, -0));
-                m_light_dir = normalize(vec3(M*vec4(m_light_dir, 1.0f)));
+                m_near -= 0.5;
+            }
+            if (key == GLFW_KEY_RIGHT) {
+                m_light_height += 1;
+            }
+
+            if (key == GLFW_KEY_LEFT) {
+                m_light_height-= 1;
             }
             switch (key) {
                 case GLFW_KEY_ESCAPE:

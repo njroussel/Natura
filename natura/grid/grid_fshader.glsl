@@ -96,7 +96,7 @@ void main() {
                         texture(perlin_tex, vec2(pos_2d.x, pos_2d.y - epsilon)).r;
 
     vec3 normal = normalize(cross(vec3(2 *epsilon, zDiffXaxis, 0.0f), vec3(0.0, zDiffYaxis, 2* epsilon)));
-    vec3 n = normal; // Normal in worlds coordinates.
+    vec3 n = -normal; // Normal in worlds coordinates.
     normal = (inverse(transpose(MV)) * vec4(-normal, 1.0f)).xyz;
 
     vec3 ambient = color * 0.6 * La;
@@ -144,7 +144,6 @@ void main() {
         }
 
             color = shadow * shade * color.rgb;
-            //color = vec3(shadow * shade);
 
 
 
