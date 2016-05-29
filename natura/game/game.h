@@ -8,6 +8,7 @@
 #include "../../external/glm/detail/type_mat.hpp"
 #include "../skybox/skybox.h"
 #include "../terrain/terrain.h"
+#include "../physics/ball.h"
 #include "../misc/observer_subject/messages/keyboard_handler_message.h"
 #include "../misc/io/input/handlers/keyboard/keyboard_handler.h"
 #include "../misc/io/input/handlers/mouse/mouse_button_handler.h"
@@ -16,7 +17,7 @@
 #include "../config.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-class Game : public Observer {
+class Game : public Observer{
 public:
     Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window),
                                m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window) {
@@ -77,6 +78,16 @@ public:
                 resize_callback(reinterpret_cast<FrameBufferSizeHandlerMessage *>(msg));
                 break;
 
+            case Message::Type::BALL_OUT_OF_BOUNDS : {
+                BallOutOfBoundsMessage *message = reinterpret_cast<BallOutOfBoundsMessage *> (msg);
+                Ball *ball = message->getBallInstance();
+                ball->CleanUp();
+                std::vector<Ball *>::iterator position = std::find(m_balls.begin(), m_balls.end(), ball);
+                if (position != m_balls.end()) // == myVector.end() means the element was not found
+                    m_balls.erase(position);
+                break;
+            }
+
             default:
                 throw std::string("Error : Unexpected message in class Game");
         }
@@ -133,11 +144,13 @@ private:
 
     bool m_reverse = false;
 
+    vector<Ball*> m_balls;
+
 
     /* Private function. */
     void Init() {
         const bool top_down_view = false;
-        const int TERRAIN_SIZE = 10;
+        const int TERRAIN_SIZE = TERRAIN_CHUNK_SIZE;
         const int VERT_PER_GRID_SIDE = 8;
         const float cam_posxy = TERRAIN_SCALE * ((float) (TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
 
@@ -197,10 +210,14 @@ private:
             cout << "Ticks : " << 1 / (time - m_last_time_tick) << endl;
             m_last_time_tick = time;
             m_camera->tick();
+            for(int i = 0; i < m_balls.size(); i++){
+                m_balls[i]->tick(-m_camera->getPosition());
+            }
         }
 
 
         //draw as often as possible
+
         glEnable(GL_CLIP_PLANE0);
         framebufferFloor.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -211,12 +228,18 @@ private:
         glDisable(GL_CLIP_PLANE0);
         m_grass->Draw(m_last_time_tick, IDENTITY_MATRIX, m_camera->GetMatrix(), m_projection->perspective());
 
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());
 
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix,
                         m_camera->GetMatrix(),
                         m_projection->perspective());
+
+        for(int i = 0; i < m_balls.size(); i++){
+            m_balls[i]->Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
+        }
+
         if (m_look_curve.Size() > 1 && m_pos_curve.Size() > 1 && m_draw_curves) {
             m_look_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
             m_pos_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
@@ -336,7 +359,9 @@ private:
                 m_pos_curve.enableLoop(m_loop_curves);
             }
             if (key == GLFW_KEY_P) {
-                m_reverse = !m_reverse;
+                Ball *new_ball = new Ball(-m_camera->getFrontPoint() / TERRAIN_SCALE, -(m_camera->getFrontPoint() - m_camera->getPosition()), m_terrain);
+                m_balls.push_back(new_ball);
+                new_ball->attach(this);
             }
             if (key == GLFW_KEY_F){
                 if (m_camera->getCameraMode() == CAMERA_MODE::Fps)
