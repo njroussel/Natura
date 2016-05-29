@@ -9,8 +9,6 @@ uniform	mat4 model;
 uniform	mat4 view;
 
 out vec2 vTexCoord;
-out vec3 vWorldPos;
-out vec4 vEyeSpacePos;
 
 uniform float time;
 
@@ -91,19 +89,12 @@ void main()
 		vTL.y += fGrassPatchHeight;
 		gl_Position = mMVP*vec4(vTL, 1.0);
 		vTexCoord = vec2(fTCStartX, 1.0);
-		vWorldPos = vTL;
-		vEyeSpacePos = mMV*vec4(vTL, 1.0);
-		gl_Postion = mMVP* vec4(0.0f);
 		EmitVertex();
 
 		// Grass patch bottom left vertex
 		vec3 vBL = vGrassFieldPos - vBaseDir[i]*fGrassPatchSize*0.5f;
 		gl_Position = mMVP*vec4(vBL, 1.0);
 		vTexCoord = vec2(fTCStartX, 0.0);
-		vWorldPos = vBL;
-		vEyeSpacePos = mMV*vec4(vBL, 1.0);
-				gl_Postion = mMVP* vec4(0.0f);
-
 		EmitVertex();
 
 		// Grass patch top right vertex
@@ -111,20 +102,12 @@ void main()
 		vTR.y += fGrassPatchHeight;
 		gl_Position = mMVP*vec4(vTR, 1.0);
 		vTexCoord = vec2(fTCEndX, 1.0);
-		vWorldPos = vTR;
-		vEyeSpacePos = mMV*vec4(vTR, 1.0);
-				gl_Postion = mMVP* vec4(0.0f);
-
 		EmitVertex();
 
 		// Grass patch bottom right vertex
 		vec3 vBR = vGrassFieldPos + vBaseDir[i]*fGrassPatchSize*0.5f;
 		gl_Position = mMVP*vec4(vBR, 1.0);
 		vTexCoord = vec2(fTCEndX, 0.0);
-		vWorldPos = vBR;
-		vEyeSpacePos = mMV*vec4(vBR, 1.0);
-				gl_Postion = mMVP* vec4(0.0f);
-
 		EmitVertex();
 
 		EndPrimitive();

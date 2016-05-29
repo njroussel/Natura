@@ -209,7 +209,7 @@ private:
                         m_projection->perspective());
         framebufferFloor.Unbind();
         glDisable(GL_CLIP_PLANE0);
-        m_grass->Draw(m_last_time_tick, m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
+        m_grass->Draw(m_last_time_tick, IDENTITY_MATRIX, m_camera->GetMatrix(), m_projection->perspective());
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());
