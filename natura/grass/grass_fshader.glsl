@@ -20,5 +20,5 @@ void main()
    vec4 vMixedColor = vTexColor*vColor;
 
    //outputColor = vec4(vMixedColor.zyx, fNewAlpha);
-   color = vec4(1.0f);
+  color = vec4(1.0f);
 }
