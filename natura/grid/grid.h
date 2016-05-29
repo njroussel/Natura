@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include "icg_helper.h"
+#include "../shadows/attrib_locations.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdint>
 
@@ -30,7 +31,7 @@ private:
     bool mCleanedUp;                        // check if the grid is cleaned before its destruction.
     glm::vec2 m_indices;                    // Tile indices on the terrain.
     GLuint m_shadow_pid;
-    bool m_use_shadows;                     // true if we need to generate the Z-buffe
+    bool m_use_shadows = false;                     // true if we need to generate the Z-buffe
     GLuint m_depth_tex;
 
 public:
@@ -108,7 +109,7 @@ public:
             std::vector<GLuint> indices;
 
             float sideX = 1 / float(mSideNbPoints);
-            mSideNbPoints++; // OFF BY ONE BY @Rimbaut
+            mSideNbPoints++;
             for (int i = 0; i < mSideNbPoints; i++) {
                 for (int j = 0; j < mSideNbPoints; j++) {
                     vertices.push_back(i * sideX);
@@ -145,9 +146,8 @@ public:
                          &indices[0], GL_STATIC_DRAW);
 
             // position shader attribute
-            GLuint loc_position = glGetAttribLocation(program_id_, "position");
-            glEnableVertexAttribArray(loc_position);
-            glVertexAttribPointer(loc_position, 2, GL_FLOAT, DONT_NORMALIZE,
+            glEnableVertexAttribArray(ATTRIB_LOC_position);
+            glVertexAttribPointer(ATTRIB_LOC_position, 2, GL_FLOAT, DONT_NORMALIZE,
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
 

@@ -188,8 +188,7 @@ private:
         if(!m_default_pid) {
             exit(EXIT_FAILURE);
         }
-        glBindAttribLocation(m_default_pid, ATTRIB_LOC_vpoint, "vpoint");
-        glBindAttribLocation(m_default_pid, ATTRIB_LOC_vtexcoord, "vtexcoord");
+        glBindAttribLocation(m_default_pid, ATTRIB_LOC_position, "position");
         glLinkProgram(m_default_pid);
 
         m_shadow_pid = icg_helper::LoadShaders("shadow_map_vshader.glsl",
@@ -198,7 +197,7 @@ private:
             exit(EXIT_FAILURE);
         }
         BASE_TILE->setShadowPID(m_shadow_pid);
-        glBindAttribLocation(m_shadow_pid, ATTRIB_LOC_vpoint, "vpoint");
+        glBindAttribLocation(m_shadow_pid, ATTRIB_LOC_position, "position");
         glLinkProgram(m_shadow_pid);
 
         glViewport(0,0,m_window_width,m_window_height);
@@ -239,7 +238,7 @@ private:
 
         //draw as often as possible
         /* First the shadow map.*/
-        glUseProgram(m_shadow_pid);
+        /*glUseProgram(m_shadow_pid);
         m_shadow_buffer.Bind();
 
         vec3 up(0.0f, 1.0f, 0.0f);
@@ -275,11 +274,10 @@ private:
         glUniform1i(glGetUniformLocation(m_default_pid, "show_shadow"), m_show_shadow);
         glUniform1i(glGetUniformLocation(m_default_pid, "do_pcf"), m_do_pcf);
 
-        /*glActiveTexture(GL_TEXTURE9);
-        glBindTexture(GL_TEXTURE_2D, m_depth_tex);*/
+
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+*/
         /* Reflection */
         glEnable(GL_CLIP_PLANE0);
         framebufferFloor.Bind();
