@@ -139,6 +139,7 @@ private:
     bool m_do_pcf = true;
     float m_bias = 0.0f;
     glm::mat4 m_offset_matrix;
+    bool m_draw_from_light_pov = false;
 
     /* Private function. */
     void Init() {
@@ -169,7 +170,7 @@ private:
 
         // enable depth test.
         glEnable(GL_DEPTH_TEST);
-        //glEnable(GL_MULTISAMPLE);
+        glEnable(GL_MULTISAMPLE);
         m_grid_model_matrix = IDENTITY_MATRIX;
         //m_grid_model_matrix = translate(m_grid_model_matrix, vec3(-4.0f, -0.25f, -4.0f));
         m_grid_model_matrix = scale(m_grid_model_matrix, vec3(TERRAIN_SCALE, TERRAIN_SCALE, TERRAIN_SCALE));
@@ -182,14 +183,12 @@ private:
         GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
 
-        m_light_dir = vec3(1.0, -1.0, 1.0);
+        m_light_dir = vec3(0.0, 4.0, 0.0);
         m_light_dir = normalize(m_light_dir);
         m_default_pid = BASE_TILE->getPID();
         if(!m_default_pid) {
             exit(EXIT_FAILURE);
         }
-        glBindAttribLocation(m_default_pid, ATTRIB_LOC_position, "position");
-        glLinkProgram(m_default_pid);
 
         m_shadow_pid = icg_helper::LoadShaders("shadow_map_vshader.glsl",
                                              "shadow_map_fshader.glsl");
@@ -215,7 +214,7 @@ private:
                              0.5f, 0.5f, 0.5f, 1.0f);
 
         check_error_gl();
-        m_depth_tex = 0;// m_shadow_buffer.Init();
+        m_depth_tex = m_shadow_buffer.Init();
         BASE_TILE->setDepthTex(m_depth_tex);
     }
 
@@ -238,15 +237,15 @@ private:
 
         //draw as often as possible
         /* First the shadow map.*/
-        /*glUseProgram(m_shadow_pid);
+        glUseProgram(m_shadow_pid);
         m_shadow_buffer.Bind();
 
         vec3 up(0.0f, 1.0f, 0.0f);
         if (abs(dot(m_light_dir, up)) > 0.99) {
             up = vec3(0.0f, 0.0f, 1.0f);
         }
-
-        mat4 light_view = lookAt(m_light_dir, vec3(4.0f, 1.0f, 4.0f), up);
+        //glm::vec3 eye = -glm::vec3(4*m_light_dir.x, 4*m_light_dir.y, 4*m_light_dir.z);
+        mat4 light_view = lookAt(m_light_dir, vec3(0.0f, 1.0f, 0.0f), up);
         mat4 depth_vp = m_light_projection * light_view;
         glUniformMatrix4fv(glGetUniformLocation(m_shadow_pid, "depth_vp"), 1,
                            GL_FALSE, value_ptr(depth_vp));
@@ -255,8 +254,8 @@ private:
         glClear(GL_DEPTH_BUFFER_BIT);
         BASE_TILE->setUseShadowPID(true);
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, m_grid_model_matrix,
-                                   m_camera->getMirroredMatrix(m_terrain->m_water_height * -CHUNK_SIDE_TILE_COUNT * TERRAIN_SCALE),
-                                   m_projection->perspective());
+                        light_view,
+                        m_light_projection);
         BASE_TILE->setUseShadowPID(false);
         m_shadow_buffer.Unbind();
 
@@ -277,7 +276,7 @@ private:
 
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-*/
+
         /* Reflection */
         glEnable(GL_CLIP_PLANE0);
         framebufferFloor.Bind();
@@ -290,9 +289,16 @@ private:
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());
-        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix,
-                        m_camera->GetMatrix(),
-                        m_projection->perspective());
+        if (!m_draw_from_light_pov) {
+            m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix,
+                            m_camera->GetMatrix(),
+                            m_projection->perspective());
+        }
+        else {
+            m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix,
+                            light_view,
+                            m_light_projection);
+        }
         if (m_look_curve.Size() > 1 && m_pos_curve.Size() > 1 && m_draw_curves) {
             m_look_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
             m_pos_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
@@ -420,6 +426,9 @@ private:
                 else
                     m_camera->enableFpsMode();
             }
+            if (key == GLFW_KEY_Z){
+                m_draw_from_light_pov = !m_draw_from_light_pov;
+            }
         }
 
         if (action == GLFW_RELEASE) {
@@ -444,6 +453,15 @@ private:
         }
 
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
+            if (key == GLFW_KEY_UP) {
+                mat4 M = translate(IDENTITY_MATRIX, vec3(0, 1.0, 0));
+                m_light_dir = normalize(vec3(M*vec4(m_light_dir, 1.0f)));
+            }
+
+            if (key == GLFW_KEY_DOWN) {
+                mat4 M = translate(IDENTITY_MATRIX, vec3(-0, -1.0, -0));
+                m_light_dir = normalize(vec3(M*vec4(m_light_dir, 1.0f)));
+            }
             switch (key) {
                 case GLFW_KEY_ESCAPE:
                     glfwSetWindowShouldClose(window,

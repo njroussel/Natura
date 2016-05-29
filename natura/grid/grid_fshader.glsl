@@ -17,11 +17,12 @@ uniform sampler2D rock_tex;
 uniform sampler2D snow_tex;
 uniform sampler2D sand_tex;
 uniform sampler2D water_tex;
+uniform mat4 model;
 
 
 /* Shadows */
 uniform float bias;
-//uniform sampler2D shadow_map;
+uniform sampler2D shadow_map;
 uniform bool show_shadow;
 uniform bool do_pcf;
 uniform vec3 sun_light_dir;
@@ -95,6 +96,7 @@ void main() {
                         texture(perlin_tex, vec2(pos_2d.x, pos_2d.y - epsilon)).r;
 
     vec3 normal = normalize(cross(vec3(2 *epsilon, zDiffXaxis, 0.0f), vec3(0.0, zDiffYaxis, 2* epsilon)));
+    vec3 n = normal; // Normal in worlds coordinates.
     normal = (inverse(transpose(MV)) * vec4(-normal, 1.0f)).xyz;
 
     vec3 ambient = color * 0.6 * La;
@@ -115,8 +117,8 @@ void main() {
     //color = mix(fog_colour, ambient + diffuse +specular, fog_factor);
     color = ambient + diffuse +specular;
 
-    /*float ambient_light = 0.0;
-        float shade = ambient_light + max(dot(normalize(normal),
+    float ambient_light = 0.0;
+        float shade = ambient_light + max(dot(normalize(n),
                                               normalize(sun_light_dir)), 0.0);
 
         // shading factor from the shadow (1.0 = no shadow, 0.0 = all dark)
@@ -139,9 +141,9 @@ void main() {
                   }
                 }
             }
-        }*/
+        }
 
-            //color = shadow * shade * color.rgb;
+            color = shadow * shade * color.rgb;
             //color = vec3(shadow * shade);
 
 
