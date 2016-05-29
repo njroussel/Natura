@@ -138,6 +138,9 @@ private:
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_camera = new Camera(starting_camera_position, starting_camera_rotation, m_terrain);
         m_camera->enableFPSMode(false);
+
+        m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
+        m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
         m_grass = new Grass(0.1f,0.2f,4.0f,0.0f,2.0f,0.0f,2.0f,m_terrain);
         m_grass->Init();
 
@@ -183,7 +186,7 @@ private:
                         m_projection->perspective());
         framebufferFloor.Unbind();
         glDisable(GL_CLIP_PLANE0);
-        m_grass->Draw(m_last_time, IDENTITY_MATRIX, m_camera->GetMatrix(), m_projection->perspective());
+        m_grass->Draw(m_last_time, m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());
