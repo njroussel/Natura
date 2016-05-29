@@ -30,7 +30,8 @@ private:
     bool mCleanedUp;                        // check if the grid is cleaned before its destruction.
     glm::vec2 m_indices;                    // Tile indices on the terrain.
     GLuint m_shadow_pid;
-    bool m_use_shadows;                     // true if we need to generate the Z-buffer
+    bool m_use_shadows;                     // true if we need to generate the Z-buffe
+    GLuint m_depth_tex;
 
 public:
 
@@ -51,6 +52,10 @@ public:
 
     void setUseShadowPID(bool enable){
         m_use_shadows = enable;
+    }
+
+    void setDepthTex(GLuint tex) {
+        m_depth_tex = tex;
     }
 
     void setTextureId(int id) {
@@ -193,6 +198,7 @@ public:
             glUniform1i(glGetUniformLocation(program_id_, "left_tex"), 6/*GL_TEXTURE0*/);
             glUniform1i(glGetUniformLocation(program_id_, "low_tex"), 7 /*GL_TEXTURE0*/);
             glUniform1i(glGetUniformLocation(program_id_, "low_left_tex"), 8 /*GL_TEXTURE0*/);
+            glUniform1i(glGetUniformLocation(program_id_, "shadow_map"), 9 /*GL_TEXTURE0*/);
         }
 
         loadTexture("grass.tga", &texture_grass_id_, 1, glGetUniformLocation(program_id_, "grass_tex"));
@@ -211,7 +217,7 @@ public:
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(m_use_shadows ? m_shadow_pid : program_id_);
         glBindVertexArray(vertex_array_id_);
-        glUniform1i(glGetUniformLocation(program_id_, "shadow_map"), 1);
+        //glUniform1i(glGetUniformLocation(program_id_, "shadow_map"), 1);
         glUniform1f(glGetUniformLocation(program_id_, "amplitude"), amplitude);
 
         glUniform1f(glGetUniformLocation(program_id_, "water_height"), water_height);
@@ -251,6 +257,9 @@ public:
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, texture_low_left_id_);
         glUniform1i(glGetUniformLocation(program_id_, "low_left_present"), texture_low_left_id_ != 0);
+
+        glActiveTexture(GL_TEXTURE9);
+        glBindTexture(GL_TEXTURE_2D, m_depth_tex);
 
         // draw
         glEnable(GL_BLEND);

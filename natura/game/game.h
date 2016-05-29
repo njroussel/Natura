@@ -182,7 +182,7 @@ private:
         GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
 
-        m_light_dir = vec3(0.0, 4.0, 0.0);
+        m_light_dir = vec3(1.0, -1.0, 1.0);
         m_light_dir = normalize(m_light_dir);
         m_default_pid = BASE_TILE->getPID();
         if(!m_default_pid) {
@@ -217,6 +217,7 @@ private:
 
         check_error_gl();
         m_depth_tex = m_shadow_buffer.Init();
+        BASE_TILE->setDepthTex(m_depth_tex);
     }
 
     void Display() {
@@ -246,7 +247,7 @@ private:
             up = vec3(0.0f, 0.0f, 1.0f);
         }
 
-        mat4 light_view = lookAt(m_light_dir, vec3(0.0f, 0.0f, 0.0f), up);
+        mat4 light_view = lookAt(m_light_dir, vec3(4.0f, 1.0f, 4.0f), up);
         mat4 depth_vp = m_light_projection * light_view;
         glUniformMatrix4fv(glGetUniformLocation(m_shadow_pid, "depth_vp"), 1,
                            GL_FALSE, value_ptr(depth_vp));
@@ -261,7 +262,7 @@ private:
         m_shadow_buffer.Unbind();
 
         glUseProgram(m_default_pid);
-        glUniform3fv(glGetUniformLocation(m_default_pid, "light_dir"), 1,
+        glUniform3fv(glGetUniformLocation(m_default_pid, "sun_light_dir"), 1,
                      value_ptr(m_light_dir));
 
         // Set matrix to transform from world space into NDC and then into [0, 1] ranges.
@@ -274,8 +275,8 @@ private:
         glUniform1i(glGetUniformLocation(m_default_pid, "show_shadow"), m_show_shadow);
         glUniform1i(glGetUniformLocation(m_default_pid, "do_pcf"), m_do_pcf);
 
-        glActiveTexture(GL_TEXTURE9);
-        glBindTexture(GL_TEXTURE_2D, m_depth_tex);
+        /*glActiveTexture(GL_TEXTURE9);
+        glBindTexture(GL_TEXTURE_2D, m_depth_tex);*/
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 

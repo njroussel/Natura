@@ -7,6 +7,7 @@ in vec2 uv;
 in vec3 light_dir;
 in mat4 MV;
 in float distance_camera;
+in vec4 shadow_coord;
 
 out vec4 out_color;
 uniform vec2 quad_indices;
@@ -17,9 +18,39 @@ uniform sampler2D snow_tex;
 uniform sampler2D sand_tex;
 uniform sampler2D water_tex;
 
+
+/* Shadows */
+uniform float bias;
+uniform sampler2D shadow_map;
+uniform bool show_shadow;
+uniform bool do_pcf;
+uniform vec3 sun_light_dir;
+uniform bool use_color;  // Use predefined color or texture?
+
+
 uniform vec3 La, Ld, Ls;
 uniform vec3 ka, kd, ks;
 uniform float alpha;
+
+// Poisson disk sample locations.
+vec2 poisson_disk[16] = vec2[](
+   vec2(-0.94201624, -0.39906216),
+   vec2(0.94558609, -0.76890725),
+   vec2(-0.094184101, -0.92938870),
+   vec2(0.34495938, 0.29387760),
+   vec2(-0.91588581, 0.45771432),
+   vec2(-0.81544232, -0.87912464),
+   vec2(-0.38277543, 0.27676845),
+   vec2(0.97484398, 0.75648379),
+   vec2(0.44323325, -0.97511554),
+   vec2(0.53742981, -0.47373420),
+   vec2(-0.26496911, -0.41893023),
+   vec2(0.79197514, 0.19090188),
+   vec2(-0.24188840, 0.99706507),
+   vec2(-0.81409955, 0.91437590),
+   vec2(0.19984126, 0.78641367),
+   vec2(0.14383161, -0.14100790)
+);
 
 float getPercentage( float value,  float min,  float max ){
     value = clamp( value, min, max );
@@ -28,7 +59,6 @@ float getPercentage( float value,  float min,  float max ){
 
 
 void main() {
-
     vec2 pos_2d = uv;
     vec3 color;
 
@@ -84,8 +114,40 @@ void main() {
 
     //color = mix(fog_colour, ambient + diffuse +specular, fog_factor);
     color = ambient + diffuse +specular;
+
+    float ambient_light = 0.0;
+        float shade = ambient_light + max(dot(normalize(normal),
+                                              normalize(sun_light_dir)), 0.0);
+
+        // shading factor from the shadow (1.0 = no shadow, 0.0 = all dark)
+        float shadow = 1.0;
+        if (show_shadow) {
+            // perspective division
+            vec3 shadow_coord_norm = shadow_coord.xyz / shadow_coord.w;
+            if (!do_pcf) {
+                // Read only 1 shadow sample.
+                if (texture(shadow_map, shadow_coord_norm.xy).r <
+                    (shadow_coord_norm.z - bias)) {
+                    shadow = 0.2;
+                }
+            } else {
+                // Do percentage closer filtering with 16 samples
+                for (int i = 0; i < 16; i++) {
+                  if (texture(shadow_map, shadow_coord_norm.xy + poisson_disk[i]
+                              / 200.0).r < (shadow_coord_norm.z - bias)) {
+                    shadow -= 0.05;
+                  }
+                }
+            }
+        }
+
+            //color = shadow * shade * color.rgb;
+            //color = vec3(shadow * shade);
+
+
+
     out_color.r = color.r;
     out_color.g = color.g;
     out_color.b = color.b;
-    out_color.a = fog_factor;
+    out_color.a = 1.0;
 }
