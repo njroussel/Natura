@@ -26,8 +26,6 @@ public:
         m_window = window;
         m_amplitude = 9.05f;
 
-        m_grass = NULL;
-
         Init();
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
@@ -104,7 +102,6 @@ private:
     float m_last_time_tick;
     float m_last_time_frame;
 
-    Grass *m_grass;
 
     /* Window size */
     int m_window_width;
@@ -189,9 +186,6 @@ private:
         m_perlinNoise->Init();
         GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
-        m_grass = new Grass(0.1f,0.2f,0.2f,0.5f,0.6f,0.5f,0.6f,m_terrain);
-        m_grass->Init();
-
     }
 
     void Display() {
@@ -228,7 +222,6 @@ private:
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());
-        m_grass->Draw(m_last_time_tick, IDENTITY_MATRIX, m_camera->GetMatrix(), m_projection->perspective());
 
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix,
                         m_camera->GetMatrix(),
