@@ -169,6 +169,7 @@ private:
 
         // enable depth test.
         glEnable(GL_DEPTH_TEST);
+        glEnable(GL_MULTISAMPLE);
         m_grid_model_matrix = IDENTITY_MATRIX;
         //m_grid_model_matrix = translate(m_grid_model_matrix, vec3(-4.0f, -0.25f, -4.0f));
         m_grid_model_matrix = scale(m_grid_model_matrix, vec3(TERRAIN_SCALE, TERRAIN_SCALE, TERRAIN_SCALE));
@@ -181,6 +182,8 @@ private:
         GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
 
+        m_light_dir = vec3(0.0, 4.0, 0.0);
+        m_light_dir = normalize(m_light_dir);
         m_default_pid = BASE_TILE->getPID();
         if(!m_default_pid) {
             exit(EXIT_FAILURE);
@@ -194,6 +197,7 @@ private:
         if(!m_shadow_pid) {
             exit(EXIT_FAILURE);
         }
+        BASE_TILE->setShadowPID(m_shadow_pid);
         glBindAttribLocation(m_shadow_pid, ATTRIB_LOC_vpoint, "vpoint");
         glLinkProgram(m_shadow_pid);
 
@@ -233,6 +237,49 @@ private:
 
 
         //draw as often as possible
+        /* First the shadow map.*/
+        glUseProgram(m_shadow_pid);
+        m_shadow_buffer.Bind();
+
+        vec3 up(0.0f, 1.0f, 0.0f);
+        if (abs(dot(m_light_dir, up)) > 0.99) {
+            up = vec3(0.0f, 0.0f, 1.0f);
+        }
+
+        mat4 light_view = lookAt(m_light_dir, vec3(0.0f, 0.0f, 0.0f), up);
+        mat4 depth_vp = m_light_projection * light_view;
+        glUniformMatrix4fv(glGetUniformLocation(m_shadow_pid, "depth_vp"), 1,
+                           GL_FALSE, value_ptr(depth_vp));
+
+
+        glClear(GL_DEPTH_BUFFER_BIT);
+        BASE_TILE->setUseShadowPID(true);
+        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, m_grid_model_matrix,
+                                   m_camera->getMirroredMatrix(m_terrain->m_water_height * -CHUNK_SIDE_TILE_COUNT * TERRAIN_SCALE),
+                                   m_projection->perspective());
+        BASE_TILE->setUseShadowPID(false);
+        m_shadow_buffer.Unbind();
+
+        glUseProgram(m_default_pid);
+        glUniform3fv(glGetUniformLocation(m_default_pid, "light_dir"), 1,
+                     value_ptr(m_light_dir));
+
+        // Set matrix to transform from world space into NDC and then into [0, 1] ranges.
+        mat4 depth_vp_offset = m_offset_matrix * depth_vp;
+        glUniformMatrix4fv(glGetUniformLocation(m_default_pid, "depth_vp_offset"), 1,
+                           GL_FALSE, value_ptr(depth_vp_offset));
+
+        glUniform1f(glGetUniformLocation(m_default_pid, "bias"), m_bias);
+
+        glUniform1i(glGetUniformLocation(m_default_pid, "show_shadow"), m_show_shadow);
+        glUniform1i(glGetUniformLocation(m_default_pid, "do_pcf"), m_do_pcf);
+
+        glActiveTexture(GL_TEXTURE9);
+        glBindTexture(GL_TEXTURE_2D, m_depth_tex);
+
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        /* Reflection */
         glEnable(GL_CLIP_PLANE0);
         framebufferFloor.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

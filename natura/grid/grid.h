@@ -29,6 +29,8 @@ private:
     uint32_t mSideNbPoints;                 // grids side X nb of vertices;
     bool mCleanedUp;                        // check if the grid is cleaned before its destruction.
     glm::vec2 m_indices;                    // Tile indices on the terrain.
+    GLuint m_shadow_pid;
+    bool m_use_shadows;                     // true if we need to generate the Z-buffer
 
 public:
 
@@ -41,6 +43,14 @@ public:
     ~Grid() {
         if (!mCleanedUp)
             Cleanup();
+    }
+
+    void setShadowPID(GLuint pid){
+        m_shadow_pid = pid;
+    }
+
+    void setUseShadowPID(bool enable){
+        m_use_shadows = enable;
     }
 
     void setTextureId(int id) {
@@ -199,7 +209,7 @@ public:
     void Draw(glm::vec2 indices, float amplitude, float water_height, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
-        glUseProgram(program_id_);
+        glUseProgram(m_use_shadows ? m_shadow_pid : program_id_);
         glBindVertexArray(vertex_array_id_);
         glUniform1i(glGetUniformLocation(program_id_, "shadow_map"), 1);
         glUniform1f(glGetUniformLocation(program_id_, "amplitude"), amplitude);
