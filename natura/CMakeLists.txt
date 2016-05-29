@@ -15,6 +15,7 @@ file(GLOB TEXTURES
         skybox/right.tga
         skybox/back.tga
         skybox/bottom.tga
+        grass/grassPack.dds
         skybox/front.tga
         skybox/stormydays_large.tga)
 copy_files_once(${TEXTURES})

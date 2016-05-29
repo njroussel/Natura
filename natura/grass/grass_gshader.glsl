@@ -4,19 +4,15 @@ layout(points) in;
 layout(triangle_strip) out;
 layout(max_vertices = 12) out;
 
-uniform struct Matrices
-{
-	mat4 projMatrix;
-	mat4 modelMatrix;
-	mat4 viewMatrix;
-	mat4 normalMatrix;
-} matrices;
+uniform mat4 projection;
+uniform	mat4 model;
+uniform	mat4 view;
 
-smooth out vec2 vTexCoord;
-smooth out vec3 vWorldPos;
-smooth out vec4 vEyeSpacePos;
+out vec2 vTexCoord;
+out vec3 vWorldPos;
+out vec4 vEyeSpacePos;
 
-uniform float fTimePassed;
+uniform float time;
 
 mat4 rotationMatrix(vec3 axis, float angle)
 {
@@ -53,8 +49,8 @@ int randomInt(int min, int max)
 
 void main()
 {
-	mat4 mMV = matrices.viewMatrix*matrices.modelMatrix;
-	mat4 mMVP = matrices.projMatrix*matrices.viewMatrix*matrices.modelMatrix;
+	mat4 mMV =  view* model;
+	mat4 mMVP =  projection* view* model;
 
 	vec3 vGrassFieldPos = gl_in[0].gl_Position.xyz;
 
@@ -74,7 +70,7 @@ void main()
 	{
 		// Grass patch top left vertex
 
-		vec3 vBaseDirRotated = (rotationMatrix(vec3(0, 1, 0), sin(fTimePassed*0.7f)*0.1f)*vec4(vBaseDir[i], 1.0)).xyz;
+		vec3 vBaseDirRotated = (rotationMatrix(vec3(0, 1, 0), sin(time*0.7f)*0.1f)*vec4(vBaseDir[i], 1.0)).xyz;
 
 		vLocalSeed = vGrassFieldPos*float(i);
 		int iGrassPatch = randomInt(0, 3);
@@ -84,7 +80,7 @@ void main()
 		float fTCStartX = float(iGrassPatch)*0.25f;
 		float fTCEndX = fTCStartX+0.25f;
 
-		float fWindPower = 0.5f+sin(vGrassFieldPos.x/30+vGrassFieldPos.z/30+fTimePassed*(1.2f+fWindStrength/20.0f));
+		float fWindPower = 0.5f+sin(vGrassFieldPos.x/30+vGrassFieldPos.z/30+time*(1.2f+fWindStrength/20.0f));
 		if(fWindPower < 0.0f)
 			fWindPower = fWindPower*0.2f;
 		else fWindPower = fWindPower*0.3f;

@@ -14,6 +14,7 @@ private :
     GLuint program_id_;
     GLuint vertex_array_id_;   // memory buffer
     GLuint vertex_buffer_object_;   // memory buffer
+    GLuint m_texture_id;
     GLuint m_grass_triangles_count;
     float m_fGrassPatchOffsetMin;
     float m_fGrassPatchOffsetMax;
@@ -39,6 +40,7 @@ public :
     }
 
     void Init() {
+
         program_id_ = icg_helper::LoadShaders("grass_vshader.glsl",
                                               "grass_fshader.glsl",
                                               "grass_gshader.glsl");
@@ -59,8 +61,8 @@ public :
             while (vCurPatchPos.x < m_maxXpos) {
                 vCurPatchPos.z = m_minZpos;
                 while (vCurPatchPos.z < m_maxZpos) {
-                    vCurPatchPos.z += m_fGrassPatchOffsetMin +
-                                      (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
+                    vCurPatchPos.z += m_fGrassPatchOffsetMin ; //+
+                                      //(m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
                     vCurPatchPos.y = m_terrain->getHeight(vec2(vCurPatchPos.x, vCurPatchPos.z));
                     m_grass_triangles_count += 1;
                     vertex_point.push_back(vCurPatchPos.x);
@@ -68,8 +70,8 @@ public :
                     vertex_point.push_back(vCurPatchPos.z);
                 }
 
-                vCurPatchPos.x += m_fGrassPatchOffsetMin +
-                                  (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
+                vCurPatchPos.x += m_fGrassPatchOffsetMin ;//+
+                                 // (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
             }
 
             // buffer
@@ -85,23 +87,105 @@ public :
                                   ZERO_STRIDE, ZERO_BUFFER_OFFSET);
         }
 
+        m_texture_id = loadDDS("grassPack.dds");
+        glUniform1i(glGetUniformLocation(program_id_, "gSampler"), 0 /*GL_TEXTURE*/);
 
         glBindVertexArray(0);
         glUseProgram(0);
     }
 
-    void Draw(const glm::mat4 &model = IDENTITY_MATRIX,
+    void Draw(float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
+
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
 
-       // draw
+        glUniformMatrix4fv(glGetUniformLocation(program_id_, "model"), ONE, DONT_TRANSPOSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(program_id_, "view"), ONE, DONT_TRANSPOSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(program_id_, "projection"), ONE, DONT_TRANSPOSE,
+                           glm::value_ptr(projection));
+
+
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, m_texture_id);
+
+
+        glUniform1f(glGetUniformLocation(program_id_, "time"), time);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+        // draw
         //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glDrawArrays(GL_POINTS, 0, m_grass_triangles_count);
+        glDisable(GL_BLEND);
 
         glBindVertexArray(0);
         glUseProgram(0);
+    }
+
+    GLuint loadDDS(const char *imagepath) {
+
+        unsigned char header[124];
+
+        FILE *fp;
+
+        /* try to open the file */
+        fp = fopen(imagepath, "rb");
+        if (fp == NULL)
+            return 0;
+
+        /* verify the type of file */
+        char filecode[4];
+        fread(filecode, 1, 4, fp);
+        if (strncmp(filecode, "DDS ", 4) != 0) {
+            fclose(fp);
+            return 0;
+        }
+
+        /* get the surface desc */
+        fread(&header, 124, 1, fp);
+
+        unsigned int height = *(unsigned int *) &(header[8]);
+        unsigned int width = *(unsigned int *) &(header[12]);
+        unsigned int linearSize = *(unsigned int *) &(header[16]);
+        unsigned int mipMapCount = *(unsigned int *) &(header[24]);
+        unsigned int fourCC = *(unsigned int *) &(header[80]);
+
+        unsigned char * buffer;
+        unsigned int bufsize;
+        /* how big is it going to be including all mipmaps? */
+        bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize;
+        buffer = (unsigned char*)malloc(bufsize * sizeof(unsigned char));
+        fread(buffer, 1, bufsize, fp);
+        /* close the file pointer */
+        fclose(fp);
+
+        unsigned int format;
+        format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+        GLuint textureID;
+        glGenTextures(1, &textureID);
+
+        // "Bind" the newly created texture : all future texture functions will modify this texture
+        glBindTexture(GL_TEXTURE_2D, textureID);
+
+        unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
+        unsigned int offset = 0;
+
+        /* load the mipmaps */
+        for (unsigned int level = 0; level < mipMapCount && (width || height); ++level)
+        {
+            unsigned int size = ((width+3)/4)*((height+3)/4)*blockSize;
+            glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height,
+                                   0, size, buffer + offset);
+
+            offset += size;
+            width  /= 2;
+            height /= 2;
+        }
+        free(buffer);
+
+        return textureID;
     }
 };
 

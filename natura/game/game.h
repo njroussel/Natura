@@ -21,15 +21,12 @@ public:
     Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window),
                                m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window) {
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
+
         m_window = window;
         m_amplitude = 9.05f;
         m_camera_mode = FLYTHROUGH;
-        const int TERRAIN_SIZE = 10;
-        const int VERT_PER_GRID_SIDE = 8;
-        m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
-        m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
 
-        m_grass = new Grass(0.1f,0.3f,4.0f,0.0f,2.0f,0.0f,2.0f,m_terrain);
+        m_grass = NULL;
         Init();
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
@@ -135,10 +132,13 @@ private:
             starting_camera_position = vec3(-cam_posxy, -5.0f, -cam_posxy);
             starting_camera_rotation = vec2(0.0f);
         }
+
         m_trackball = new Trackball();
+
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.1f, 100.0f);
         m_camera = new Camera(starting_camera_position, starting_camera_rotation, m_terrain);
         m_camera->enableFPSMode(false);
+        m_grass = new Grass(0.1f,0.2f,4.0f,0.0f,2.0f,0.0f,2.0f,m_terrain);
         m_grass->Init();
 
         // sets background color b
@@ -183,12 +183,11 @@ private:
                         m_projection->perspective());
         framebufferFloor.Unbind();
         glDisable(GL_CLIP_PLANE0);
-        m_grass->Draw(IDENTITY_MATRIX, m_camera->GetMatrix(), m_projection->perspective());
+        m_grass->Draw(m_last_time, IDENTITY_MATRIX, m_camera->GetMatrix(), m_projection->perspective());
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());
-        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix, m_camera->GetMatrix(),
-                        m_projection->perspective());
+        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix, m_camera->GetMatrix(),m_projection->perspective());
     }
 
     // transforms glfw screen coordinates into normalized OpenGL coordinates.
