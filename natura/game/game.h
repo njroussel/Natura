@@ -136,7 +136,7 @@ private:
     vec3 m_light_dir;         // Direction towards the light
     mat4 m_light_projection;  // Projection matrix for light source
     bool m_show_shadow = true;
-    bool m_do_pcf = true;
+    bool m_do_pcf = false;
     float m_bias = 0.0f;
     glm::mat4 m_offset_matrix;
     bool m_draw_from_light_pov = false;
@@ -236,7 +236,7 @@ private:
             m_camera->tick();
         }
 
-        m_light_dir = vec3(1.0, 0.1, 1.0);
+        m_light_dir = vec3(cos(time), 1, cos(time));
         m_light_dir = normalize(m_light_dir);
         float ext = 50.0f;
         m_light_projection = ortho(-ext, ext, -ext, ext, -ext, ext);
