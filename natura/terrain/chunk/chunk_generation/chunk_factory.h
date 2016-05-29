@@ -3,7 +3,7 @@
 #include "../../../perlin_noise/perlinnoise.h"
 #include <cstdint>
 #include "../chunk.h"
-#include "../../terrain.h"
+
 
 class ChunkFactory {
 public:

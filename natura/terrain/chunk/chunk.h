@@ -7,7 +7,6 @@
 #include "../../../common/icg_helper.h"
 #include "../../../external/glm/detail/type_mat.hpp"
 #include "../../../external/glm/gtc/matrix_transform.hpp"
-#include "../../grass/grass.h"
 #include "../terrain.h"
 
 #define CHUNK_SIDE_TILE_COUNT 4
@@ -18,9 +17,7 @@ public:
     Chunk(glm::vec2 pos, uint32_t quad_res, PerlinNoise *perlinNoise) {
         m_position = pos;
         m_perlin_noise = perlinNoise;
-        m_grass = new Grass(0.15f, 0.40f, 0.1f, pos.x * TERRAIN_SCALE, (pos.x + 1) * TERRAIN_SCALE,
-                            pos.y * TERRAIN_SCALE, (pos.y + 1) * TERRAIN_SCALE, );
-    }
+   }
 
     ~Chunk() { }
 
@@ -67,5 +64,4 @@ private:
     glm::vec2 m_position;
     PerlinNoise *m_perlin_noise;
     int m_chunk_noise_tex_id;
-    Grass *m_grass;
 };
