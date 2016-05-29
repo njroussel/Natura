@@ -13,6 +13,8 @@
 #include "../misc/io/input/handlers/mouse/mouse_cursor_handler.h"
 #include "../misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
 #include "../config.h"
+#include "../shadows/shadowbuffer.h"
+#include "../shadows/attrib_locations.h"
 #include <glm/gtc/matrix_transform.hpp>
 
 class Game : public Observer {
@@ -126,6 +128,17 @@ private:
 
     bool m_reverse = false;
 
+    /* Shadows. */
+    GLuint m_default_pid; /* Default pid. */
+    ShadowBuffer m_shadow_buffer;
+    GLuint m_shadow_pid;      // Handle for the shadow map genration shader program
+    GLuint m_depth_tex;       // Handle for the shadow map
+    vec3 m_light_dir;         // Direction towards the light
+    mat4 m_light_projection;  // Projection matrix for light source
+    bool m_show_shadow = true;
+    bool m_do_pcf = true;
+    float m_bias = 0.0f;
+    glm::mat4 m_offset_matrix;
 
     /* Private function. */
     void Init() {
@@ -167,6 +180,39 @@ private:
         m_perlinNoise->Init();
         GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
+
+        m_default_pid = BASE_TILE->getPID();
+        if(!m_default_pid) {
+            exit(EXIT_FAILURE);
+        }
+        glBindAttribLocation(m_default_pid, ATTRIB_LOC_vpoint, "vpoint");
+        glBindAttribLocation(m_default_pid, ATTRIB_LOC_vtexcoord, "vtexcoord");
+        glLinkProgram(m_default_pid);
+
+        m_shadow_pid = icg_helper::LoadShaders("shadow_map_vshader.glsl",
+                                             "shadow_map_fshader.glsl");
+        if(!m_shadow_pid) {
+            exit(EXIT_FAILURE);
+        }
+        glBindAttribLocation(m_shadow_pid, ATTRIB_LOC_vpoint, "vpoint");
+        glLinkProgram(m_shadow_pid);
+
+        glViewport(0,0,m_window_width,m_window_height);
+
+        float ratio = m_window_width / (float) m_window_height;
+
+        // Orthographic projection, assuming directional light.
+        float ext = 1.5f;
+        m_light_projection = ortho(-ext, ext, -ext, ext, 1.0f-ext, 1.0f+ext);
+
+        // Matrix that can be used to move a point's components from [-1, 1] to [0, 1].
+        m_offset_matrix = mat4(0.5f, 0.0f, 0.0f, 0.0f,
+                             0.0f, 0.5f, 0.0f, 0.0f,
+                             0.0f, 0.0f, 0.5f, 0.0f,
+                             0.5f, 0.5f, 0.5f, 1.0f);
+
+        check_error_gl();
+        m_depth_tex = m_shadow_buffer.Init();
     }
 
     void Display() {

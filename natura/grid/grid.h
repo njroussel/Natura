@@ -201,7 +201,7 @@ public:
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         glUseProgram(program_id_);
         glBindVertexArray(vertex_array_id_);
-
+        glUniform1i(glGetUniformLocation(program_id_, "shadow_map"), 1);
         glUniform1f(glGetUniformLocation(program_id_, "amplitude"), amplitude);
 
         glUniform1f(glGetUniformLocation(program_id_, "water_height"), water_height);
@@ -253,6 +253,9 @@ public:
         glUseProgram(0);
     }
 
+    GLuint getPID(){
+        return program_id_;
+    }
 
     void loadTexture(string filename, GLuint *texture_id, int tex_index, GLint tex_id_uniform) {
         // load grass texture
