@@ -49,6 +49,11 @@ public:
 
     void setShadowPID(GLuint pid){
         m_shadow_pid = pid;
+        glUniform1i(glGetUniformLocation(m_shadow_pid, "perlin_tex"), 0 /*GL_TEXTURE0*/);
+        glUniform1i(glGetUniformLocation(m_shadow_pid, "left_tex"), 6/*GL_TEXTURE0*/);
+        glUniform1i(glGetUniformLocation(m_shadow_pid, "low_tex"), 7 /*GL_TEXTURE0*/);
+        glUniform1i(glGetUniformLocation(m_shadow_pid, "low_left_tex"), 8 /*GL_TEXTURE0*/);
+        glUniform1i(glGetUniformLocation(m_shadow_pid, "shadow_map"), 9 /*GL_TEXTURE0*/);
     }
 
     void setUseShadowPID(bool enable){
@@ -218,17 +223,18 @@ public:
     void Draw(glm::vec2 indices, float amplitude, float water_height, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
-        glUseProgram(m_use_shadows ? m_shadow_pid : program_id_);
+        GLuint pid = m_use_shadows ? m_shadow_pid : program_id_;
+        glUseProgram(pid);
         glBindVertexArray(vertex_array_id_);
         //glUniform1i(glGetUniformLocation(program_id_, "shadow_map"), 1);
-        glUniform1f(glGetUniformLocation(program_id_, "amplitude"), amplitude);
+        glUniform1f(glGetUniformLocation(pid, "amplitude"), amplitude);
 
-        glUniform1f(glGetUniformLocation(program_id_, "water_height"), water_height);
+        glUniform1f(glGetUniformLocation(pid, "water_height"), water_height);
 
-        glUniformMatrix4fv(M_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(model));
-        glUniformMatrix4fv(V_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(view));
-        glUniformMatrix4fv(P_id_, ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
-        glUniform2fv(glGetUniformLocation(program_id_, "quad_indices"), ONE, glm::value_ptr(indices));
+        glUniformMatrix4fv(glGetUniformLocation(pid, "model"), ONE, DONT_TRANSPOSE, glm::value_ptr(model));
+        glUniformMatrix4fv(glGetUniformLocation(pid, "view"), ONE, DONT_TRANSPOSE, glm::value_ptr(view));
+        glUniformMatrix4fv(glGetUniformLocation(pid, "projection"), ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
+        glUniform2fv(glGetUniformLocation(pid, "quad_indices"), ONE, glm::value_ptr(indices));
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_perlin_id_);
@@ -251,15 +257,15 @@ public:
         glActiveTexture(GL_TEXTURE6);
         glBindTexture(GL_TEXTURE_2D, texture_left_id_);
 
-        glUniform1i(glGetUniformLocation(program_id_, "left_present"), texture_left_id_ != 0);
+        glUniform1i(glGetUniformLocation(pid, "left_present"), texture_left_id_ != 0);
 
         glActiveTexture(GL_TEXTURE7);
         glBindTexture(GL_TEXTURE_2D, texture_low_id_);
-        glUniform1i(glGetUniformLocation(program_id_, "low_present"), texture_low_id_ != 0);
+        glUniform1i(glGetUniformLocation(pid, "low_present"), texture_low_id_ != 0);
 
         glActiveTexture(GL_TEXTURE8);
         glBindTexture(GL_TEXTURE_2D, texture_low_left_id_);
-        glUniform1i(glGetUniformLocation(program_id_, "low_left_present"), texture_low_left_id_ != 0);
+        glUniform1i(glGetUniformLocation(pid, "low_left_present"), texture_low_left_id_ != 0);
 
         glActiveTexture(GL_TEXTURE9);
         glBindTexture(GL_TEXTURE_2D, m_depth_tex);

@@ -17,6 +17,14 @@ uniform sampler2D rock_tex;
 uniform sampler2D snow_tex;
 uniform sampler2D sand_tex;
 uniform sampler2D water_tex;
+
+uniform sampler2D left_tex;
+uniform bool left_present;
+uniform sampler2D low_tex;
+uniform bool low_present;
+uniform sampler2D low_left_tex;
+uniform bool low_left_present;
+
 uniform mat4 model;
 
 
@@ -52,6 +60,21 @@ vec2 poisson_disk[16] = vec2[](
    vec2(0.19984126, 0.78641367),
    vec2(0.14383161, -0.14100790)
 );
+
+float getTextureVal(vec2 pos){
+    if (pos.x >= 1.0f && pos.y >= 1.0 && low_left_present){
+        return texture(low_left_tex, vec2(pos.x - 1.0f, pos.y - 1.0f)).r;
+    }
+    else if(pos.x >= 1.0f && low_present){
+        return texture(low_tex, vec2(pos.x - 1.0f, pos.y)).r;
+    }
+    else if (pos.y >= 1.0f && left_present){
+        return texture(left_tex, vec2(pos.x, pos.y - 1.0f)).r;
+    }
+    else{
+        return texture(perlin_tex, pos).r;
+    }
+}
 
 float getPercentage( float value,  float min,  float max ){
     value = clamp( value, min, max );
@@ -90,10 +113,10 @@ void main() {
     }
 
     float epsilon = 0.005f;
-    float zDiffXaxis = texture(perlin_tex, vec2(pos_2d.x + epsilon, pos_2d.y)).r -
-                        texture(perlin_tex, vec2(pos_2d.x - epsilon, pos_2d.y)).r;
-    float zDiffYaxis = texture(perlin_tex, vec2(pos_2d.x, pos_2d.y + epsilon)).r -
-                        texture(perlin_tex, vec2(pos_2d.x, pos_2d.y - epsilon)).r;
+    float zDiffXaxis = getTextureVal(vec2(pos_2d.x + epsilon, pos_2d.y)) -
+                        getTextureVal(vec2(pos_2d.x - epsilon, pos_2d.y));
+    float zDiffYaxis = getTextureVal(vec2(pos_2d.x, pos_2d.y + epsilon))-
+                        getTextureVal(vec2(pos_2d.x, pos_2d.y - epsilon));
 
     vec3 normal = normalize(cross(vec3(2 *epsilon, zDiffXaxis, 0.0f), vec3(0.0, zDiffYaxis, 2* epsilon)));
     vec3 n = mat3(model) * -normal; // Normal in worlds coordinates.
@@ -126,7 +149,6 @@ void main() {
         if (show_shadow) {
             // perspective division
             vec3 shadow_coord_norm = shadow_coord.xyz / shadow_coord.w;
-            color = vec3(texture(shadow_map, shadow_coord_norm.xy).r);
             if (!do_pcf) {
                 // Read only 1 shadow sample.
                 if (texture(shadow_map, shadow_coord_norm.xy).r <
@@ -144,7 +166,7 @@ void main() {
             }
         }
 
-            //color = shadow * shade * color.rgb;
+            color = shadow * shade * color.rgb;
 
 
 

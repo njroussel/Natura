@@ -136,7 +136,7 @@ private:
     vec3 m_light_dir;         // Direction towards the light
     mat4 m_light_projection;  // Projection matrix for light source
     bool m_show_shadow = true;
-    bool m_do_pcf = false;
+    bool m_do_pcf = true;
     float m_bias = 0.0f;
     glm::mat4 m_offset_matrix;
     bool m_draw_from_light_pov = false;
@@ -147,7 +147,7 @@ private:
     void Init() {
         const bool top_down_view = false;
         const int TERRAIN_SIZE = 10;
-        const int VERT_PER_GRID_SIDE = 8;
+        const int VERT_PER_GRID_SIDE = 16;
         const float cam_posxy = TERRAIN_SCALE * ((float) (TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
 
         vec3 starting_camera_position;
@@ -236,7 +236,7 @@ private:
             m_camera->tick();
         }
 
-        m_light_dir = vec3(cos(time), 1, cos(time));
+        m_light_dir = vec3(cos(time), 0.5, sin(time));
         m_light_dir = normalize(m_light_dir);
         float ext = 50.0f;
         m_light_projection = ortho(-ext, ext, -ext, ext, -ext, ext);
@@ -374,6 +374,7 @@ private:
     void keyCallback(KeyboardHandlerMessage *message) {
         GLFWwindow *window = message->getWindow();
         int key = message->getKey();
+        int mods = message->getMods();
         int action = message->getAction();
         if (action == GLFW_PRESS) {
             if (key == GLFW_KEY_W && !m_camera->hasAcceleration(DIRECTION::Forward)) {
@@ -433,6 +434,13 @@ private:
             }
             if (key == GLFW_KEY_Z){
                 m_draw_from_light_pov = !m_draw_from_light_pov;
+            }
+            if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && mods == GLFW_MOD_SHIFT) {
+                m_bias -= 0.0005f;
+            }
+
+            else if (key == GLFW_KEY_RIGHT && action == GLFW_PRESS && mods == GLFW_MOD_SHIFT) {
+                m_bias += 0.0005f;
             }
         }
 
