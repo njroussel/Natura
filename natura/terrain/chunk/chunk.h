@@ -27,12 +27,12 @@ private :
     float m_maxXpos;
     float m_minZpos;
     float m_maxZpos;
-    Chunk* m_chunk;
+    PerlinNoise* m_perlin_noise;
 
 public :
 
     Grass(float fGrassPatchOffsetMin, float fGrassPatchOffsetMax, float fGrassPatchHeight, float minXpos, float maxXpos,
-          float minZpos, float maxZpos, Chunk * chunk) {
+          float minZpos, float maxZpos, PerlinNoise * perlinNoise) {
         m_fGrassPatchOffsetMin = fGrassPatchOffsetMin;
         m_fGrassPatchOffsetMax = fGrassPatchOffsetMax;
         m_fGrassPatchHeight = fGrassPatchHeight;
@@ -40,7 +40,7 @@ public :
         m_maxXpos = maxXpos;
         m_minZpos = minZpos;
         m_maxZpos = maxZpos;
-        m_chunk = chunk;
+        m_perlin_noise = perlinNoise;
     }
 
     void Init() {
@@ -67,7 +67,7 @@ public :
                 while (vCurPatchPos.z < m_maxZpos) {
                     vCurPatchPos.z += m_fGrassPatchOffsetMin; //+
                     //(m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
-                    vCurPatchPos.y = m_chunk->getHeight(vec2(vCurPatchPos.x, vCurPatchPos.z));
+                    vCurPatchPos.y = getHeight(vec2(vCurPatchPos.x, vCurPatchPos.z));
                     m_grass_triangles_count += 1;
                     vertex_point.push_back(vCurPatchPos.x);
                     vertex_point.push_back(vCurPatchPos.y);
@@ -130,6 +130,35 @@ public :
 
         glBindVertexArray(0);
         glUseProgram(0);
+    }
+
+    float getHeight(glm::vec2 pos) {
+        glm::vec3 tmp = glm::vec3(pos.x, 0, pos.y);
+        tmp = getChunkPos(tmp);
+        glm::vec2 relative_pos = pos - glm::vec2(m_offset.x * CHUNK_SIDE_TILE_COUNT, m_offset.y * CHUNK_SIDE_TILE_COUNT);
+        if (relative_pos.x <= 0.f || relative_pos.x >= TERRAIN_CHUNK_SIZE * CHUNK_SIDE_TILE_COUNT ||
+            relative_pos.y <= 0.f || relative_pos.y >= TERRAIN_CHUNK_SIZE * CHUNK_SIDE_TILE_COUNT){
+            throw std::runtime_error("Out of terrain bounds " + std::to_string(tmp.x) + " " + std::to_string(tmp.y));
+        }
+
+        glm::vec2 chunk_idx = glm::vec2(tmp.x, tmp.z);
+        FrameBuffer *frameBuffer = m_perlin_noise->getFrameBufferForChunk(chunk_idx);
+
+        glm::vec2 pos_on_tex = pos - glm::vec2((chunk_idx.x + m_offset.x) * CHUNK_SIDE_TILE_COUNT,
+                                               (chunk_idx.y + m_offset.y) * CHUNK_SIDE_TILE_COUNT);
+
+        pos_on_tex.x /= (CHUNK_SIDE_TILE_COUNT);
+        pos_on_tex.y /= (CHUNK_SIDE_TILE_COUNT);
+        pos_on_tex.x *= frameBuffer->getSize().x;
+        pos_on_tex.y *= frameBuffer->getSize().y;
+
+        frameBuffer->Bind();
+        float height;
+        glReadPixels((int) pos_on_tex.x, (int) pos_on_tex.y, 1, 1, GL_RED, GL_FLOAT, &height);
+        frameBuffer->Unbind();
+
+        height = (height - 0.5f);
+        return height;
     }
 
     GLuint loadDDS(const char *imagepath) {
@@ -213,7 +242,7 @@ public :
 class Chunk : public Observer {
 public:
     Chunk(glm::vec2 pos, uint32_t quad_res, PerlinNoise *perlinNoise) {
-        m_grass = new Grass(0.1f, 0.4f, 0.4f, pos.x, pos.x + 1, pos.y, pos.y + 1, this);
+        m_grass = new Grass(0.1f, 0.4f, 0.4f, pos.x, pos.x + 1, pos.y, pos.y + 1, perlinNoise);
         m_position = pos;
         m_perlin_noise = perlinNoise;
     }
@@ -223,6 +252,7 @@ public:
     void Init() {
         m_perlin_noise->attach(this);
         m_chunk_noise_tex_id = m_perlin_noise->generateNoise(glm::vec2(m_position.x, m_position.y));
+        m_grass->Init();
     }
 
     void Draw(float amplitude, float time, float water_height, GLuint left_tex, GLuint low_tex, GLuint low_left_tex,
@@ -246,35 +276,6 @@ public:
     void Cleanup() {
 
     }
-
-    float getHeight(glm::vec2 pos) {
-        glm::vec3 tmp = glm::vec3(m_position.x, 0, m_position.y);
-        glm::vec2 relative_pos = pos - glm::vec2(CHUNK_SIDE_TILE_COUNT, CHUNK_SIDE_TILE_COUNT);
-        if (relative_pos.x <= 0.f || relative_pos.x >= TERRAIN_CHUNK_SIZE * CHUNK_SIDE_TILE_COUNT ||
-            relative_pos.y <= 0.f || relative_pos.y >= TERRAIN_CHUNK_SIZE * CHUNK_SIDE_TILE_COUNT){
-            throw std::runtime_error("Out of terrain bounds " + std::to_string(tmp.x) + " " + std::to_string(tmp.y));
-        }
-
-        glm::vec2 chunk_idx = glm::vec2(tmp.x, tmp.z);
-        FrameBuffer *frameBuffer = m_perlin_noise->getFrameBufferForChunk(chunk_idx);
-
-        glm::vec2 pos_on_tex = pos - glm::vec2((chunk_idx.x) * CHUNK_SIDE_TILE_COUNT,
-                                               (chunk_idx.y) * CHUNK_SIDE_TILE_COUNT);
-
-        pos_on_tex.x /= (CHUNK_SIDE_TILE_COUNT);
-        pos_on_tex.y /= (CHUNK_SIDE_TILE_COUNT);
-        pos_on_tex.x *= frameBuffer->getSize().x;
-        pos_on_tex.y *= frameBuffer->getSize().y;
-
-        frameBuffer->Bind();
-        float height;
-        glReadPixels((int) pos_on_tex.x, (int) pos_on_tex.y, 1, 1, GL_RED, GL_FLOAT, &height);
-        frameBuffer->Unbind();
-
-        height = (height - 0.5f);
-        return height;
-    }
-
 
     virtual void update(Message *msg) {
         if (msg->getType() == Message::Type::PERLIN_PROP_CHANGE) {

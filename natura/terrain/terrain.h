@@ -115,34 +115,6 @@ public:
         //}while (redo);
     }
 
-    float getHeight(glm::vec2 pos) {
-        glm::vec3 tmp = glm::vec3(pos.x, 0, pos.y);
-        tmp = getChunkPos(tmp);
-        glm::vec2 relative_pos = pos - glm::vec2(m_offset.x * CHUNK_SIDE_TILE_COUNT, m_offset.y * CHUNK_SIDE_TILE_COUNT);
-        if (relative_pos.x <= 0.f || relative_pos.x >= TERRAIN_CHUNK_SIZE * CHUNK_SIDE_TILE_COUNT ||
-                relative_pos.y <= 0.f || relative_pos.y >= TERRAIN_CHUNK_SIZE * CHUNK_SIDE_TILE_COUNT){
-            throw std::runtime_error("Out of terrain bounds " + std::to_string(tmp.x) + " " + std::to_string(tmp.y));
-        }
-
-        glm::vec2 chunk_idx = glm::vec2(tmp.x, tmp.z);
-        FrameBuffer *frameBuffer = m_perlin_noise->getFrameBufferForChunk(chunk_idx);
-
-        glm::vec2 pos_on_tex = pos - glm::vec2((chunk_idx.x + m_offset.x) * CHUNK_SIDE_TILE_COUNT,
-                                               (chunk_idx.y + m_offset.y) * CHUNK_SIDE_TILE_COUNT);
-
-        pos_on_tex.x /= (CHUNK_SIDE_TILE_COUNT);
-        pos_on_tex.y /= (CHUNK_SIDE_TILE_COUNT);
-        pos_on_tex.x *= frameBuffer->getSize().x;
-        pos_on_tex.y *= frameBuffer->getSize().y;
-
-        frameBuffer->Bind();
-        float height;
-        glReadPixels((int) pos_on_tex.x, (int) pos_on_tex.y, 1, 1, GL_RED, GL_FLOAT, &height);
-        frameBuffer->Unbind();
-
-        height = (height - 0.5f) * m_amplitude;
-        return height;
-    }
 
     enum Direction {
         NORTH, SOUTH, EST, WEST
