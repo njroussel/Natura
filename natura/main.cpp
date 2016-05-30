@@ -16,7 +16,6 @@
 #include "physics/material_point.h"
 #include "physics/ball.h"
 #include "camera/camera.h"
-#include "grass/grass.h"
 
 using namespace glm;
 
@@ -57,7 +56,7 @@ int main(int argc, char *argv[]) {
 
     // makes the OpenGL context of window current on the calling thread
     glfwMakeContextCurrent(window);
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 
     // GLEW Initialization (must have a context)
     // https://www.opengl.org/wiki/OpenGL_Loading_Library

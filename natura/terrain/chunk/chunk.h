@@ -11,11 +11,14 @@
 
 #define CHUNK_SIDE_TILE_COUNT 4
 
+
 class Grass {
 
 private :
 
     GLuint program_id_;
+
+
     GLuint vertex_array_id_;   // memory buffer
     GLuint vertex_buffer_object_;   // memory buffer
     GLuint m_texture_id;
@@ -30,9 +33,11 @@ private :
     PerlinNoise *m_perlin_noise;
     vec2 m_chunck_pos;
 
+
 public :
 
-    Grass(vec2 chunck_pos, float fGrassPatchOffsetMin, float fGrassPatchOffsetMax, float fGrassPatchHeight,
+
+    Grass(GLuint program_id, vec2 chunck_pos, float fGrassPatchOffsetMin, float fGrassPatchOffsetMax, float fGrassPatchHeight,
           PerlinNoise *perlinNoise) {
         m_fGrassPatchOffsetMin = fGrassPatchOffsetMin;
         m_fGrassPatchOffsetMax = fGrassPatchOffsetMax;
@@ -43,13 +48,13 @@ public :
         m_minZpos = 0;
         m_maxZpos = CHUNK_SIDE_TILE_COUNT;
         m_perlin_noise = perlinNoise;
+        program_id_ = program_id;
     }
 
     void Init() {
-
         program_id_ = icg_helper::LoadShaders("grass_vshader.glsl",
-                                              "grass_fshader.glsl",
-                                              "grass_gshader.glsl");
+                                                           "grass_fshader.glsl",
+                                                           "grass_gshader.glsl");
         glUseProgram(program_id_);
 
         // vertex one vertex Array
@@ -70,8 +75,8 @@ public :
                     vCurPatchPos.z += m_fGrassPatchOffsetMin +
                                       (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
                     try {
-                        vCurPatchPos.y = getHeight(vec2(vCurPatchPos.x, vCurPatchPos.z)) - 0.02f;
-                        if (vCurPatchPos.y <= 0.0f) {
+                        vCurPatchPos.y = getHeight(vec2(vCurPatchPos.x, vCurPatchPos.z));
+                        if (vCurPatchPos.y >= WATER_HEIGHT + 0.5f && vCurPatchPos.y <= 0.1f) {
                             m_grass_triangles_count += 1;
                             vertex_point.push_back(vCurPatchPos.x);
                             vertex_point.push_back(vCurPatchPos.y);
@@ -162,7 +167,6 @@ public :
 
         glm::vec2 chunk_idx = glm::vec2(tmp.x, tmp.z);
         FrameBuffer *frameBuffer = m_perlin_noise->getFrameBufferForChunk(chunk_idx);
-        cout << "CAMERA " << frameBuffer << endl;
 
         glm::vec2 pos_on_tex = pos - glm::vec2((chunk_idx.x + TERRAIN_OFFSET.x) * CHUNK_SIDE_TILE_COUNT,
                                                (chunk_idx.y + TERRAIN_OFFSET.y) * CHUNK_SIDE_TILE_COUNT);
@@ -245,7 +249,7 @@ public :
         }
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST_MIPMAP_LINEAR);
         glGenerateMipmap(GL_TEXTURE_2D);
 
         free(buffer);
@@ -261,10 +265,10 @@ public :
 
 class Chunk : public Observer {
 public:
-    Chunk(glm::vec2 pos, uint32_t quad_res, PerlinNoise *perlinNoise) {
+    Chunk(GLuint grass_program_id, glm::vec2 pos, uint32_t quad_res, PerlinNoise *perlinNoise) {
         m_position = pos;
         m_perlin_noise = perlinNoise;
-        m_grass = new Grass(pos, 1.0f, 2.0f, 0.4f, perlinNoise);
+        m_grass = new Grass(grass_program_id, pos, 0.001f, 0.1f, 0.4f, perlinNoise);
     }
 
     ~Chunk() { }
@@ -279,7 +283,7 @@ public:
               const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
-        //m_grass->Draw(amplitude, time, model, view, projection);
+        m_grass->Draw(amplitude, time, model, view, projection);
         for (int i = 0; i < CHUNK_SIDE_TILE_COUNT; i++) {
             for (int j = 0; j < CHUNK_SIDE_TILE_COUNT; j++) {
                 BASE_TILE->setTextureId(m_chunk_noise_tex_id);

@@ -2,7 +2,6 @@
 
 #include "../projection.h"
 #include "../camera/camera.h"
-#include "../grass/grass.h"
 #include "../perlin_noise/perlinnoise.h"
 #include "../trackball.h"
 #include "../../external/glm/detail/type_mat.hpp"
@@ -17,7 +16,7 @@
 #include "../config.h"
 #include <glm/gtc/matrix_transform.hpp>
 
-class Game : public Observer{
+class Game : public Observer {
 public:
     Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window),
                                m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window) {
@@ -34,6 +33,8 @@ public:
         m_pos_curve.setTimeLength(10.f);
         m_draw_curves = false;
         m_loop_curves = false;
+
+
     }
 
     ~Game() {
@@ -141,7 +142,7 @@ private:
 
     bool m_reverse = false;
 
-    vector<Ball*> m_balls;
+    vector<Ball *> m_balls;
 
 
     /* Private function. */
@@ -166,6 +167,7 @@ private:
 
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.025f, 400.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
+
         m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
         m_camera = new Camera(starting_camera_position, starting_camera_rotation, m_terrain);
         //m_camera->enableFpsMode();
@@ -202,7 +204,7 @@ private:
             cout << "Ticks : " << 1 / (time - m_last_time_tick) << endl;
             m_last_time_tick = time;
             m_camera->tick();
-            for(int i = 0; i < m_balls.size(); i++){
+            for (int i = 0; i < m_balls.size(); i++) {
                 m_balls[i]->tick(-m_camera->getPosition());
             }
         }
@@ -227,7 +229,7 @@ private:
                         m_camera->GetMatrix(),
                         m_projection->perspective());
 
-        for(int i = 0; i < m_balls.size(); i++){
+        for (int i = 0; i < m_balls.size(); i++) {
             m_balls[i]->Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
         }
 
@@ -235,17 +237,6 @@ private:
             m_look_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
             m_pos_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
         }
-    }
-
-    // transforms glfw screen coordinates into normalized OpenGL coordinates.
-    static vec2 TransformScreenCoords(GLFWwindow *window, int x, int y) {
-        // the framebuffer and the window doesn't necessarily have the same size
-        // i.e. hidpi screens. so we need to get the correct one
-        int width;
-        int height;
-        glfwGetWindowSize(window, &width, &height);
-        return vec2(2.0f * (float) x / width - 1.0f,
-                    1.0f - 2.0f * (float) y / height);
     }
 
     void mouseButtonCallback(MouseButtonHandlerMessage *message) {
@@ -350,11 +341,12 @@ private:
                 m_pos_curve.enableLoop(m_loop_curves);
             }
             if (key == GLFW_KEY_P) {
-                Ball *new_ball = new Ball(-m_camera->getFrontPoint() / TERRAIN_SCALE, -(m_camera->getFrontPoint() - m_camera->getPosition()), m_terrain);
+                Ball *new_ball = new Ball(-m_camera->getFrontPoint() / TERRAIN_SCALE,
+                                          -(m_camera->getFrontPoint() - m_camera->getPosition()), m_terrain);
                 m_balls.push_back(new_ball);
                 new_ball->attach(this);
             }
-            if (key == GLFW_KEY_F){
+            if (key == GLFW_KEY_F) {
                 if (m_camera->getCameraMode() == CAMERA_MODE::Fps)
                     m_camera->enableFlyThroughtMode();
                 else
@@ -408,23 +400,23 @@ private:
                                         - .05f);
                     break;
 
-              /*  case GLFW_KEY_F:
-                    m_perlinNoise->
-                            setProperty(PerlinNoiseProperty::FREQUENCY,
-                                        m_perlinNoise
-                                                ->
-                                                        getProperty(PerlinNoiseProperty::FREQUENCY)
-                                        + 0.1f);
-                    break;
+                    /*  case GLFW_KEY_F:
+                          m_perlinNoise->
+                                  setProperty(PerlinNoiseProperty::FREQUENCY,
+                                              m_perlinNoise
+                                                      ->
+                                                              getProperty(PerlinNoiseProperty::FREQUENCY)
+                                              + 0.1f);
+                          break;
 
-                case GLFW_KEY_V:
-                    m_perlinNoise->
-                            setProperty(PerlinNoiseProperty::FREQUENCY,
-                                        m_perlinNoise
-                                                ->
-                                                        getProperty(PerlinNoiseProperty::FREQUENCY)
-                                        - 0.1f);
-                    break;*/
+                      case GLFW_KEY_V:
+                          m_perlinNoise->
+                                  setProperty(PerlinNoiseProperty::FREQUENCY,
+                                              m_perlinNoise
+                                                      ->
+                                                              getProperty(PerlinNoiseProperty::FREQUENCY)
+                                              - 0.1f);
+                          break;*/
 
                 case GLFW_KEY_O:
                     m_perlinNoise->

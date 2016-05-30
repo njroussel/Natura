@@ -9,6 +9,7 @@ uniform	mat4 model;
 uniform	mat4 view;
 
 out vec2 vTexCoord;
+out float distance_camera;
 
 uniform float time;
 
@@ -41,8 +42,8 @@ float randZeroOne()
 
 int randomInt(int min, int max)
 {
-	float fRandomFloat = randZeroOne();
-	return 2;
+    float fRandomFloat = randZeroOne();
+	return int(float(min)+fRandomFloat*float(max-min));
 }
 
 void main()
@@ -58,21 +59,20 @@ void main()
 		vec3(float(cos(45.0*PIover180)), 0.0f, float(sin(45.0*PIover180))),
 		vec3(float(cos(-45.0*PIover180)), 0.0f, float(sin(-45.0*PIover180))));
 
-	float fGrassPatchSize = 5.0;
-	float fWindStrength = 4.0;
+	float fGrassPatchSize = 0.1f;
+	float fWindStrength = 0.1f;
 
 	vec3 vWindDirection = vec3(1.0, 0.0, 1.0);
 	vWindDirection = normalize(vWindDirection);
 
 	for(int i = 0; i < 3; i++)
 	{
-
 		vec3 vBaseDirRotated = (rotationMatrix(vec3(0, 1, 0), sin(time*0.7f)*0.1f)*vec4(vBaseDir[i], 1.0)).xyz;
 
 		vLocalSeed = vGrassFieldPos*float(i);
 		int iGrassPatch = randomInt(0, 3);
 
-		float fGrassPatchHeight = 3.5+randZeroOne()*2.0;
+		float fGrassPatchHeight = randZeroOne()* 0.2f;
 
 		float fTCStartX = float(iGrassPatch)*0.25f;
 		float fTCEndX = fTCStartX+0.25f;
@@ -88,11 +88,13 @@ void main()
 		vec3 vTL = vGrassFieldPos - vBaseDirRotated*fGrassPatchSize*0.5f + vWindDirection*fWindPower;
 		vTL.y += fGrassPatchHeight;
 		gl_Position = mMVP*vec4(vTL, 1.0);
+		distance_camera = length(mMV *vec4(vTL, 1.0));
 		vTexCoord = vec2(fTCStartX, 1.0);
 		EmitVertex();
 
 		// Grass patch bottom left vertex
 		vec3 vBL = vGrassFieldPos - vBaseDir[i]*fGrassPatchSize*0.5f;
+		distance_camera = length(mMV *vec4(vBL, 1.0));
 		gl_Position = mMVP*vec4(vBL, 1.0);
 		vTexCoord = vec2(fTCStartX, 0.0);
 		EmitVertex();
@@ -101,12 +103,14 @@ void main()
 		vec3 vTR = vGrassFieldPos + vBaseDirRotated*fGrassPatchSize*0.5f + vWindDirection*fWindPower;
 		vTR.y += fGrassPatchHeight;
 		gl_Position = mMVP*vec4(vTR, 1.0);
+		distance_camera = length(mMV *vec4(vTR, 1.0));
 		vTexCoord = vec2(fTCEndX, 1.0);
 		EmitVertex();
 
 		// Grass patch bottom right vertex
 		vec3 vBR = vGrassFieldPos + vBaseDir[i]*fGrassPatchSize*0.5f;
 		gl_Position = mMVP*vec4(vBR, 1.0);
+		distance_camera = length(mMV *vec4(vBR, 1.0));
 		vTexCoord = vec2(fTCEndX, 0.0);
 		EmitVertex();
 

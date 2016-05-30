@@ -82,10 +82,7 @@ public:
         vec3 pos = getPosition();
         mirrored = glm::rotate(mirrored, radians(-m_rotation.y), vec3(1.0f, 0.0f, 0.0f));
         mirrored = glm::rotate(mirrored, radians(m_rotation.x), vec3(0.0f, 1.0f, 0.0f));
-        cout << pos.y << endl;
-        cout << axisHeight << endl;
         vec3 new_pos = vec3(pos.x, (axisHeight - (pos.y - axisHeight)), pos.z);
-        cout << new_pos.y << endl;
         mirrored = glm::translate(mirrored, new_pos);
         return mirrored;
     }

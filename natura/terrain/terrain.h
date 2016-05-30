@@ -12,8 +12,8 @@
 
 class Terrain {
 public:
-    Terrain(uint32_t chunk_per_side, uint32_t quad_side_size, PerlinNoise *perlinNoise) : m_chunk_factory(
-            quad_side_size, perlinNoise) {
+    Terrain(  uint32_t chunk_per_side, uint32_t quad_side_size, PerlinNoise *perlinNoise)
+            : m_chunk_factory( quad_side_size, perlinNoise) {
         for (int i = 0; i < chunk_per_side; i++) {
             std::deque<Chunk *> row;
             for (int j = 0; j < chunk_per_side; j++) {
@@ -118,15 +118,15 @@ public:
     float getHeight(glm::vec2 pos) {
         glm::vec3 tmp = glm::vec3(pos.x, 0, pos.y);
         tmp = getChunkPos(tmp);
-        glm::vec2 relative_pos = pos - glm::vec2(TERRAIN_OFFSET.x * CHUNK_SIDE_TILE_COUNT, TERRAIN_OFFSET.y * CHUNK_SIDE_TILE_COUNT);
+        glm::vec2 relative_pos =
+                pos - glm::vec2(TERRAIN_OFFSET.x * CHUNK_SIDE_TILE_COUNT, TERRAIN_OFFSET.y * CHUNK_SIDE_TILE_COUNT);
         if (relative_pos.x <= 0.f || relative_pos.x >= TERRAIN_CHUNK_SIZE * CHUNK_SIDE_TILE_COUNT ||
-                relative_pos.y <= 0.f || relative_pos.y >= TERRAIN_CHUNK_SIZE * CHUNK_SIDE_TILE_COUNT){
+            relative_pos.y <= 0.f || relative_pos.y >= TERRAIN_CHUNK_SIZE * CHUNK_SIDE_TILE_COUNT) {
             throw std::runtime_error("Out of terrain bounds " + std::to_string(tmp.x) + " " + std::to_string(tmp.y));
         }
 
         glm::vec2 chunk_idx = glm::vec2(tmp.x, tmp.z);
         FrameBuffer *frameBuffer = m_perlin_noise->getFrameBufferForChunk(chunk_idx);
-        cout << "CAMERA " << frameBuffer<< endl;
 
         glm::vec2 pos_on_tex = pos - glm::vec2((chunk_idx.x + TERRAIN_OFFSET.x) * CHUNK_SIDE_TILE_COUNT,
                                                (chunk_idx.y + TERRAIN_OFFSET.y) * CHUNK_SIDE_TILE_COUNT);
@@ -188,7 +188,8 @@ private:
                 m_perlin_noise->setTerrainOffset(TERRAIN_OFFSET);
                 for (int i = 0; i < m_chunks.size(); i++) {
                     m_chunks[i].pop_back();
-                    m_chunks[i].push_front(m_chunk_factory.createChunk(glm::vec2(TERRAIN_OFFSET.x + i, TERRAIN_OFFSET.y)));
+                    m_chunks[i].push_front(
+                            m_chunk_factory.createChunk(glm::vec2(TERRAIN_OFFSET.x + i, TERRAIN_OFFSET.y)));
                     m_chunks[i][0]->Init();
                 }
                 break;
