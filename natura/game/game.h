@@ -239,8 +239,8 @@ private:
         glm::vec3 tmp = -m_camera->getPosition();
         m_light_dir = vec3(tmp.x+25, m_light_height, tmp.z-25);
         //m_light_dir = normalize(m_light_dir);
-        float ext = 75.0f;
-        m_light_projection = ortho(-ext, ext, -ext, ext, -ext, ext);
+        float ext = 60.0f;
+        m_light_projection = ortho(-ext, ext, -ext, ext, -ext, 2*ext);
         //draw as often as possible
         /* First the shadow map.*/
         glUseProgram(m_shadow_pid);
