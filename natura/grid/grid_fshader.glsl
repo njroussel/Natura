@@ -173,5 +173,5 @@ void main() {
     out_color.r = color.r;
     out_color.g = color.g;
     out_color.b = color.b;
-    out_color.a = 1.0;
+    out_color.a = fog_factor;
 }

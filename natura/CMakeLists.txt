@@ -6,6 +6,7 @@ file(GLOB_RECURSE HEADERS "*.h")
 # these files are copied only once
 file(GLOB TEXTURES
         grid/grass.tga
+        grid/grass2.tga
         grid/rock.tga
         grid/snow.tga
         grid/sand.tga
@@ -15,6 +16,7 @@ file(GLOB TEXTURES
         skybox/right.tga
         skybox/back.tga
         skybox/bottom.tga
+        grass/grassPack.dds
         skybox/front.tga
         skybox/stormydays_large.tga)
 copy_files_once(${TEXTURES})
@@ -24,10 +26,13 @@ copy_files_once(${TEXTURES})
 file(GLOB SHADERS
         grid/*.glsl
         perlin_quad/*.glsl
+        grass/*.glsl
         skybox/*.glsl
         water_grid/*.glsl
         axis/axis_fshader.glsl
         axis/axis_vshader.glsl
+        physics/ball_vshader.glsl
+        physics/ball_fshader.glsl
         camera/bezier/bezier_fshader.glsl
         camera/bezier/bezier_vshader.glsl
         shadows/shadow_map_fshader.glsl
@@ -35,24 +40,12 @@ file(GLOB SHADERS
 
 deploy_shaders_to_build_dir(${SHADERS})
 
-add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS}
-        terrain/chunk/chunk.h
-        game/game.h
-        misc/observer_subject/observer.h
-        misc/observer_subject/subject.h
-        misc/observer_subject/messages/message.h
-        misc/io/input/handlers/keyboard/keyboard_handler.h
-        misc/observer_subject/messages/keyboard_handler_message.h
-        misc/observer_subject/messages/perlin_noise_prop_changed_message.h
-        misc/io/input/handlers/mouse/mouse_button_handler.h
-        misc/observer_subject/messages/mouse_button_handler_message.h
-        misc/io/input/handlers/mouse/mouse_cursor_handler.h
-        misc/observer_subject/messages/mouse_cursor_handler_message.h
-        misc/io/input/handlers/framebuffer/framebuffer_size_handler.h
-        misc/observer_subject/messages/framebuffer_size_handler_message.h
-        terrain/chunk/chunk_generation/chunk_factory.h
-        axis/axis.h
-        physics/material_point.h
-        config.h
-        shadows/shadowbuffer.h)
+
+# these files are copied only once
+file(GLOB OBJ_FILES
+        physics/sphere.obj)
+copy_files_once(${OBJ_FILES})
+
+
+add_executable(${EXERCISENAME} ${SOURCES} ${HEADERS} ${SHADERS} )
 target_link_libraries(${EXERCISENAME} ${COMMON_LIBS})

@@ -7,6 +7,7 @@
 #include "../../external/glm/detail/type_mat.hpp"
 #include "../skybox/skybox.h"
 #include "../terrain/terrain.h"
+#include "../physics/ball.h"
 #include "../misc/observer_subject/messages/keyboard_handler_message.h"
 #include "../misc/io/input/handlers/keyboard/keyboard_handler.h"
 #include "../misc/io/input/handlers/mouse/mouse_button_handler.h"
@@ -22,8 +23,10 @@ public:
     Game(GLFWwindow *window) : m_keyboard_handler(window), m_mouse_button_handler(window),
                                m_mouse_cursor_handler(window), m_frame_buffer_size_handler(window) {
         glfwGetWindowSize(window, &m_window_width, &m_window_height);
+
         m_window = window;
         m_amplitude = 9.05f;
+
         Init();
         glfwGetFramebufferSize(window, &m_window_width, &m_window_height);
         FrameBufferSizeHandlerMessage m(window, m_window_width, m_window_height);
@@ -32,6 +35,8 @@ public:
         m_pos_curve.setTimeLength(10.f);
         m_draw_curves = false;
         m_loop_curves = false;
+
+
     }
 
     ~Game() {
@@ -74,6 +79,16 @@ public:
                 resize_callback(reinterpret_cast<FrameBufferSizeHandlerMessage *>(msg));
                 break;
 
+            case Message::Type::BALL_OUT_OF_BOUNDS : {
+                BallOutOfBoundsMessage *message = reinterpret_cast<BallOutOfBoundsMessage *> (msg);
+                Ball *ball = message->getBallInstance();
+                ball->CleanUp();
+                std::vector<Ball *>::iterator position = std::find(m_balls.begin(), m_balls.end(), ball);
+                if (position != m_balls.end()) // == myVector.end() means the element was not found
+                    m_balls.erase(position);
+                break;
+            }
+
             default:
                 throw std::string("Error : Unexpected message in class Game");
         }
@@ -89,6 +104,7 @@ private:
     double m_last_mouse_xpos, m_last_mouse_ypos;
     float m_last_time_tick;
     float m_last_time_frame;
+
 
     /* Window size */
     int m_window_width;
@@ -143,11 +159,15 @@ private:
     float m_near = -10.f;
     float m_light_height = 7.f;
 
+
+    vector<Ball *> m_balls;
+
+
     /* Private function. */
     void Init() {
-        const bool top_down_view = true;
-        const int TERRAIN_SIZE = 10;
-        const int VERT_PER_GRID_SIDE = 16;
+        const bool top_down_view = false;
+        const int TERRAIN_SIZE = TERRAIN_CHUNK_SIZE;
+        const int VERT_PER_GRID_SIDE = 8;
         const float cam_posxy = TERRAIN_SCALE * ((float) (TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
 
         vec3 starting_camera_position;
@@ -160,9 +180,12 @@ private:
             starting_camera_position = vec3(-cam_posxy, -5.0f, -cam_posxy);
             starting_camera_rotation = vec2(0.0f);
         }
+
         m_trackball = new Trackball();
+
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.025f, 400.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
+
         m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
         m_camera = new Camera(starting_camera_position, starting_camera_rotation, m_terrain);
         //m_camera->enableFpsMode();
@@ -215,7 +238,6 @@ private:
                              0.0f, 0.0f, 0.5f, 0.0f,
                              0.5f, 0.5f, 0.5f, 1.0f);
 
-        check_error_gl();
         m_depth_tex = m_shadow_buffer.Init();
         BASE_TILE->setDepthTex(m_depth_tex);
     }
@@ -234,6 +256,9 @@ private:
             cout << "Ticks : " << 1 / (time - m_last_time_tick) << endl;
             m_last_time_tick = time;
             m_camera->tick();
+            for (int i = 0; i < m_balls.size(); i++) {
+                m_balls[i]->tick(-m_camera->getPosition());
+            }
         }
 
         glm::vec3 tmp = -m_camera->getPosition();
@@ -242,6 +267,7 @@ private:
         float ext = 75.0f;
         m_light_projection = ortho(-ext, ext, -ext, ext, -ext, ext);
         //draw as often as possible
+
         /* First the shadow map.*/
         glUseProgram(m_shadow_pid);
         m_shadow_buffer.Bind();
@@ -294,7 +320,9 @@ private:
         framebufferFloor.Unbind();
         glDisable(GL_CLIP_PLANE0);
 
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
         if (!m_draw_from_light_pov) {
             m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, true, m_grid_model_matrix,
                             m_camera->GetMatrix(),
@@ -305,21 +333,18 @@ private:
                             light_view,
                             m_light_projection);
         }
+        m_terrain->ExpandTerrain(m_camera->getPosition());
+
+
+
+        for (int i = 0; i < m_balls.size(); i++) {
+            m_balls[i]->Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
+        }
+
         if (m_look_curve.Size() > 1 && m_pos_curve.Size() > 1 && m_draw_curves) {
             m_look_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
             m_pos_curve.Draw(m_grid_model_matrix, m_camera->GetMatrix(), m_projection->perspective());
         }
-    }
-
-    // transforms glfw screen coordinates into normalized OpenGL coordinates.
-    static vec2 TransformScreenCoords(GLFWwindow *window, int x, int y) {
-        // the framebuffer and the window doesn't necessarily have the same size
-        // i.e. hidpi screens. so we need to get the correct one
-        int width;
-        int height;
-        glfwGetWindowSize(window, &width, &height);
-        return vec2(2.0f * (float) x / width - 1.0f,
-                    1.0f - 2.0f * (float) y / height);
     }
 
     void mouseButtonCallback(MouseButtonHandlerMessage *message) {
@@ -425,9 +450,12 @@ private:
                 m_pos_curve.enableLoop(m_loop_curves);
             }
             if (key == GLFW_KEY_P) {
-                m_reverse = !m_reverse;
+                Ball *new_ball = new Ball(-m_camera->getFrontPoint() / TERRAIN_SCALE,
+                                          -(m_camera->getFrontPoint() - m_camera->getPosition()), m_terrain);
+                m_balls.push_back(new_ball);
+                new_ball->attach(this);
             }
-            if (key == GLFW_KEY_F){
+            if (key == GLFW_KEY_F) {
                 if (m_camera->getCameraMode() == CAMERA_MODE::Fps)
                     m_camera->enableFlyThroughtMode();
                 else
@@ -507,23 +535,23 @@ private:
                                         - .05f);
                     break;
 
-              /*  case GLFW_KEY_F:
-                    m_perlinNoise->
-                            setProperty(PerlinNoiseProperty::FREQUENCY,
-                                        m_perlinNoise
-                                                ->
-                                                        getProperty(PerlinNoiseProperty::FREQUENCY)
-                                        + 0.1f);
-                    break;
+                    /*  case GLFW_KEY_F:
+                          m_perlinNoise->
+                                  setProperty(PerlinNoiseProperty::FREQUENCY,
+                                              m_perlinNoise
+                                                      ->
+                                                              getProperty(PerlinNoiseProperty::FREQUENCY)
+                                              + 0.1f);
+                          break;
 
-                case GLFW_KEY_V:
-                    m_perlinNoise->
-                            setProperty(PerlinNoiseProperty::FREQUENCY,
-                                        m_perlinNoise
-                                                ->
-                                                        getProperty(PerlinNoiseProperty::FREQUENCY)
-                                        - 0.1f);
-                    break;*/
+                      case GLFW_KEY_V:
+                          m_perlinNoise->
+                                  setProperty(PerlinNoiseProperty::FREQUENCY,
+                                              m_perlinNoise
+                                                      ->
+                                                              getProperty(PerlinNoiseProperty::FREQUENCY)
+                                              - 0.1f);
+                          break;*/
 
                 case GLFW_KEY_O:
                     m_perlinNoise->

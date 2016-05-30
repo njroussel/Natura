@@ -16,3 +16,4 @@
 #define BALL_MAX_FROZEN_TIME 30.f
 
 glm::vec2 TERRAIN_OFFSET;
+GLuint grass_program_id;
