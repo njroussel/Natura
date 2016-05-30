@@ -14,7 +14,7 @@ public:
     }
 
     Chunk *createChunk(glm::vec2 indices){
-        return new Chunk(m_grass_program_id, indices, m_tile_side_size, m_perlin_noise);
+        return new Chunk( indices, m_tile_side_size, m_perlin_noise);
     }
 
 private:

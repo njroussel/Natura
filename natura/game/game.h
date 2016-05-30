@@ -223,7 +223,7 @@ private:
 
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_terrain->ExpandTerrain(m_camera->getPosition());
+        //m_terrain->ExpandTerrain(m_camera->getPosition());
 
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix,
                         m_camera->GetMatrix(),

@@ -169,6 +169,7 @@ private:
     }
 
     void _expand(Direction dir) {
+
         switch (dir) {
             case SOUTH: {
                 TERRAIN_OFFSET.y++;
@@ -220,5 +221,6 @@ private:
                 break;
             }
         }
+
     }
 };

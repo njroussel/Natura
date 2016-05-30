@@ -185,7 +185,7 @@ public:
             glUniform1i(glGetUniformLocation(program_id_, "low_left_tex"), 8 /*GL_TEXTURE0*/);
         }
 
-        loadTexture("grass.tga", &texture_grass_id_, 1, glGetUniformLocation(program_id_, "grass_tex"));
+        loadTexture("grass2.tga", &texture_grass_id_, 1, glGetUniformLocation(program_id_, "grass_tex"));
         loadTexture("rock.tga", &texture_rock_id_, 2, glGetUniformLocation(program_id_, "rock_tex"));
         loadTexture("snow.tga", &texture_snow_id_, 3, glGetUniformLocation(program_id_, "snow_tex"));
         loadTexture("sand.tga", &texture_sand_id_, 4, glGetUniformLocation(program_id_, "sand_tex"));
