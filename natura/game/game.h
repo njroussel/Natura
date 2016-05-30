@@ -282,7 +282,6 @@ private:
         glUniformMatrix4fv(glGetUniformLocation(m_shadow_pid, "depth_vp"), 1,
                            GL_FALSE, value_ptr(depth_vp));
 
-        m_terrain->ExpandTerrain(m_camera->getPosition());
 
         glClear(GL_DEPTH_BUFFER_BIT);
         BASE_TILE->setUseShadowPID(true);
