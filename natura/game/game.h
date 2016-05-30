@@ -239,7 +239,7 @@ private:
         glm::vec3 tmp = -m_camera->getPosition();
         m_light_dir = vec3(tmp.x+25, m_light_height, tmp.z-25);
         //m_light_dir = normalize(m_light_dir);
-        float ext = 100.0f;
+        float ext = 75.0f;
         m_light_projection = ortho(-ext, ext, -ext, ext, -ext, ext);
         //draw as often as possible
         /* First the shadow map.*/
@@ -256,6 +256,7 @@ private:
         glUniformMatrix4fv(glGetUniformLocation(m_shadow_pid, "depth_vp"), 1,
                            GL_FALSE, value_ptr(depth_vp));
 
+        m_terrain->ExpandTerrain(m_camera->getPosition());
 
         glClear(GL_DEPTH_BUFFER_BIT);
         BASE_TILE->setUseShadowPID(true);
@@ -294,7 +295,6 @@ private:
         glDisable(GL_CLIP_PLANE0);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_terrain->ExpandTerrain(m_camera->getPosition());
         if (!m_draw_from_light_pov) {
             m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, true, m_grid_model_matrix,
                             m_camera->GetMatrix(),

@@ -160,7 +160,7 @@ void main() {
                 for (int i = 0; i < 16; i++) {
                   if (texture(shadow_map, shadow_coord_norm.xy + poisson_disk[i]
                               / 200.0).r < (shadow_coord_norm.z - bias)) {
-                    shadow -= 0.05;
+                    shadow -= 0.04;
                   }
                 }
             }
