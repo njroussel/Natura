@@ -194,8 +194,13 @@ public:
         GLint projection_id = glGetUniformLocation(m_program_id, "projection");
         glUniformMatrix4fv(projection_id, ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
 
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
         glDrawElements(GL_TRIANGLES, /*#vertices*/ m_shapes[0].mesh.indices.size(),
                        GL_UNSIGNED_INT, ZERO_BUFFER_OFFSET);
+
+        glDisable(GL_BLEND);
 
         vertex_point_id = glGetAttribLocation(m_program_id, "vpoint");
         if (vertex_point_id >= 0) {

@@ -10,12 +10,15 @@ uniform mat4 view;
 out vec3 view_dir;
 out vec3 light_dir;
 out vec3 normal_mv;
+out float distance_camera;
 
 
 void main() {
     mat4 MV = view * model;
     vec4 vpoint_mv = MV * vec4(vpoint, 1.0);
     gl_Position = projection * vpoint_mv;
+    distance_camera = length(vpoint_mv);
+
 
     ///>>>>>>>>>> TODO >>>>>>>>>>>
     /// TODO 1.1: Phong shading.

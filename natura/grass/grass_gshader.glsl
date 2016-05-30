@@ -66,7 +66,6 @@ void main()
 
 	for(int i = 0; i < 3; i++)
 	{
-		// Grass patch top left vertex
 
 		vec3 vBaseDirRotated = (rotationMatrix(vec3(0, 1, 0), sin(time*0.7f)*0.1f)*vec4(vBaseDir[i], 1.0)).xyz;
 
@@ -85,6 +84,7 @@ void main()
 
 		fWindPower *= fWindStrength;
 
+		// Grass patch top left vertex
 		vec3 vTL = vGrassFieldPos - vBaseDirRotated*fGrassPatchSize*0.5f + vWindDirection*fWindPower;
 		vTL.y += fGrassPatchHeight;
 		gl_Position = mMVP*vec4(vTL, 1.0);

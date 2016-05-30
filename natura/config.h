@@ -14,3 +14,5 @@
 #define CHUNK_SIDE_TILE_COUNT 4
 /* Maximum time a ball can stay in a frozen state. */
 #define BALL_MAX_FROZEN_TIME 30.f
+
+glm::vec2 TERRAIN_OFFSET;
