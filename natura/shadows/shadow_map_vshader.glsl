@@ -12,6 +12,8 @@ uniform float amplitude;
 uniform float water_height;
 uniform vec3 light_pos;
 uniform vec3 cam_pos;
+uniform vec2 chunk_pos;
+uniform int terrain_size; /* Size of terrain in chunks. */
 
 uniform sampler2D perlin_tex;
 uniform sampler2D left_tex;
@@ -31,18 +33,23 @@ out vec4 shadow_coord;
 
 /* Sampler2D are opaque types so this function is handy to avoid duplication. */
 float getTextureVal(vec2 pos){
-    /*if (pos.x >= 1.0f && pos.y >= 1.0 && low_left_present){
-        return texture(low_left_tex, vec2(0.0, 0.0)).r;
+    if (chunk_pos.x == 0 && pos.x == 0){
+        /* This is actually a trick to prevent the light coming 'under' the terrain.
+        */
+            return -100.0;
     }
-    else if(pos.x >= 1.0f && low_present){
-        return texture(low_tex, vec2(0.0f, pos.y)).r;
+    else if (chunk_pos.y == 0 && pos.y == 0){
+        return -100.0;
     }
-    else if (pos.y >= 1.0f && left_present){
-        return texture(left_tex, vec2(pos.x, 0.0f)).r;
+    else if (chunk_pos.x == terrain_size-1 && pos.x == 1.0){
+            return -100.0;
+        }
+    else if (chunk_pos.y == terrain_size-1 && pos.y == 1.0){
+        return -100.0;
     }
-    else{*/
+    else {
         return texture(perlin_tex, pos).r;
-    //}
+    }
 }
 
 void main() {

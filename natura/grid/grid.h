@@ -4,6 +4,7 @@
 #include <GLFW/glfw3.h>
 #include "icg_helper.h"
 #include "../shadows/attrib_locations.h"
+#include "../config.h"
 #include <glm/gtc/type_ptr.hpp>
 #include <cstdint>
 
@@ -220,7 +221,7 @@ public:
         glUseProgram(0);
     }
 
-    void Draw(glm::vec2 indices, float amplitude, float water_height, float time, const glm::mat4 &model = IDENTITY_MATRIX,
+    void Draw(glm::vec2 chunk_pos, glm::vec2 indices, float amplitude, float water_height, float time, const glm::mat4 &model = IDENTITY_MATRIX,
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
         GLuint pid = m_use_shadows ? m_shadow_pid : program_id_;
@@ -235,6 +236,9 @@ public:
         glUniformMatrix4fv(glGetUniformLocation(pid, "view"), ONE, DONT_TRANSPOSE, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(pid, "projection"), ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
         glUniform2fv(glGetUniformLocation(pid, "quad_indices"), ONE, glm::value_ptr(indices));
+        glUniform2fv(glGetUniformLocation(pid, "chunk_pos"), ONE, glm::value_ptr(chunk_pos));
+        cout << "chunkpos = " << chunk_pos.x << " " << chunk_pos.y << endl;
+        glUniform1i(glGetUniformLocation(pid, "terrain_size"), TERRAIN_CHUNK_SIZE);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture_perlin_id_);

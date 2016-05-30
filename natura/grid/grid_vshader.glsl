@@ -12,6 +12,8 @@ uniform float amplitude;
 uniform float water_height;
 uniform vec3 light_pos;
 uniform vec3 cam_pos;
+uniform vec2 chunk_pos;
+uniform int terrain_size; /* Size of terrain in chunks. */
 
 uniform sampler2D perlin_tex;
 uniform sampler2D left_tex;

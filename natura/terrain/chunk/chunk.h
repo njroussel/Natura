@@ -34,7 +34,7 @@ public:
                 BASE_TILE->setTextureLeft(left_tex);
                 BASE_TILE->setTextureLow(low_tex);
                 BASE_TILE->setTextureLowLeft(low_left_tex);
-                BASE_TILE->Draw(glm::vec2(i, j), amplitude, water_height, time, glm::translate(model, glm::vec3(i, 0, j)), view, projection);
+                BASE_TILE->Draw(m_position - TERRAIN_OFFSET, glm::vec2(i, j), amplitude, water_height, time, glm::translate(model, glm::vec3(i, 0, j)), view, projection);
             }
         }
     }
