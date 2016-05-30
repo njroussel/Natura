@@ -141,11 +141,11 @@ private:
     glm::mat4 m_offset_matrix;
     bool m_draw_from_light_pov = false;
     float m_near = -10.f;
-    float m_light_height = 5.f;
+    float m_light_height = 7.f;
 
     /* Private function. */
     void Init() {
-        const bool top_down_view = false;
+        const bool top_down_view = true;
         const int TERRAIN_SIZE = 10;
         const int VERT_PER_GRID_SIDE = 16;
         const float cam_posxy = TERRAIN_SCALE * ((float) (TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
@@ -153,8 +153,8 @@ private:
         vec3 starting_camera_position;
         vec2 starting_camera_rotation;
         if (top_down_view) {
-            starting_camera_position = vec3(0.0f, 0.0f, -0.0f);
-            starting_camera_rotation = vec2(180.0f, 0.0f);
+            starting_camera_position = vec3(0.0f, -10.0f, -0.0f);
+            starting_camera_rotation = vec2(0.0f, 45.0f);
         }
         else {
             starting_camera_position = vec3(-cam_posxy, -5.0f, -cam_posxy);
@@ -237,7 +237,7 @@ private:
         }
 
         glm::vec3 tmp = -m_camera->getPosition();
-        m_light_dir = vec3(tmp.x+25, tmp.z+m_light_height, tmp.z-25);
+        m_light_dir = vec3(tmp.x+25, m_light_height, tmp.z-25);
         //m_light_dir = normalize(m_light_dir);
         float ext = 100.0f;
         m_light_projection = ortho(-ext, ext, -ext, ext, -ext, ext);
@@ -251,7 +251,7 @@ private:
             //up = vec3(0.0f, 0.0f, 1.0f);
         }
         //glm::vec3 eye = -glm::vec3(4*m_light_dir.x, 4*m_light_dir.y, 4*m_light_dir.z);
-        mat4 light_view = lookAt(m_light_dir, tmp, up);
+        mat4 light_view = lookAt(m_light_dir, glm::vec3(tmp.x, 0, tmp.z), up);
         mat4 depth_vp = m_light_projection * light_view;
         glUniformMatrix4fv(glGetUniformLocation(m_shadow_pid, "depth_vp"), 1,
                            GL_FALSE, value_ptr(depth_vp));
@@ -476,10 +476,12 @@ private:
             }
             if (key == GLFW_KEY_RIGHT) {
                 m_light_height += 1;
+                cout << "light height = " << m_light_height << endl;
             }
 
             if (key == GLFW_KEY_LEFT) {
                 m_light_height-= 1;
+                cout << "light height = " << m_light_height << endl;
             }
             switch (key) {
                 case GLFW_KEY_ESCAPE:

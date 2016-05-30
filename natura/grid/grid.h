@@ -237,7 +237,6 @@ public:
         glUniformMatrix4fv(glGetUniformLocation(pid, "projection"), ONE, DONT_TRANSPOSE, glm::value_ptr(projection));
         glUniform2fv(glGetUniformLocation(pid, "quad_indices"), ONE, glm::value_ptr(indices));
         glUniform2fv(glGetUniformLocation(pid, "chunk_pos"), ONE, glm::value_ptr(chunk_pos));
-        cout << "chunkpos = " << chunk_pos.x << " " << chunk_pos.y << endl;
         glUniform1i(glGetUniformLocation(pid, "terrain_size"), TERRAIN_CHUNK_SIZE);
 
         glActiveTexture(GL_TEXTURE0);
