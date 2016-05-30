@@ -31,7 +31,7 @@ out vec4 shadow_coord;
 
 /* Sampler2D are opaque types so this function is handy to avoid duplication. */
 float getTextureVal(vec2 pos){
-    if (pos.x >= 1.0f && pos.y >= 1.0 && low_left_present){
+    /*if (pos.x >= 1.0f && pos.y >= 1.0 && low_left_present){
         return texture(low_left_tex, vec2(0.0, 0.0)).r;
     }
     else if(pos.x >= 1.0f && low_present){
@@ -40,9 +40,9 @@ float getTextureVal(vec2 pos){
     else if (pos.y >= 1.0f && left_present){
         return texture(left_tex, vec2(pos.x, 0.0f)).r;
     }
-    else{
+    else{*/
         return texture(perlin_tex, pos).r;
-    }
+    //}
 }
 
 void main() {

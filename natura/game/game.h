@@ -141,7 +141,7 @@ private:
     glm::mat4 m_offset_matrix;
     bool m_draw_from_light_pov = false;
     float m_near = -10.f;
-    float m_light_height = 1.f;
+    float m_light_height = 5.f;
 
     /* Private function. */
     void Init() {
@@ -236,9 +236,10 @@ private:
             m_camera->tick();
         }
 
-        m_light_dir = vec3(cos(time), 0.5, sin(time));
-        m_light_dir = normalize(m_light_dir);
-        float ext = 50.0f;
+        glm::vec3 tmp = -m_camera->getPosition();
+        m_light_dir = vec3(tmp.x+25, tmp.z+m_light_height, tmp.z-25);
+        //m_light_dir = normalize(m_light_dir);
+        float ext = 100.0f;
         m_light_projection = ortho(-ext, ext, -ext, ext, -ext, ext);
         //draw as often as possible
         /* First the shadow map.*/
@@ -247,10 +248,10 @@ private:
 
         vec3 up(0.0f, 1.0f, 0.0f);
         if (abs(dot(m_light_dir, up)) > 0.99) {
-            up = vec3(0.0f, 0.0f, 1.0f);
+            //up = vec3(0.0f, 0.0f, 1.0f);
         }
         //glm::vec3 eye = -glm::vec3(4*m_light_dir.x, 4*m_light_dir.y, 4*m_light_dir.z);
-        mat4 light_view = lookAt(m_light_dir, vec3(0.0f, 0.0f, 0.0f), up);
+        mat4 light_view = lookAt(m_light_dir, tmp, up);
         mat4 depth_vp = m_light_projection * light_view;
         glUniformMatrix4fv(glGetUniformLocation(m_shadow_pid, "depth_vp"), 1,
                            GL_FALSE, value_ptr(depth_vp));
@@ -258,7 +259,7 @@ private:
 
         glClear(GL_DEPTH_BUFFER_BIT);
         BASE_TILE->setUseShadowPID(true);
-        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, m_grid_model_matrix,
+        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, false, m_grid_model_matrix,
                         light_view,
                         m_light_projection);
         BASE_TILE->setUseShadowPID(false);
@@ -286,7 +287,7 @@ private:
         glEnable(GL_CLIP_PLANE0);
         framebufferFloor.Bind();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, m_grid_model_matrix,
+        m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, true, m_grid_model_matrix,
                         m_camera->getMirroredMatrix(m_terrain->m_water_height * -CHUNK_SIDE_TILE_COUNT * TERRAIN_SCALE),
                         m_projection->perspective());
         framebufferFloor.Unbind();
@@ -295,12 +296,12 @@ private:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         m_terrain->ExpandTerrain(m_camera->getPosition());
         if (!m_draw_from_light_pov) {
-            m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix,
+            m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, true, m_grid_model_matrix,
                             m_camera->GetMatrix(),
                             m_projection->perspective());
         }
         else {
-            m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, m_grid_model_matrix,
+            m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, false, m_grid_model_matrix,
                             light_view,
                             m_light_projection);
         }
@@ -555,11 +556,11 @@ private:
                                                - 0.05f);
                     break;
 
-                case GLFW_KEY_Z:
+                case GLFW_KEY_X:
                     m_amplitude += 0.1f;
                     break;
 
-                case GLFW_KEY_X:
+                case GLFW_KEY_C:
                     m_amplitude -= 0.1f;
                     break;
 

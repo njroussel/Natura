@@ -140,7 +140,7 @@ void main() {
     //color = mix(fog_colour, ambient + diffuse +specular, fog_factor);
     color = ambient + diffuse +specular;
 
-    float ambient_light = 1.0;
+    float ambient_light = 2.0;
         float shade = ambient_light + max(dot(normalize(n),
                                               normalize(sun_light_dir)), 0.0);
 
