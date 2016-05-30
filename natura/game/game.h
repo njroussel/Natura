@@ -288,6 +288,7 @@ private:
         m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), true, false, m_grid_model_matrix,
                         light_view,
                         m_light_projection);
+
         BASE_TILE->setUseShadowPID(false);
         m_shadow_buffer.Unbind();
 

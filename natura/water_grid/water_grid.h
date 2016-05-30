@@ -11,6 +11,7 @@ private:
     GLuint vertex_buffer_object_index_;     // memory buffer for indices
     GLuint program_id_;                     // GLSL shader program ID
     GLuint texture_id_;                     // texture ID
+    GLuint texture_water_id_;               // texture ID
     GLuint reflection_texture_id_;          // texture ID
     GLuint num_indices_;                    // number of vertices to render
     GLuint MV_id;                         // model, view, proj matrix ID
@@ -139,6 +140,10 @@ public:
         glUniform3fv(ks_id, ONE, glm::value_ptr(ks));
         glUniform1f(alpha_id, alpha);
 
+        glUniform1i(glGetUniformLocation(program_id_, "water_tex"), 2 /*GL_TEXTURE0*/);
+        loadTexture("tex02.tga", &texture_water_id_, 2, glGetUniformLocation(program_id_, "water_tex"));
+
+
         // to avoid the current object being polluted
         glBindVertexArray(0);
         glUseProgram(0);
@@ -168,6 +173,9 @@ public:
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, reflection_texture_id_);
 
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, texture_water_id_);
+
         // setup MV
         glm::mat4 MV = view * model;
         glUniformMatrix4fv(MV_id, ONE, DONT_TRANSPOSE, glm::value_ptr(MV));
@@ -190,5 +198,42 @@ public:
 
         glBindVertexArray(0);
         glUseProgram(0);
+    }
+
+
+    void loadTexture(string filename, GLuint *texture_id, int tex_index, GLint tex_id_uniform) {
+        // load grass texture
+        int width;
+        int height;
+        int nb_component;
+        // set stb_image to have the same coordinates as OpenGL
+        stbi_set_flip_vertically_on_load(1);
+        unsigned char *image = stbi_load(filename.c_str(), &width,
+                                         &height, &nb_component, 0);
+
+        if (image == nullptr) {
+            throw (string("Failed to load texture"));
+        }
+
+        glGenTextures(1, texture_id);
+        glBindTexture(GL_TEXTURE_2D, *texture_id);
+
+        if (nb_component == 3) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0,
+                         GL_RGB, GL_UNSIGNED_BYTE, image);
+        } else if (nb_component == 4) {
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0,
+                         GL_RGBA, GL_UNSIGNED_BYTE, image);
+        }
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        glUniform1i(tex_id_uniform, tex_index /*GL_TEXTURE*/);
+
+        // cleanup
+        stbi_image_free(image);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
 };

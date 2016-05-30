@@ -11,6 +11,7 @@ file(GLOB TEXTURES
         grid/snow.tga
         grid/sand.tga
         grid/water.tga
+        water_grid/tex02.tga
         skybox/top.tga
         skybox/left.tga
         skybox/right.tga

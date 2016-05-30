@@ -37,7 +37,7 @@ private :
 public :
 
 
-    Grass( vec2 chunck_pos, float fGrassPatchOffsetMin, float fGrassPatchOffsetMax,
+    Grass(vec2 chunck_pos, float fGrassPatchOffsetMin, float fGrassPatchOffsetMax,
           float fGrassPatchHeight,
           PerlinNoise *perlinNoise) {
         m_fGrassPatchOffsetMin = fGrassPatchOffsetMin;
@@ -70,31 +70,32 @@ public :
             vector<GLfloat> vertex_point;
 
             m_grass_triangles_count = 0;
-            glm::vec3 vCurPatchPos(m_minXpos, 0.0f, m_minZpos);
+            glm::vec3 vCurPatchPos(m_minXpos+ 0.001f, 0.0f, m_minZpos+ 0.001f);
 
 
             while (vCurPatchPos.x < m_maxXpos) {
-                vCurPatchPos.z = m_minZpos;
+                vCurPatchPos.z = m_minZpos + 0.001f;
                 while (vCurPatchPos.z < m_maxZpos) {
-                    float tmpX =  m_fGrassPatchOffsetMin +
-                                      (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
+                    float tmpX = m_fGrassPatchOffsetMin +
+                                 (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
                     vCurPatchPos.x += tmpX;
                     vCurPatchPos.z += m_fGrassPatchOffsetMin +
                                       (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
                     try {
+                        vCurPatchPos.x = glm::min(float(CHUNK_SIDE_TILE_COUNT), vCurPatchPos.x);
+                        vCurPatchPos.z = glm::min(float(CHUNK_SIDE_TILE_COUNT), vCurPatchPos.z);
                         vCurPatchPos.y = getHeight(vec2(vCurPatchPos.x, vCurPatchPos.z));
                         if (vCurPatchPos.y >= WATER_HEIGHT + 0.5f && vCurPatchPos.y <= 0.1f) {
                             m_grass_triangles_count += 1;
                             vertex_point.push_back(vCurPatchPos.x);
                             vertex_point.push_back(vCurPatchPos.y);
                             vertex_point.push_back(vCurPatchPos.z);
-
                         }
                     }
                     catch (std::runtime_error e) {
 
                     }
-                    vCurPatchPos.x -=tmpX;
+                    vCurPatchPos.x -= tmpX;
                 }
 
                 vCurPatchPos.x += m_fGrassPatchOffsetMin +
@@ -273,7 +274,7 @@ public :
 
 class Chunk : public Observer {
 public:
-    Chunk( glm::vec2 pos, uint32_t quad_res, PerlinNoise *perlinNoise) {
+    Chunk(glm::vec2 pos, uint32_t quad_res, PerlinNoise *perlinNoise) {
         m_position = pos;
         m_perlin_noise = perlinNoise;
         m_grass = new Grass(pos, 0.8f, 1.0f, 0.4f, perlinNoise);
@@ -298,7 +299,8 @@ public:
                 BASE_TILE->setTextureLeft(left_tex);
                 BASE_TILE->setTextureLow(low_tex);
                 BASE_TILE->setTextureLowLeft(low_left_tex);
-                BASE_TILE->Draw(m_position - TERRAIN_OFFSET, glm::vec2(i, j), amplitude, water_height, time, glm::translate(model, glm::vec3(i, 0, j)), view, projection);
+                BASE_TILE->Draw(m_position - TERRAIN_OFFSET, glm::vec2(i, j), amplitude, water_height, time,
+                                glm::translate(model, glm::vec3(i, 0, j)), view, projection);
 
             }
         }

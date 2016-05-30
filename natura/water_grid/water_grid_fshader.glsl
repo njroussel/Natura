@@ -14,15 +14,19 @@ uniform vec3 La, Ld, Ls;
 uniform vec3 ka, kd, ks;
 uniform float alpha;
 
-out vec4 color;
 
 uniform sampler1D colormap;
 uniform sampler2D tex_reflection;
+uniform sampler2D water_tex;
+
+out vec4 color;
+
 
 void main() {
     float epsilon = 0.005f;
     float value = height_;
-    vec3 water_color = texture(colormap, value).rgb;
+    vec3 water_color =  vec3(texture(water_tex, uv));
+
 
     vec3 ambient = water_color * 0.6 * La;
 
@@ -55,5 +59,4 @@ void main() {
 
     vec3 original_color = specular + diffuse + ambient;
     color = vec4(mix(color_from_mirror, original_color, vec3(0.65f)), min(0.6, fog_factor));
-    //color = vec4(original_color, 0.6f);
 }
