@@ -35,8 +35,6 @@ public:
         m_pos_curve.setTimeLength(10.f);
         m_draw_curves = false;
         m_loop_curves = false;
-
-
     }
 
     ~Game() {
@@ -264,6 +262,7 @@ private:
             }
         }
 
+
         glm::vec3 tmp = -m_camera->getPosition();
         m_light_dir = vec3(tmp.x+25, m_light_height, tmp.z-25);
         //m_light_dir = normalize(m_light_dir);
@@ -271,7 +270,7 @@ private:
         m_light_projection = ortho(-ext, ext, -ext, ext, -ext, 2*ext);
         //draw as often as possible
 
-        /* First the shadow map.*/
+        // First the shadow map.
         glUseProgram(m_shadow_pid);
         m_shadow_buffer.Bind();
 
@@ -332,12 +331,12 @@ private:
                             m_projection->perspective());
         }
         else {
-            m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, false, m_grid_model_matrix,
+           /* m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, false, m_grid_model_matrix,
                             light_view,
-                            m_light_projection);
+                            m_light_projection);*/
         }
 
-        //m_terrain->ExpandTerrain(m_camera->getPosition());
+        m_terrain->ExpandTerrain(m_camera->getPosition());
 
 
 

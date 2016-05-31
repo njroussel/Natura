@@ -12,7 +12,7 @@ class ShadowBuffer {
         GLint previous_viewport_[4];
 
     public:
-        ShadowBuffer(int image_width = 2*4096, int image_height = 2*4096){
+        ShadowBuffer(int image_width = 2048, int image_height = 2048){
             this->width_ = image_width;
             this->height_ = image_height;
         }
@@ -53,8 +53,8 @@ class ShadowBuffer {
 
                 //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
                 //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+            //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+              //  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             }
 
             // tie it all together
