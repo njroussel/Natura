@@ -337,7 +337,7 @@ private:
                             m_light_projection);
         }
 
-        m_terrain->ExpandTerrain(m_camera->getPosition());
+        //m_terrain->ExpandTerrain(m_camera->getPosition());
 
 
 

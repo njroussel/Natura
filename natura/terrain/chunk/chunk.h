@@ -88,7 +88,7 @@ public :
                                       (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
                     try {
                         vCurPatchPos.y = getHeight(vec2(vCurPatchPos.x, vCurPatchPos.z));
-                        if (vCurPatchPos.y >= WATER_HEIGHT + 0.5f && vCurPatchPos.y <= 0.1f) {
+                        if (vCurPatchPos.y >= -0.3 && vCurPatchPos.y <= 0.1f) {
                             m_grass_triangles_count += 1;
                             vertex_point.push_back(vCurPatchPos.x);
                             vertex_point.push_back(vCurPatchPos.y);
@@ -280,7 +280,7 @@ public:
     Chunk(glm::vec2 pos, uint32_t quad_res, PerlinNoise *perlinNoise) {
         m_position = pos;
         m_perlin_noise = perlinNoise;
-        //m_grass = new Grass(pos, 0.04f, 0.08f, 0.4f, perlinNoise);
+         m_grass = new Grass(pos, 0.04f, 0.08f, 0.4f, perlinNoise);
     }
 
     ~Chunk() { }
@@ -288,7 +288,7 @@ public:
     void Init() {
         m_perlin_noise->attach(this);
         m_chunk_noise_tex_id = m_perlin_noise->generateNoise(glm::vec2(m_position.x, m_position.y));
-        //m_grass->Init();
+        m_grass->Init();
     }
 
     void Draw(float amplitude, float time, float water_height, GLuint left_tex, GLuint low_tex, GLuint low_left_tex,
@@ -313,9 +313,8 @@ public:
                 BASE_TILE->Draw(m_position - TERRAIN_OFFSET, glm::vec2(i, j), amplitude, water_height, time, _model, view, projection);
             }
         }
-        if (time >=  INTRO_DURATION){
-            //m_grass->Draw(amplitude, time,model, view, projection);
-        }
+             m_grass->Draw(amplitude, time,model, view, projection);
+
     }
 
     void Cleanup() {
