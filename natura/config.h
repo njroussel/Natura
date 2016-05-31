@@ -9,7 +9,7 @@
 /* Size of the terrain in chunks. */
 #define TERRAIN_CHUNK_SIZE 10
 /* Height of the water grid. */
-#define WATER_HEIGHT -0.75f
+#define WATER_HEIGHT -3.75f
 /* Number of sub-tiles per chunk. */
 #define CHUNK_SIDE_TILE_COUNT 4
 /* Maximum time a ball can stay in a frozen state. */

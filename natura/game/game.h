@@ -166,6 +166,7 @@ private:
     /* Private function. */
     void Init() {
         const bool top_down_view = false;
+
         const int TERRAIN_SIZE = TERRAIN_CHUNK_SIZE;
         const int VERT_PER_GRID_SIDE = 8;
         const float cam_posxy = TERRAIN_SCALE * ((float) (TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
@@ -173,12 +174,14 @@ private:
         vec3 starting_camera_position;
         vec2 starting_camera_rotation;
         if (top_down_view) {
-            starting_camera_position = vec3(0.0f, -10.0f, -0.0f);
-            starting_camera_rotation = vec2(0.0f, 45.0f);
+            //starting_camera_position = vec3(0.0f, -10.0f, -0.0f);
+           // starting_camera_rotation = vec2(0.0f, 45.0f);
+           starting_camera_position = vec3(-cam_posxy, -10.0f, -cam_posxy);
+            starting_camera_rotation = vec2(45.0f, 35.0f);
         }
         else {
             starting_camera_position = vec3(-cam_posxy, -5.0f, -cam_posxy);
-            starting_camera_rotation = vec2(0.0f);
+            starting_camera_rotation = vec2(-180.0f, 30.0f);
         }
 
         m_trackball = new Trackball();
@@ -333,6 +336,7 @@ private:
                             light_view,
                             m_light_projection);
         }
+
         m_terrain->ExpandTerrain(m_camera->getPosition());
 
 
@@ -591,7 +595,7 @@ private:
                     break;
 
                 case GLFW_KEY_C:
-                    m_amplitude -= 0.1f;
+                    //m_amplitude -= 0.1f;
                     break;
 
                 case GLFW_KEY_J:

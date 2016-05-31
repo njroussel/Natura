@@ -43,7 +43,7 @@ public:
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
 
-        m_axis.Draw(glm::translate(model, m_axis_pos), view, projection);
+        //m_axis.Draw(glm::translate(model, m_axis_pos), view, projection);
         m_amplitude = amplitude;
 
         m_skybox->Draw(projection * view * glm::translate(model, -cam_pos / TERRAIN_SCALE));
