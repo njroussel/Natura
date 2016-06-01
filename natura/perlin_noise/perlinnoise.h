@@ -26,7 +26,6 @@ public:
         for (int i = 0 ; i < m_frame_buffers.size() ; i ++){
             for (int j = 0 ; j < m_frame_buffers[i].size() ; j ++){
                 m_frame_buffers[i][j].Init(mWidth, mHeight, GL_R32F);
-                cout << "FB (" << j << " " << i << ") tex = " << m_frame_buffers[i][j].getTextureId() << endl;
             }
         }
         quad.Init();

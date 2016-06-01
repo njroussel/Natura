@@ -249,12 +249,10 @@ private:
 
         const float time = glfwGetTime();
 
-        cout << "Frames : " << 1 / (time - m_last_time_frame) << endl;
         m_last_time_frame = time;
 
         //tick 60 times per second
         if (time - m_last_time_tick >= TICK) {
-            cout << "Ticks : " << 1 / (time - m_last_time_tick) << endl;
             m_last_time_tick = time;
             m_camera->tick();
             for (int i = 0; i < m_balls.size(); i++) {
@@ -520,12 +518,10 @@ private:
             }
             if (key == GLFW_KEY_RIGHT) {
                 m_light_height += 1;
-                cout << "light height = " << m_light_height << endl;
             }
 
             if (key == GLFW_KEY_LEFT) {
                 m_light_height-= 1;
-                cout << "light height = " << m_light_height << endl;
             }
             switch (key) {
                 case GLFW_KEY_ESCAPE:
@@ -630,7 +626,6 @@ private:
 
                 case GLFW_KEY_B:
                     m_terrain->m_water_height -= 0.05f;
-                    cout << "Water height = " << m_terrain->m_water_height << endl;
                     break;
 
 

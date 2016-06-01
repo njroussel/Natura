@@ -93,19 +93,15 @@ public:
 
         if (cam_pos.z < edge_threshold) {
             _expand(Terrain::Direction::NORTH);
-            cout << "EXPANSINO" << endl;
         }
         else if (cam_pos.z > m_chunks[0].size() - 1 - edge_threshold) {
             _expand(Terrain::Direction::SOUTH);
-            cout << "EXPANSINO" << endl;
         }
         else if (cam_pos.x < edge_threshold) {
             _expand(Terrain::Direction::WEST);
-            cout << "EXPANSINO" << endl;
         }
         else if (cam_pos.x > m_chunks.size() - 1 - edge_threshold) {
             _expand(Terrain::Direction::EST);
-            cout << "EXPANSINO" << endl;
         }
         else {
             redo = false;

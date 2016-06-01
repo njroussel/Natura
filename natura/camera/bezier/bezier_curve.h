@@ -7,7 +7,6 @@ class BezierCurve {
 public:
     glm::vec3 getPosition(float time){
         time = mod(time / m_time_length, 1.f);
-        cout << "time = " << time << endl;
         size_t n = m_control_points.size()-1;
         glm::vec3 res = glm::vec3(0, 0, 0);
         for (size_t j = 0 ; j <= n ; j ++){
