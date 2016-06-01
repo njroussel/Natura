@@ -34,6 +34,7 @@ public:
         m_mode = CAMERA_MODE::Flythrough;
         m_pos_curve = NULL;
         m_look_curve = NULL;
+        m_bezier_step = TICK;
     }
 
     void CalculateMatrix() {
@@ -64,10 +65,9 @@ public:
             }
         }
         else if (m_mode == CAMERA_MODE::Bezier) {
-            double time = glfwGetTime();
-            double delta_time = time - m_bezier_time;
-            glm::vec3 look_point = -m_look_curve->getPosition(delta_time);
-            glm::vec3 pos_point = -m_pos_curve->getPosition(delta_time);
+            m_bezier_time += m_bezier_step;
+            glm::vec3 look_point = -m_look_curve->getPosition(m_bezier_time);
+            glm::vec3 pos_point = -m_pos_curve->getPosition(m_bezier_time);
             m_position = pos_point * TERRAIN_SCALE;
             lookAtPoint(glm::vec3(TERRAIN_SCALE * look_point.x, TERRAIN_SCALE * look_point.y, TERRAIN_SCALE * look_point.z));
         }
@@ -177,6 +177,14 @@ public:
         return m_position +  getForwardDirection();
     }
 
+    float getBezierStep() {
+        return m_bezier_step;
+    }
+
+    void setBezierStep(float step) {
+        m_bezier_step = step;
+    }
+
 private:
     glm::vec2 m_rotation;
     glm::mat4 m_matrix;
@@ -185,6 +193,7 @@ private:
     BezierCurve *m_pos_curve;
     double m_bezier_time;
     float m_rotation_speed = 2.f;
+    float m_bezier_step;
 
     Terrain *m_terrain;
     CAMERA_MODE m_mode;

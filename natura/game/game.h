@@ -149,7 +149,7 @@ private:
     GLuint m_depth_tex;       // Handle for the shadow map
     vec3 m_light_dir;         // Direction towards the light
     mat4 m_light_projection;  // Projection matrix for light source
-    bool m_show_shadow = true;
+    bool m_show_shadow = false;
     bool m_do_pcf = true;
     float m_bias = 0.0f;
     glm::mat4 m_offset_matrix;
@@ -414,10 +414,16 @@ private:
         int action = message->getAction();
         if (action == GLFW_PRESS) {
             if (key == GLFW_KEY_W && !m_camera->hasAcceleration(DIRECTION::Forward)) {
-                m_camera->setMovement(DIRECTION::Forward);
+                if (m_camera->getCameraMode() == CAMERA_MODE::Bezier)
+                    m_camera->setBezierStep(m_camera->getBezierStep()*1.1f);
+                else
+                    m_camera->setMovement(DIRECTION::Forward);
             }
             if (key == GLFW_KEY_S && !m_camera->hasAcceleration(DIRECTION::Backward)) {
-                m_camera->setMovement(DIRECTION::Backward);
+                if (m_camera->getCameraMode() == CAMERA_MODE::Bezier)
+                    m_camera->setBezierStep(m_camera->getBezierStep()*0.9f);
+                else
+                    m_camera->setMovement(DIRECTION::Backward);
             }
             if (key == GLFW_KEY_A && !m_camera->hasAcceleration(DIRECTION::Left)) {
                 m_camera->setMovement(DIRECTION::Left);
