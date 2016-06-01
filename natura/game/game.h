@@ -431,9 +431,6 @@ private:
                 else
                     m_camera->enableFpsMode();
             }
-            if (key == GLFW_KEY_Z){
-                m_draw_from_light_pov = !m_draw_from_light_pov;
-            }
             if (key == GLFW_KEY_LEFT && action == GLFW_PRESS && mods == GLFW_MOD_SHIFT) {
                 m_bias -= 0.0005f;
             }
@@ -465,13 +462,6 @@ private:
         }
 
         if (action == GLFW_PRESS || action == GLFW_REPEAT) {
-            if (key == GLFW_KEY_UP) {
-                m_near += 0.5;
-            }
-
-            if (key == GLFW_KEY_DOWN) {
-                m_near -= 0.5;
-            }
             if (key == GLFW_KEY_RIGHT) {
                 m_light_height += 1;
             }
@@ -481,99 +471,15 @@ private:
             }
             switch (key) {
                 case GLFW_KEY_ESCAPE:
-                    glfwSetWindowShouldClose(window,
-                                             GL_TRUE);
+                    glfwSetWindowShouldClose(window, GL_TRUE);
                     break;
 
-                case GLFW_KEY_H:
-                    m_perlinNoise->
-                            setProperty(PerlinNoiseProperty::H,
-                                        m_perlinNoise
-                                                ->
-                                                        getProperty(PerlinNoiseProperty::H)
-                                        + .05f);
-                    break;
-
-                case GLFW_KEY_N:
-                    m_perlinNoise->
-                            setProperty(PerlinNoiseProperty::H,
-                                        m_perlinNoise
-                                                ->
-                                                        getProperty(PerlinNoiseProperty::H)
-                                        - .05f);
-                    break;
-
-                    /*  case GLFW_KEY_F:
-                          m_perlinNoise->
-                                  setProperty(PerlinNoiseProperty::FREQUENCY,
-                                              m_perlinNoise
-                                                      ->
-                                                              getProperty(PerlinNoiseProperty::FREQUENCY)
-                                              + 0.1f);
-                          break;
-
-                      case GLFW_KEY_V:
-                          m_perlinNoise->
-                                  setProperty(PerlinNoiseProperty::FREQUENCY,
-                                              m_perlinNoise
-                                                      ->
-                                                              getProperty(PerlinNoiseProperty::FREQUENCY)
-                                              - 0.1f);
-                          break;*/
-
-                case GLFW_KEY_O:
-                    m_perlinNoise->
-                            setProperty(PerlinNoiseProperty::OFFSET,
-                                        m_perlinNoise
-                                                ->
-                                                        getProperty(PerlinNoiseProperty::OFFSET)
-                                        + 0.05);
-                    break;
-
-                    /*case GLFW_KEY_L:
-                        m_perlinNoise->
-                                setProperty(PerlinNoiseProperty::OFFSET,
-                                            m_perlinNoise
-                                                    ->
-                                                            getProperty(PerlinNoiseProperty::OFFSET)
-                                            - 0.05);
-                        break;
-
-                    case GLFW_KEY_I:
-                        m_perlinNoise->
-                                setProperty(PerlinNoiseProperty::LACUNARITY,
-                                            m_perlinNoise
-                                                    ->
-                                                            getProperty(PerlinNoiseProperty::LACUNARITY)
-                                            + 0.05f);
-                        break;*/
-
-                case GLFW_KEY_K:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::LACUNARITY,
-                                               m_perlinNoise->getProperty(PerlinNoiseProperty::LACUNARITY)
-                                               - 0.05f);
-                    break;
-
-                case GLFW_KEY_X:
+                case GLFW_KEY_Z:
                     m_amplitude += 0.1f;
                     break;
 
-                case GLFW_KEY_C:
-                    //m_amplitude -= 0.1f;
-                    break;
-
-                case GLFW_KEY_J:
-                    m_perlinNoise->
-                            setProperty(PerlinNoiseProperty::OCTAVE,
-                                        m_perlinNoise
-                                                ->
-                                                        getProperty(PerlinNoiseProperty::OCTAVE)
-                                        - 1);
-                    break;
-
-                case GLFW_KEY_U:
-                    m_perlinNoise->setProperty(PerlinNoiseProperty::OCTAVE,
-                                               m_perlinNoise->getProperty(PerlinNoiseProperty::OCTAVE) + 1);
+                case GLFW_KEY_X:
+                    m_amplitude -= 0.1f;
                     break;
 
                 case GLFW_KEY_G:

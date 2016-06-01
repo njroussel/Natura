@@ -280,7 +280,7 @@ public:
     Chunk(glm::vec2 pos, uint32_t quad_res, PerlinNoise *perlinNoise) {
         m_position = pos;
         m_perlin_noise = perlinNoise;
-        m_grass = new Grass(pos, 0.24f, 0.38f, 0.4f, perlinNoise);
+        m_grass = new Grass(pos, 0.1, 0.3, 0.4f, perlinNoise);
     }
 
     ~Chunk() { }
