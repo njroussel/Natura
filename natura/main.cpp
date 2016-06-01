@@ -12,7 +12,6 @@
 #include "misc/io/input/handlers/mouse/mouse_cursor_handler.h"
 #include "misc/io/input/handlers/framebuffer/framebuffer_size_handler.h"
 #include "water_grid/water_grid.h"
-#include "axis/axis.h"
 #include "physics/material_point.h"
 #include "physics/ball.h"
 #include "camera/camera.h"

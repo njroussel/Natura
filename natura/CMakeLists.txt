@@ -30,8 +30,6 @@ file(GLOB SHADERS
         grass/*.glsl
         skybox/*.glsl
         water_grid/*.glsl
-        axis/axis_fshader.glsl
-        axis/axis_vshader.glsl
         physics/ball_vshader.glsl
         physics/ball_fshader.glsl
         camera/bezier/bezier_fshader.glsl

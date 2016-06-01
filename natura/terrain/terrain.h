@@ -3,7 +3,6 @@
 #include <cstdint>
 #include <deque>
 #include "../grid/grid.h"
-#include "../axis/axis.h"
 #include "chunk/chunk.h"
 #include "chunk/chunk_generation/chunk_factory.h"
 #include "../water_grid/water_grid.h"
@@ -24,12 +23,10 @@ public:
         m_skybox = new SkyBox();
         TERRAIN_OFFSET = glm::vec2(0, 0);
         m_perlin_noise = perlinNoise;
-        m_axis_pos = glm::vec3(0, 0, 0);
     }
 
     void Init(GLuint water_reflection_tex) {
         m_water_grid.Init(water_reflection_tex);
-        m_axis.Init();
         m_skybox->Init();
         for (size_t i = 0; i < m_chunks.size(); i++) {
             for (size_t j = 0; j < m_chunks[i].size(); j++) {
@@ -150,7 +147,6 @@ public:
         NORTH, SOUTH, EST, WEST
     };
     float m_water_height = WATER_HEIGHT;
-    glm::vec3 m_axis_pos = glm::vec3(0, 0, 0);
 
 private:
     PerlinNoise *m_perlin_noise;
@@ -158,7 +154,6 @@ private:
     ChunkFactory m_chunk_factory;
     std::deque<std::deque<Chunk *>> m_chunks;
     SkyBox *m_skybox;
-    Axis m_axis;
 
     float m_amplitude;
 
