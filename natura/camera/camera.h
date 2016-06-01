@@ -35,6 +35,7 @@ public:
         m_pos_curve = NULL;
         m_look_curve = NULL;
         m_bezier_step = TICK;
+        m_rotation_inertia = glm::vec3(0, 0, 0);
     }
 
     void CalculateMatrix() {
@@ -109,22 +110,31 @@ public:
     void AddRotation() {
         vec2 addRotation = vec2(0.0f, 0.0f);
         float speed = m_mode == CAMERA_MODE::Fps ? 1.f : m_rotation_speed;
-        if (m_pressed[Left]) {
-            glm::vec2 rot = vec2(-speed, 0);
-            addRotation += rot;
+        bool key_pressed = m_pressed[Left] || m_pressed[Right] || m_pressed[Up] || m_pressed[Down];
+        if (!key_pressed && (m_rotation_inertia.x != 0 || m_rotation_inertia.y != 0)){
+            if (m_rotation_inertia.x < 0) m_rotation_inertia.x += m_rotation_inertia_factor;
+            else if (m_rotation_inertia.x > 0) m_rotation_inertia.x -= m_rotation_inertia_factor;
+            if (m_rotation_inertia.y < 0) m_rotation_inertia.y += m_rotation_inertia_factor;
+            else if (m_rotation_inertia.y > 0) m_rotation_inertia.y -= m_rotation_inertia_factor;
         }
-        if (m_pressed[Right]) {
-            glm::vec2 rot = vec2(speed, 0);
-            addRotation += rot;
+        else {
+            if (m_pressed[Left]) {
+                m_rotation_inertia.x -= m_rotation_inertia_factor;
+            }
+            if (m_pressed[Right]) {
+                m_rotation_inertia.x += m_rotation_inertia_factor;
+            }
+            if (m_pressed[Up]) {
+                m_rotation_inertia.y -= m_rotation_inertia_factor;
+            }
+            if (m_pressed[Down]) {
+                m_rotation_inertia.y += m_rotation_inertia_factor;
+            }
         }
-        if (m_pressed[Up]) {
-            glm::vec2 rot = vec2(0, -speed);
-            addRotation += rot;
-        }
-        if (m_pressed[Down]) {
-            glm::vec2 rot = vec2(0, speed);
-            addRotation += rot;
-        }
+        if (m_rotation_inertia.x > m_rotation_speed) m_rotation_inertia.x = m_rotation_speed;
+        if (m_rotation_inertia.y > m_rotation_speed) m_rotation_inertia.y = m_rotation_speed;
+        glm::vec2 rot = vec2(speed*m_rotation_inertia.x, speed*m_rotation_inertia.y);
+        addRotation += rot;
 
         m_rotation += addRotation;
         if (m_mode == CAMERA_MODE::Fps){
@@ -194,9 +204,11 @@ private:
     BezierCurve *m_look_curve;
     BezierCurve *m_pos_curve;
     double m_bezier_time;
-    float m_rotation_speed = 2.f;
+    float const m_rotation_speed = 2.f;
     float m_bezier_step;
     const float m_bezier_step_threshold = 0.001f;
+    glm::vec3 m_rotation_inertia;
+    const float m_rotation_inertia_factor = 0.25f;
 
     Terrain *m_terrain;
     CAMERA_MODE m_mode;
