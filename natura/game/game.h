@@ -136,7 +136,7 @@ private:
     GLuint m_depth_tex;       // Handle for the shadow map
     glm::vec3 m_light_dir;         // Direction towards the light
     glm::mat4 m_light_projection;  // Projection matrix for light source
-    bool m_show_shadow = false;
+    bool m_show_shadow = true;
     bool m_do_pcf = true;
     float m_bias = 0.0f;
     glm::mat4 m_offset_matrix;
