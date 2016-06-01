@@ -183,6 +183,8 @@ public:
 
     void setBezierStep(float step) {
         m_bezier_step = step;
+        if (m_bezier_step < m_bezier_step_threshold)
+            m_bezier_step = m_bezier_step_threshold;
     }
 
 private:
@@ -194,6 +196,7 @@ private:
     double m_bezier_time;
     float m_rotation_speed = 2.f;
     float m_bezier_step;
+    const float m_bezier_step_threshold = 0.001f;
 
     Terrain *m_terrain;
     CAMERA_MODE m_mode;
