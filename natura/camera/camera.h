@@ -157,7 +157,7 @@ public:
         m_mode = CAMERA_MODE::Bezier;
         m_pos_curve = pos_curve;
         m_look_curve = look_curve;
-        m_bezier_time = glfwGetTime();
+        m_bezier_time = 0.f;
     }
 
     CAMERA_MODE getCameraMode() {
