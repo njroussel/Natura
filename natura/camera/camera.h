@@ -131,8 +131,10 @@ public:
                 m_rotation_inertia.y += m_rotation_inertia_factor;
             }
         }
-        if (m_rotation_inertia.x > m_rotation_speed) m_rotation_inertia.x = m_rotation_speed;
-        if (m_rotation_inertia.y > m_rotation_speed) m_rotation_inertia.y = m_rotation_speed;
+        if (m_rotation_inertia.x > 1.f) m_rotation_inertia.x = 1.f;
+        else if (m_rotation_inertia.x < -1.f) m_rotation_inertia.x = -1.f;
+        if (m_rotation_inertia.y > 1.f) m_rotation_inertia.y = 1.f;
+        else if (m_rotation_inertia.y < -1.f) m_rotation_inertia.y = -1.f;
         glm::vec2 rot = vec2(speed*m_rotation_inertia.x, speed*m_rotation_inertia.y);
         addRotation += rot;
 
@@ -204,11 +206,11 @@ private:
     BezierCurve *m_look_curve;
     BezierCurve *m_pos_curve;
     double m_bezier_time;
-    float const m_rotation_speed = 2.f;
+    float const m_rotation_speed = 4.f;
     float m_bezier_step;
     const float m_bezier_step_threshold = 0.001f;
     glm::vec3 m_rotation_inertia;
-    const float m_rotation_inertia_factor = 0.25f;
+    const float m_rotation_inertia_factor = 0.125f;
 
     Terrain *m_terrain;
     CAMERA_MODE m_mode;
