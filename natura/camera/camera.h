@@ -21,8 +21,8 @@ typedef enum CAMERA_MODE {
 class Camera : public MaterialPoint {
 public:
 
-    Camera(vec3 &starting_position, vec2 &starting_rotation, Terrain *terrain) : MaterialPoint(1.0, 0.4f, starting_position) {
-        m_rotation = vec2(starting_rotation.x, starting_rotation.y);
+    Camera(glm::vec3 &starting_position, glm::vec2 &starting_rotation, Terrain *terrain) : MaterialPoint(0.4f, starting_position) {
+        m_rotation = glm::vec2(starting_rotation.x, starting_rotation.y);
         m_matrix = IDENTITY_MATRIX;
         m_pressed[Forward] = false;
         m_pressed[Backward] = false;
@@ -40,8 +40,8 @@ public:
 
     void CalculateMatrix() {
         m_matrix = IDENTITY_MATRIX;
-        m_matrix = glm::rotate(m_matrix, radians(m_rotation.y), vec3(1.0f, 0.0f, 0.0f));
-        m_matrix = glm::rotate(m_matrix, radians(m_rotation.x), vec3(0.0f, 1.0f, 0.0f));
+        m_matrix = glm::rotate(m_matrix, glm::radians(m_rotation.y), glm::vec3(1.0f, 0.0f, 0.0f));
+        m_matrix = glm::rotate(m_matrix, glm::radians(m_rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
         m_matrix = glm::translate(m_matrix, getPosition());
     }
 
@@ -74,41 +74,41 @@ public:
         }
     }
 
-    mat4 &GetMatrix() {
+    glm::mat4 &GetMatrix() {
         return m_matrix;
     }
 
-    mat4 getMirroredMatrix(float axisHeight) {
-        mat4 mirrored = IDENTITY_MATRIX;
-        vec3 pos = getPosition();
-        mirrored = glm::rotate(mirrored, radians(-m_rotation.y), vec3(1.0f, 0.0f, 0.0f));
-        mirrored = glm::rotate(mirrored, radians(m_rotation.x), vec3(0.0f, 1.0f, 0.0f));
-        vec3 new_pos = vec3(pos.x, (axisHeight - (pos.y - axisHeight)), pos.z);
+    glm::mat4 getMirroredMatrix(float axisHeight) {
+        glm::mat4 mirrored = IDENTITY_MATRIX;
+        glm::vec3 pos = getPosition();
+        mirrored = glm::rotate(mirrored, glm::radians(-m_rotation.y), glm::vec3(1.0f, 0.0f, 0.0f));
+        mirrored = glm::rotate(mirrored, glm::radians(m_rotation.x), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::vec3 new_pos = glm::vec3(pos.x, (axisHeight - (pos.y - axisHeight)), pos.z);
         mirrored = glm::translate(mirrored, new_pos);
         return mirrored;
     }
 
-    void lookAtPoint(vec3 point) {
-        vec3 position = getPosition();
+    void lookAtPoint(glm::vec3 point) {
+        glm::vec3 position = getPosition();
         if(position == point){
             return;
         }
 
-        vec3 newFwd = normalize(point - position);
-        vec3 up = vec3(0.0f, 1.0f, 0.0f);
-        vec3 right = vec3(0.0f, 0.0f, 1.0f);
+        glm::vec3 newFwd = normalize(point - position);
+        glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+        glm::vec3 right = glm::vec3(0.0f, 0.0f, 1.0f);
 
-        float newYRotation = degrees(acos(dot(newFwd, up)));
+        float newYRotation = glm::degrees(acos(dot(newFwd, up)));
 
-        vec3 fwdPlaneDirection = normalize(vec3(newFwd.x, 0, newFwd.z));
-        float newXRotation =  degrees(acos(dot(fwdPlaneDirection, right)));
+        glm::vec3 fwdPlaneDirection = glm::normalize(glm::vec3(newFwd.x, 0, newFwd.z));
+        float newXRotation =  glm::degrees(acos(dot(fwdPlaneDirection, right)));
 
         m_rotation.y = -(newYRotation - 90);
         m_rotation.x =  position.x < point.x ? -newXRotation : newXRotation;
     }
 
     void AddRotation() {
-        vec2 addRotation = vec2(0.0f, 0.0f);
+        glm::vec2 addRotation = glm::vec2(0.0f, 0.0f);
         float speed = m_mode == CAMERA_MODE::Fps ? 1.f : m_rotation_speed;
         bool key_pressed = m_pressed[Left] || m_pressed[Right] || m_pressed[Up] || m_pressed[Down];
         if (!key_pressed && (m_rotation_inertia.x != 0 || m_rotation_inertia.y != 0)){
@@ -135,7 +135,7 @@ public:
         else if (m_rotation_inertia.x < -1.f) m_rotation_inertia.x = -1.f;
         if (m_rotation_inertia.y > 1.f) m_rotation_inertia.y = 1.f;
         else if (m_rotation_inertia.y < -1.f) m_rotation_inertia.y = -1.f;
-        glm::vec2 rot = vec2(speed*m_rotation_inertia.x, speed*m_rotation_inertia.y);
+        glm::vec2 rot = glm::vec2(speed*m_rotation_inertia.x, speed*m_rotation_inertia.y);
         addRotation += rot;
 
         m_rotation += addRotation;
@@ -221,14 +221,14 @@ private:
             /* We need to do this in order to be able to walk when looking up. */
             rot_y = 0.0;
         }
-        vec3 tmp = vec3(-sin(radians(rot_y + 90.0f)) * sin(radians(m_rotation.x)),
-                        -cos(radians(rot_y + 90.0f)),
-                        sin(radians(rot_y + 90.0f)) * cos(radians(m_rotation.x)));
+        glm::vec3 tmp = glm::vec3(-sin(glm::radians(rot_y + 90.0f)) * sin(glm::radians(m_rotation.x)),
+                        -cos(glm::radians(rot_y + 90.0f)),
+                        sin(glm::radians(rot_y + 90.0f)) * cos(glm::radians(m_rotation.x)));
         return normalize(tmp);
     }
 
     void _update_acc() {
-        vec3 fwdDirection = getForwardDirection();
+        glm::vec3 fwdDirection = getForwardDirection();
         if (m_pressed[Forward] && !m_pressed[Backward]) {
             forceSpeedDirectionAlongAcceleration(fwdDirection);
         }
@@ -237,7 +237,7 @@ private:
         }
         else {
             if (isMoving()) {
-                vec3 currentSpeed = getSpeedVector();
+                glm::vec3 currentSpeed = getSpeedVector();
                 float direction = dot(currentSpeed, fwdDirection);
                 if (direction < 0) {
                     forceSpeedDirectionAlongAcceleration(fwdDirection);

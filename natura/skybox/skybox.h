@@ -234,7 +234,7 @@ class SkyBox {
 
 
             // setup MVP
-            mat4 model = scale(model_matrix_, vec3(100.0f));
+            glm::mat4 model = scale(model_matrix_, glm::vec3(100.0f));
 
             glm::mat4 MVP = view_projection * model;
             GLuint MVP_id = glGetUniformLocation(program_id_, "MVP");

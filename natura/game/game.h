@@ -3,7 +3,6 @@
 #include "../projection.h"
 #include "../camera/camera.h"
 #include "../perlin_noise/perlinnoise.h"
-#include "../trackball.h"
 #include "../../external/glm/detail/type_mat.hpp"
 #include "../skybox/skybox.h"
 #include "../terrain/terrain.h"
@@ -93,16 +92,8 @@ public:
     }
 
 private:
-
-    enum CameraMode {
-        FLYTHROUGH, FPS
-    };
-
-
-    double m_last_mouse_xpos, m_last_mouse_ypos;
     float m_last_time_tick;
     float m_last_time_frame;
-
 
     /* Window size */
     int m_window_width;
@@ -114,8 +105,6 @@ private:
     glm::mat4 m_grid_model_matrix;
     Projection *m_projection;
     float m_fps_sensitivity = 0.1;
-
-    Trackball *m_trackball;
 
     /* Perlin noise generator for the game. */
     PerlinNoise *m_perlinNoise;
@@ -140,15 +129,13 @@ private:
 
     FrameBuffer framebufferFloor;
 
-    bool m_reverse = false;
-
     /* Shadows. */
     GLuint m_default_pid; /* Default pid. */
     ShadowBuffer m_shadow_buffer;
     GLuint m_shadow_pid;      // Handle for the shadow map genration shader program
     GLuint m_depth_tex;       // Handle for the shadow map
-    vec3 m_light_dir;         // Direction towards the light
-    mat4 m_light_projection;  // Projection matrix for light source
+    glm::vec3 m_light_dir;         // Direction towards the light
+    glm::mat4 m_light_projection;  // Projection matrix for light source
     bool m_show_shadow = false;
     bool m_do_pcf = true;
     float m_bias = 0.0f;
@@ -163,33 +150,18 @@ private:
 
     /* Private function. */
     void Init() {
-        const bool top_down_view = false;
-
         const int TERRAIN_SIZE = TERRAIN_CHUNK_SIZE;
         const int VERT_PER_GRID_SIDE = 8;
         const float cam_posxy = TERRAIN_SCALE * ((float) (TERRAIN_SIZE * CHUNK_SIDE_TILE_COUNT)) / 2.0f;
 
-        vec3 starting_camera_position;
-        vec2 starting_camera_rotation;
-        if (top_down_view) {
-            //starting_camera_position = vec3(0.0f, -10.0f, -0.0f);
-           // starting_camera_rotation = vec2(0.0f, 45.0f);
-           starting_camera_position = vec3(-cam_posxy, -10.0f, -cam_posxy);
-            starting_camera_rotation = vec2(45.0f, 35.0f);
-        }
-        else {
-            starting_camera_position = vec3(-cam_posxy, -5.0f, -cam_posxy);
-            starting_camera_rotation = vec2(-180.0f, 30.0f);
-        }
-
-        m_trackball = new Trackball();
+        glm::vec3 starting_camera_position = glm::vec3(-cam_posxy, -5.0f, -cam_posxy);
+        glm::vec2 starting_camera_rotation = glm::vec2(-180.0f, 30.0f);
 
         m_projection = new Projection(45.0f, (GLfloat) m_window_width / m_window_height, 0.025f, 400.0f);
         m_perlinNoise = new PerlinNoise(m_window_width, m_window_height, glm::vec2(TERRAIN_SIZE, TERRAIN_SIZE));
 
         m_terrain = new Terrain(TERRAIN_SIZE, VERT_PER_GRID_SIDE, m_perlinNoise);
         m_camera = new Camera(starting_camera_position, starting_camera_rotation, m_terrain);
-        //m_camera->enableFpsMode();
 
         // sets background color b
         glClearColor(0, 0, 0/*gray*/, 1.0 /*solid*/);
@@ -198,18 +170,16 @@ private:
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_MULTISAMPLE);
         m_grid_model_matrix = IDENTITY_MATRIX;
-        //m_grid_model_matrix = translate(m_grid_model_matrix, vec3(-4.0f, -0.25f, -4.0f));
-        m_grid_model_matrix = scale(m_grid_model_matrix, vec3(TERRAIN_SCALE, TERRAIN_SCALE, TERRAIN_SCALE));
+        m_grid_model_matrix = scale(m_grid_model_matrix, glm::vec3(TERRAIN_SCALE, TERRAIN_SCALE, TERRAIN_SCALE));
 
 
-        //int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
-        BASE_TILE = new Grid(VERT_PER_GRID_SIDE, glm::vec2(0, 0));
+        BASE_TILE = new Grid(VERT_PER_GRID_SIDE);
         BASE_TILE->Init(0);
         m_perlinNoise->Init();
         GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
 
-        m_light_dir = vec3(0.0, m_light_height, 0.0);
+        m_light_dir = glm::vec3(0.0, m_light_height, 0.0);
         m_light_dir = normalize(m_light_dir);
         m_default_pid = BASE_TILE->getPID();
         if(!m_default_pid) {
@@ -227,14 +197,8 @@ private:
 
         glViewport(0,0,m_window_width,m_window_height);
 
-        float ratio = m_window_width / (float) m_window_height;
-
-        // Orthographic projection, assuming directional light.
-        //float ext = 1500.0f;
-        //m_light_projection = ortho(-ext, ext, -ext, ext, -10.f, ext);
-
         // Matrix that can be used to move a point's components from [-1, 1] to [0, 1].
-        m_offset_matrix = mat4(0.5f, 0.0f, 0.0f, 0.0f,
+        m_offset_matrix = glm::mat4(0.5f, 0.0f, 0.0f, 0.0f,
                              0.0f, 0.5f, 0.0f, 0.0f,
                              0.0f, 0.0f, 0.5f, 0.0f,
                              0.5f, 0.5f, 0.5f, 1.0f);
@@ -262,25 +226,21 @@ private:
 
 
         glm::vec3 tmp = -m_camera->getPosition();
-        m_light_dir = vec3(tmp.x+25, m_light_height, tmp.z-25);
-        //m_light_dir = normalize(m_light_dir);
+        m_light_dir = glm::vec3(tmp.x+25, m_light_height, tmp.z-25);
+
         float ext = 60.0f;
-        m_light_projection = ortho(-ext, ext, -ext, ext, -ext, 2*ext);
+        m_light_projection = glm::ortho(-ext, ext, -ext, ext, -ext, 2*ext);
         //draw as often as possible
 
         // First the shadow map.
+        glm::vec3 up(0.0f, 1.0f, 0.0f);
+        glm::mat4 light_view = lookAt(m_light_dir, glm::vec3(tmp.x, 0, tmp.z),
+                                 up);
         if (m_show_shadow) {
             glUseProgram(m_shadow_pid);
             m_shadow_buffer.Bind();
 
-            vec3 up(0.0f, 1.0f, 0.0f);
-            if (abs(dot(m_light_dir, up)) > 0.99) {
-                //up = vec3(0.0f, 0.0f, 1.0f);
-            }
-            //glm::vec3 eye = -glm::vec3(4*m_light_dir.x, 4*m_light_dir.y, 4*m_light_dir.z);
-            mat4 light_view = lookAt(m_light_dir, glm::vec3(tmp.x, 0, tmp.z),
-                                     up);
-            mat4 depth_vp = m_light_projection * light_view;
+            glm::mat4 depth_vp = m_light_projection * light_view;
             glUniformMatrix4fv(glGetUniformLocation(m_shadow_pid, "depth_vp"),
                                1,
                                GL_FALSE, value_ptr(depth_vp));
@@ -302,10 +262,10 @@ private:
                          value_ptr(m_light_dir));
 
             // Set matrix to transform from world space into NDC and then into [0, 1] ranges.
-            mat4 depth_vp_offset = m_offset_matrix * depth_vp;
+            glm::mat4 depth_vp_offset = m_offset_matrix * depth_vp;
             glUniformMatrix4fv(
                     glGetUniformLocation(m_default_pid, "depth_vp_offset"), 1,
-                    GL_FALSE, value_ptr(depth_vp_offset));
+                    GL_FALSE, glm::value_ptr(depth_vp_offset));
 
             glUniform1f(glGetUniformLocation(m_default_pid, "bias"), m_bias);
 
@@ -336,9 +296,9 @@ private:
                             m_projection->perspective());
         }
         else {
-           /* m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, false, m_grid_model_matrix,
+            m_terrain->Draw(m_amplitude, time, m_camera->getPosition(), false, false, m_grid_model_matrix,
                             light_view,
-                            m_light_projection);*/
+                            m_light_projection);
         }
 
         m_terrain->ExpandTerrain(m_camera->getPosition());
@@ -362,8 +322,6 @@ private:
         if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
             double x_i, y_i;
             glfwGetCursorPos(window, &x_i, &y_i);
-            m_last_mouse_xpos = x_i;
-            m_last_mouse_ypos = y_i;
         }
     }
 
@@ -373,13 +331,11 @@ private:
         double y = message->getCoordY();
         double diffx = x - m_window_width / 2; //check the difference between the current x and the last x position
         double diffy = y - m_window_height / 2; //check the difference between the current y and the last y position
-        m_last_mouse_xpos = x; //set lastx to the current x position
-        m_last_mouse_ypos = y; //set lasty to the current y position
         float xrot =
                 (float) diffx * 0.1f; //set the xrot to xrot with the addition of the difference in the y position
         float yrot =
                 (float) diffy * 0.1f;// set the xrot to yrot with the addition of the difference in the x position
-        vec2 tmp = vec2(xrot * m_fps_sensitivity, yrot * m_fps_sensitivity);
+        glm::vec2 tmp = glm::vec2(xrot * m_fps_sensitivity, yrot * m_fps_sensitivity);
         m_camera->AddRotationFPS(tmp);
         glfwSetCursorPos(window, m_window_width / 2, m_window_height / 2);
     }

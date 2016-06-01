@@ -20,5 +20,4 @@ public:
 private:
     PerlinNoise *m_perlin_noise;
     uint32_t m_tile_side_size;
-    GLuint m_grass_program_id;
 };

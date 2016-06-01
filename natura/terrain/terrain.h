@@ -40,7 +40,6 @@ public:
               const glm::mat4 &view = IDENTITY_MATRIX,
               const glm::mat4 &projection = IDENTITY_MATRIX) {
 
-        //m_axis.Draw(glm::translate(model, m_axis_pos), view, projection);
         m_amplitude = amplitude;
 
         m_skybox->Draw(projection * view * glm::translate(model, -cam_pos / TERRAIN_SCALE));
@@ -82,9 +81,6 @@ public:
 
     void ExpandTerrain(glm::vec3 camera_position) {
         const uint32_t edge_threshold = 4;
-        /* Redo: Used if the camera is too far away from the terrain so that we need to expand multiple time. */
-        bool redo = false;
-        //do {
         glm::vec3 cam_pos = camera_position;
         cam_pos = -cam_pos;
         glm::vec3 old = cam_pos;
@@ -103,10 +99,6 @@ public:
         else if (cam_pos.x > m_chunks.size() - 1 - edge_threshold) {
             _expand(Terrain::Direction::EST);
         }
-        else {
-            redo = false;
-        }
-        //}while (redo);
     }
 
     float getHeight(glm::vec2 pos) {

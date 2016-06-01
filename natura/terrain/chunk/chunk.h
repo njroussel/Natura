@@ -36,13 +36,13 @@ private :
     float m_minZpos;
     float m_maxZpos;
     PerlinNoise *m_perlin_noise;
-    vec2 m_chunck_pos;
+    glm::vec2 m_chunck_pos;
 
 
 public :
 
 
-    Grass(vec2 chunck_pos, float fGrassPatchOffsetMin, float fGrassPatchOffsetMax,
+    Grass(glm::vec2 chunck_pos, float fGrassPatchOffsetMin, float fGrassPatchOffsetMax,
           float fGrassPatchHeight,
           PerlinNoise *perlinNoise) {
         m_fGrassPatchOffsetMin = fGrassPatchOffsetMin;
@@ -87,7 +87,7 @@ public :
                     vCurPatchPos.z += m_fGrassPatchOffsetMin +
                                       (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
                     try {
-                        vCurPatchPos.y = getHeight(vec2(vCurPatchPos.x, vCurPatchPos.z));
+                        vCurPatchPos.y = getHeight(glm::vec2(vCurPatchPos.x, vCurPatchPos.z));
                         if (vCurPatchPos.y >= -0.3 && vCurPatchPos.y <= 0.1f) {
                             m_grass_triangles_count += 1;
                             vertex_point.push_back(vCurPatchPos.x);
@@ -280,7 +280,7 @@ public:
     Chunk(glm::vec2 pos, uint32_t quad_res, PerlinNoise *perlinNoise) {
         m_position = pos;
         m_perlin_noise = perlinNoise;
-        //m_grass = new Grass(pos, 0.24f, 0.38f, 0.4f, perlinNoise);
+        m_grass = new Grass(pos, 0.24f, 0.38f, 0.4f, perlinNoise);
     }
 
     ~Chunk() { }
@@ -288,7 +288,7 @@ public:
     void Init() {
         m_perlin_noise->attach(this);
         m_chunk_noise_tex_id = m_perlin_noise->generateNoise(glm::vec2(m_position.x, m_position.y));
-        //m_grass->Init();
+        m_grass->Init();
     }
 
     void Draw(float amplitude, float time, float water_height, GLuint left_tex, GLuint low_tex, GLuint low_left_tex,
@@ -316,7 +316,7 @@ public:
                                 view, projection);
             }
         }
-        //m_grass->Draw(amplitude, time, model, view, projection);
+        m_grass->Draw(amplitude, time, model, view, projection);
 
     }
 
@@ -326,7 +326,6 @@ public:
 
     virtual void update(Message *msg) {
         if (msg->getType() == Message::Type::PERLIN_PROP_CHANGE) {
-            //glDeleteTextures(1, (GLuint *) (&m_chunk_noise_tex_id));
             m_chunk_noise_tex_id = m_perlin_noise->generateNoise(m_position);
         }
         else {

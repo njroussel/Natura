@@ -19,7 +19,6 @@ public:
             m_frame_buffers.push_back(std::deque<FrameBuffer> (static_cast<unsigned long> (cache_size.x), FrameBuffer()));
         }
         m_terrain_offset = glm::vec2(0,0);
-        m_cache_size = cache_size;
     }
 
     void Init(){
@@ -40,7 +39,6 @@ public:
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         quad.Draw(IDENTITY_MATRIX, m_H, m_frequency, m_lacunarity, m_offset, m_octaves, displ);
         frameBuffer->Unbind();
-        //frameBuffer.Cleanup();
         return tex;
     }
 
@@ -137,7 +135,6 @@ public:
 private:
     std::deque<std::deque<FrameBuffer> > m_frame_buffers;
     glm::vec2 m_terrain_offset;
-    glm::vec2 m_cache_size;
     uint32_t mWidth;
     uint32_t mHeight;
     PerlinQuad quad;

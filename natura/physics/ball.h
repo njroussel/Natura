@@ -9,12 +9,11 @@
 class Ball : public MaterialPoint, public Subject{
 
 public:
-    Ball(vec3 starting_position, vec3 starting_vector, Terrain *terrain) : MaterialPoint(1.0, 2.3f, starting_position) {
+    Ball(glm::vec3 starting_position, glm::vec3 starting_vector, Terrain *terrain) : MaterialPoint(2.3f, starting_position) {
         m_terrain = terrain;
-        m_max_distance = 3.0f;
         m_speed = 0.4f * starting_vector;
         m_frozen = false;
-        this->setAccelerationVector(vec3(0, -1.0f, 0));
+        this->setAccelerationVector(glm::vec3(0, -1.0f, 0));
 
         string error;
         // obj files can contains material informations
@@ -100,7 +99,7 @@ public:
         glUniform3fv(Ls_id, ONE, glm::value_ptr(Ls));
     }
 
-    void tick(vec3 referencePoint) {
+    void tick(glm::vec3 referencePoint) {
         if (length(m_speed) < 0.01f || m_frozen) {
             if (!m_frozen){
                 m_frozen = true;
@@ -119,24 +118,24 @@ public:
                 float terrainHeight = m_terrain->getHeight(glm::vec2(m_position.x, m_position.z));
                 if (m_position.y < terrainHeight) {
                     float epsilon = 0.005f;
-                    float zDiffXaxis = m_terrain->getHeight(vec2(m_position.x + epsilon, m_position.z)) -
-                                       m_terrain->getHeight(vec2(m_position.x - epsilon, m_position.z));
+                    float zDiffXaxis = m_terrain->getHeight(glm::vec2(m_position.x + epsilon, m_position.z)) -
+                                       m_terrain->getHeight(glm::vec2(m_position.x - epsilon, m_position.z));
 
-                    float zDiffYaxis = m_terrain->getHeight(vec2(m_position.x, m_position.z + epsilon)) -
-                                       m_terrain->getHeight(vec2(m_position.x, m_position.z - epsilon));
+                    float zDiffYaxis = m_terrain->getHeight(glm::vec2(m_position.x, m_position.z + epsilon)) -
+                                       m_terrain->getHeight(glm::vec2(m_position.x, m_position.z - epsilon));
 
-                    vec3 normal = -normalize(
-                            cross(vec3(2 * epsilon, zDiffXaxis, 0.0f), vec3(0.0, zDiffYaxis, 2 * epsilon)));
-                    vec3 m = m_speed - dot(m_speed, normal) * normal;
-                    vec3 endpoint = m_position + m + m;
-                    vec3 new_speed = endpoint - (m_position + m_speed);
+                    glm::vec3 normal = -glm::normalize(
+                            glm::cross(glm::vec3(2 * epsilon, zDiffXaxis, 0.0f), glm::vec3(0.0, zDiffYaxis, 2 * epsilon)));
+                    glm::vec3 m = m_speed - dot(m_speed, normal) * normal;
+                    glm::vec3 endpoint = m_position + m + m;
+                    glm::vec3 new_speed = endpoint - (m_position + m_speed);
                     new_speed.y = -m_speed.y;
                     float curr_speed = length(m_speed);
                     if (curr_speed < 0.01f) {
-                        m_speed = vec3(0.0f);
+                        m_speed = glm::vec3(0.0f);
                     }
                     else {
-                        m_position = vec3(m_position.x, terrainHeight, m_position.z);
+                        m_position = glm::vec3(m_position.x, terrainHeight, m_position.z);
                         m_speed = normalize(new_speed) * curr_speed * 0.7f;
                     }
                 }
@@ -162,7 +161,7 @@ public:
 
         glm::mat4 M = model;
         M = glm::translate(model, m_position);
-        M = glm::scale(M, vec3(0.1f));
+        M = glm::scale(M, glm::vec3(0.1f));
 
         glUseProgram(m_program_id);
         glBindVertexArray(m_vertex_array_id);
@@ -218,7 +217,6 @@ private:
     GLuint m_vertex_normal_buffer_object;    // memory buffer
     GLuint m_vertex_array_id;                // vertex array object
     GLuint m_program_id;
-    float m_max_distance;
     bool m_frozen;
     float m_froze_time;
     Terrain *m_terrain;

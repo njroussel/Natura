@@ -25,22 +25,17 @@ private:
     GLuint texture_sand_id_;                // texture ID
     GLuint texture_deep_water_id_;                // texture ID
     GLuint num_indices_;                    // number of vertices to render
-    GLuint M_id_;                           // model matrix ID
-    GLuint V_id_;                           // view matrix ID
-    GLuint P_id_;                           // proj matrix ID
     uint32_t mSideNbPoints;                 // grids side X nb of vertices;
     bool mCleanedUp;                        // check if the grid is cleaned before its destruction.
-    glm::vec2 m_indices;                    // Tile indices on the terrain.
     GLuint m_shadow_pid;
     bool m_use_shadows = false;                     // true if we need to generate the Z-buffe
     GLuint m_depth_tex;
 
 public:
 
-    Grid(uint32_t sideSize, glm::vec2 indices) {
+    Grid(uint32_t sideSize) {
         mSideNbPoints = sideSize;
         mCleanedUp = true;
-        m_indices = indices;
     }
 
     ~Grid() {
@@ -191,11 +186,6 @@ public:
             glUniform3fv(kd_id, ONE, glm::value_ptr(kd));
             glUniform3fv(ks_id, ONE, glm::value_ptr(ks));
             glUniform1f(alpha_id, alpha);
-
-            // other uniforms
-            M_id_ = glGetUniformLocation(program_id_, "model");
-            V_id_ = glGetUniformLocation(program_id_, "view");
-            P_id_ = glGetUniformLocation(program_id_, "projection");
         }
 
         //binding perlin texture

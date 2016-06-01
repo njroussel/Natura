@@ -7,9 +7,8 @@
 class MaterialPoint {
 public:
 
-    MaterialPoint(float mass, float max_speed, glm::vec3 initial_pos = glm::vec3(0, 0, 0)) : m_acceleration(0, 0, 0), m_speed(0, 0, 0) {
+    MaterialPoint(float max_speed, glm::vec3 initial_pos = glm::vec3(0, 0, 0)) : m_acceleration(0, 0, 0), m_speed(0, 0, 0) {
         m_position = initial_pos;
-        m_mass = mass;
         m_max_speed = max_speed;
     }
 
@@ -22,13 +21,13 @@ public:
             m_max_speed = max_speed;
     }
 
-    void setAccelerationVector(vec3 acc){
+    void setAccelerationVector(glm::vec3 acc){
         m_acceleration = acc;
     }
 
     void forceSpeedDirectionAlongAcceleration(glm::vec3 acc) {
         float curr_speed = length(m_speed);
-        m_acceleration = normalize(vec3(acc.x, acc.y, acc.z));
+        m_acceleration = glm::normalize(glm::vec3(acc.x, acc.y, acc.z));
         float theta = dot(m_acceleration, m_speed) / curr_speed;
         if (theta < 0) {
             m_speed = glm::vec3(-m_acceleration.x * curr_speed,
@@ -69,7 +68,6 @@ public:
     }
 
 protected:
-    float m_mass;
     float m_max_speed;
     glm::vec3 m_acceleration;
     glm::vec3 m_speed;

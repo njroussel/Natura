@@ -32,9 +32,6 @@ class ShadowBuffer {
                     previous_viewport_[2], previous_viewport_[3]);
         }
 
-        // TODO: Analyze this function to understand how to create an FBO
-        //       with only a depth attachment and without writing to any
-        //       color buffer.
         int Init() {
             // create color attachment
             {
@@ -50,11 +47,6 @@ class ShadowBuffer {
 
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
                 glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-                //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                //glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            //    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-              //  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
             }
 
             // tie it all together
@@ -68,8 +60,6 @@ class ShadowBuffer {
                     != GL_FRAMEBUFFER_COMPLETE)
                     std::cerr << "!!!ERROR: Framebuffer not OK :(" << std::endl;
 
-                // TODO: Note that writing to any color is disabled,
-                //       only depth is written.
                 glDrawBuffer(GL_NONE);
                 glBindFramebuffer(GL_FRAMEBUFFER, 0);
             }

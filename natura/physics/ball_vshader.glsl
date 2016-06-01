@@ -20,18 +20,12 @@ void main() {
     distance_camera = length(vpoint_mv);
 
 
-    ///>>>>>>>>>> TODO >>>>>>>>>>>
-    /// TODO 1.1: Phong shading.
-    /// 1) compute normal_mv using the model_view matrix.
     normal_mv = (inverse(transpose(MV)) * vec4(vnormal, 1.0f)).xyz;
     normal_mv = normalize(normal_mv);
 
-    /// 2) compute the light direction light_dir.
     light_dir = -vpoint_mv.xyz;
     light_dir = normalize(light_dir);
 
-    /// 3) compute the view direction view_dir.
     view_dir = -vpoint_mv.xyz;
     view_dir  = normalize(view_dir);
-    ///<<<<<<<<<< TODO <<<<<<<<<<<
 }

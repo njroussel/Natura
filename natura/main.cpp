@@ -5,8 +5,12 @@
 // contains helper functions such as shader compiler
 #include "icg_helper.h"
 
-#include "trackball.h"
 #include "game/game.h"
+
+/* The following includes are not useful. But if you are using CLion not adding
+ * them will throw you errors in all the following files (even though the code
+ * compiles just fine.).
+ */
 #include "misc/io/input/handlers/keyboard/keyboard_handler.h"
 #include "misc/io/input/handlers/mouse/mouse_button_handler.h"
 #include "misc/io/input/handlers/mouse/mouse_cursor_handler.h"
