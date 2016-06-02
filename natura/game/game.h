@@ -205,9 +205,13 @@ private:
         //int perlinNoiseTex = perlinNoise.generateNoise(H, frequency, lacunarity, offset, octaves);
         BASE_TILE = new Grid(VERT_PER_GRID_SIDE, glm::vec2(0, 0));
         BASE_TILE->Init(0);
+
         m_perlinNoise->Init();
         GLuint fb_tex = framebufferFloor.Init(m_window_width, m_window_height, GL_RGB8);
         m_terrain->Init(fb_tex);
+
+        BASE_GRASS = new Grass(0.1f, 0.2f, 0.4f);
+        BASE_GRASS->Init();
 
         m_light_dir = vec3(0.0, m_light_height, 0.0);
         m_light_dir = normalize(m_light_dir);

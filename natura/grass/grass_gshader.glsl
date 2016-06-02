@@ -10,6 +10,7 @@ uniform	mat4 view;
 
 out vec2 vTexCoord;
 out float distance_camera;
+out float hOut;
 
 uniform float time;
 
@@ -90,6 +91,7 @@ void main()
 		gl_Position = mMVP*vec4(vTL, 1.0);
 		distance_camera = length(mMV *vec4(vTL, 1.0));
 		vTexCoord = vec2(fTCStartX, 1.0);
+		hOut = vTL.y;
 		EmitVertex();
 
 		// Grass patch bottom left vertex
@@ -97,6 +99,7 @@ void main()
 		distance_camera = length(mMV *vec4(vBL, 1.0));
 		gl_Position = mMVP*vec4(vBL, 1.0);
 		vTexCoord = vec2(fTCStartX, 0.0);
+		hOut = vBL.y;
 		EmitVertex();
 
 		// Grass patch top right vertex
@@ -105,6 +108,7 @@ void main()
 		gl_Position = mMVP*vec4(vTR, 1.0);
 		distance_camera = length(mMV *vec4(vTR, 1.0));
 		vTexCoord = vec2(fTCEndX, 1.0);
+		hOut = vTR.y;
 		EmitVertex();
 
 		// Grass patch bottom right vertex
@@ -112,6 +116,7 @@ void main()
 		gl_Position = mMVP*vec4(vBR, 1.0);
 		distance_camera = length(mMV *vec4(vBR, 1.0));
 		vTexCoord = vec2(fTCEndX, 0.0);
+		hOut = vBR.y;
 		EmitVertex();
 
 		EndPrimitive();
