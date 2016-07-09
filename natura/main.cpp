@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
     // note some Intel GPUs do not support OpenGL 3.2
     // note update the driver of your graphic card
     GLFWwindow *window = glfwCreateWindow(window_width, window_height,
-                                          "Trackball", NULL, NULL);
+                                          "Natura", NULL, NULL);
     if (!window) {
         glfwTerminate();
         return EXIT_FAILURE;

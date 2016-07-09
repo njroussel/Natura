@@ -4,9 +4,12 @@
 
 in vec2 vTexCoord;
 in float distance_camera;
+in float hOut;
+
 out vec4 color;
 
 uniform sampler2D gSampler;
+uniform float amplitude;
 uniform vec4 vColor;
 uniform float fAlphaMultiplier;
 
@@ -14,6 +17,10 @@ void main()
 {
     vec4 vTexColor = texture2D(gSampler, vec2(vTexCoord.x, -vTexCoord.y));
     float fNewAlpha = vTexColor.a;
+    float height = hOut / amplitude;
+    if(height > 0.07f || height < -0.3f){
+        discard;
+    }
     if(fNewAlpha < 0.1f) {
         discard;
     }
