@@ -36,8 +36,6 @@ private :
     float m_maxZpos;
 
 
-
-
 public :
 
     Grass(float fGrassPatchOffsetMin, float fGrassPatchOffsetMax, float fGrassPatchHeight) {
@@ -80,11 +78,11 @@ public :
                     vCurPatchPos.z += m_fGrassPatchOffsetMin +
                                       (m_fGrassPatchOffsetMax - m_fGrassPatchOffsetMin) * rand() / float(RAND_MAX);
                     try {
-
                         m_grass_triangles_count += 1;
                         vertex_point.push_back(vCurPatchPos.x);
                         vertex_point.push_back(vCurPatchPos.y);
                         vertex_point.push_back(vCurPatchPos.z);
+
                     }
                     catch (std::runtime_error e) {
 
